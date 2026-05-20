@@ -21,10 +21,13 @@ body {
   -webkit-font-smoothing:antialiased; padding:16px 20px 20px;
 }
 
-/* ── Week selector ── */
-.week-nav {
-  display:flex; align-items:center; gap:10px; margin-bottom:16px;
-  flex-wrap:wrap;
+/* ── Week bar (nav + progress) ── */
+.week-progress-bar {
+  display:flex; align-items:center; gap:8px; margin-bottom:16px;
+  padding:10px 16px;
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-sm); flex-wrap:wrap;
 }
 .week-nav-btn {
   width:32px; height:32px; border-radius:var(--radius-sm);
@@ -37,7 +40,7 @@ body {
 .week-nav-btn:hover { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
 .week-label {
   font-size:.93em; font-weight:650; color:var(--text);
-  min-width:160px; text-align:center;
+  min-width:150px; text-align:center;
 }
 .week-today-btn {
   background:var(--blue); color:#fff; border:none;
@@ -49,16 +52,6 @@ body {
 .week-today-btn:hover { opacity:.85; }
 
 /* ── Week progress dots ── */
-.week-progress-bar {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 16px; margin-bottom:16px;
-  background:rgba(255,255,255,var(--card-alpha));
-  border:1px solid var(--border); border-radius:var(--radius);
-  box-shadow:var(--shadow-sm);
-}
-.week-progress-bar .wlabel {
-  font-size:.88em; font-weight:650; color:var(--text); white-space:nowrap;
-}
 .week-progress-bar .wdots {
   display:flex; gap:5px; align-items:center; flex:1; justify-content:center;
 }
@@ -178,20 +171,14 @@ body {
 </head>
 <body>
 
-<!-- Week selector -->
-<div class="week-nav">
+<!-- Week bar: nav + progress + today -->
+<div class="week-progress-bar">
   <button class="week-nav-btn" onclick="navWeek(-1)" title="上一周">&lt;</button>
   <span class="week-label" id="week-label"></span>
   <button class="week-nav-btn" onclick="navWeek(1)" title="下一周">&gt;</button>
-  <span style="flex:1"></span>
-  <button class="week-today-btn" onclick="goToday()">今天</button>
-</div>
-
-<!-- Week progress dots -->
-<div class="week-progress-bar">
-  <span class="wlabel">本周</span>
   <div class="wdots" id="week-progress-dots"></div>
   <span class="wcount" id="week-progress-count"></span>
+  <button class="week-today-btn" onclick="goToday()">今天</button>
 </div>
 
 <div class="day-strip" id="day-strip"></div>
