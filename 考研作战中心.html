@@ -201,6 +201,37 @@
     transform:translateY(-2px);
     box-shadow:0 6px 20px rgba(37,99,235,.20);
   }
+
+  /* ── Settings panel (sidebar layout) ── */
+  .set-panel-body { display:flex; flex:1; overflow:hidden; min-height:0; }
+  .set-panel-nav {
+    display:flex; flex-direction:column;
+    min-width:90px; border-right:1px solid var(--border);
+    padding:8px 0; flex-shrink:0;
+  }
+  .set-panel-nav button {
+    background:none; border:none; color:var(--text2);
+    padding:10px 16px; text-align:left; cursor:pointer;
+    font-size:.82em; font-family:inherit;
+    transition:all .15s; white-space:nowrap;
+    border-left:2px solid transparent;
+  }
+  .set-panel-nav button:hover { color:var(--text); background:var(--bg-alt); }
+  .set-panel-nav button.active {
+    color:var(--blue); background:var(--blue-bg);
+    border-left-color:var(--blue);
+  }
+  @media (prefers-color-scheme:dark) {
+    .set-panel-nav button.active { background:var(--blue-bg); }
+  }
+  .set-panel-content {
+    flex:1; overflow-y:auto; padding:18px 22px; min-height:0;
+  }
+  .set-panel-content::-webkit-scrollbar { width:5px; }
+  .set-panel-content::-webkit-scrollbar-track { background:transparent; }
+  .set-panel-content::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+  .set-panel-section { display:none; }
+  .set-panel-section.active { display:block; animation:fadeSlideIn .25s ease; }
 </style>
 <body>
 
@@ -278,50 +309,67 @@
 </div>
 
 
-<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;">
-  <div style="background:var(--card-bg, #fff);border-radius:14px;padding:32px;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.15);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-      <h2 style="margin:0;font-size:1.2em;">⚙️ 外观设置</h2>
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;" onclick="if(event.target===this)toggleSettings()">
+  <div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:14px;max-width:620px;width:92%;height:65vh;max-height:80vh;box-shadow:0 8px 40px rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <h2 style="margin:0;font-size:1.1em;">⚙️ 设置</h2>
       <button class="btn btn-sm btn-secondary" onclick="toggleSettings()">✕</button>
     </div>
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🖼 背景图片URL</label>
-    <div style="display:flex;gap:8px;margin-bottom:6px;">
-      <input id="bg-url" type="text" placeholder="https://... 或本地路径" style="flex:1;font-family:inherit;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;background:var(--bg);color:var(--text);">
+    <div class="set-panel-body">
+      <div class="set-panel-nav">
+        <button class="active" data-stab="appearance" onclick="switchSettingsTab('appearance')">🎨 外观</button>
+        <button data-stab="layout" onclick="switchSettingsTab('layout')">📋 布局</button>
+        <button data-stab="homepage" onclick="switchSettingsTab('homepage')">🏠 首页</button>
+        <button data-stab="data" onclick="switchSettingsTab('data')">💾 数据</button>
+      </div>
+      <div class="set-panel-content">
+        <!-- 外观 -->
+        <div class="set-panel-section active" id="ssec-appearance">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🖼 背景图片URL</label>
+          <div style="display:flex;gap:8px;margin-bottom:6px;">
+            <input id="bg-url" type="text" placeholder="https://... 或本地路径" style="flex:1;font-family:inherit;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;background:var(--bg);color:var(--text);">
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:20px;">
+            <button class="btn btn-sm btn-primary" onclick="applyBg()">应用</button>
+            <button class="btn btn-sm btn-secondary" onclick="clearBg()">清除</button>
+          </div>
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🌫 遮罩不透明度: <span id="overlay-val">35%</span></label>
+          <input id="bg-overlay" type="range" min="0" max="100" value="35" oninput="document.getElementById('overlay-val').textContent=this.value+'%';applyOverlay(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🔮 模糊强度: <span id="blur-val">0px</span></label>
+          <input id="bg-blur" type="range" min="0" max="20" value="0" oninput="document.getElementById('blur-val').textContent=this.value+'px';applyBlur(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">📐 卡片透明度</label>
+          <input id="card-alpha" type="range" min="50" max="100" value="92" oninput="applyAlpha(this.value)" style="width:100%;accent-color:var(--blue);">
+          <p style="font-size:.76em;color:var(--text3);margin-top:12px;">设置自动保存。背景图对全部页面生效。</p>
+        </div>
+        <!-- 布局 -->
+        <div class="set-panel-section" id="ssec-layout">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:10px;">📋 Tab 顺序</label>
+          <p style="font-size:.76em;color:var(--text3);margin-bottom:10px;">拖拽上下调整导航栏的 Tab 排列顺序。</p>
+          <div id="tab-order-list"></div>
+          <div style="margin-top:10px;">
+            <button class="btn btn-sm btn-secondary" onclick="resetTabOrder()">重置默认顺序</button>
+          </div>
+        </div>
+        <!-- 首页 -->
+        <div class="set-panel-section" id="ssec-homepage">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">🏠 网站首页</label>
+          <select id="homepage-tab-select" onchange="saveHomepage()" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;font-family:inherit;background:var(--bg);color:var(--text);margin-bottom:8px;">
+            <option value="">上次关闭的页面</option>
+          </select>
+          <p style="font-size:.76em;color:var(--text3);">每次打开网站时默认显示的页面。选"上次关闭的页面"则恢复上次浏览位置。</p>
+        </div>
+        <!-- 数据 -->
+        <div class="set-panel-section" id="ssec-data">
+          <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">💾 数据存档</label>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <button class="btn btn-sm btn-primary" onclick="exportAll()">📥 导出全部</button>
+            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('import-file').click()">📤 导入恢复</button>
+            <input type="file" id="import-file" accept=".json" onchange="importAll(this)" style="display:none;">
+          </div>
+          <p style="font-size:.76em;color:var(--text3);">导出包含每日复盘、周总结、设置等全部数据。</p>
+        </div>
+      </div>
     </div>
-    <div style="display:flex;gap:6px;margin-bottom:20px;">
-      <button class="btn btn-sm btn-primary" onclick="applyBg()">应用</button>
-      <button class="btn btn-sm btn-secondary" onclick="clearBg()">清除</button>
-    </div>
-    
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🌫 遮罩不透明度: <span id="overlay-val">35%</span></label>
-    <input id="bg-overlay" type="range" min="0" max="100" value="35" oninput="document.getElementById('overlay-val').textContent=this.value+'%';applyOverlay(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
-
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🔮 模糊强度: <span id="blur-val">0px</span></label>
-    <input id="bg-blur" type="range" min="0" max="20" value="0" oninput="document.getElementById('blur-val').textContent=this.value+'px';applyBlur(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">📐 卡片透明度</label>
-    <input id="card-alpha" type="range" min="50" max="100" value="92" oninput="applyAlpha(this.value)" style="width:100%;accent-color:var(--blue);">
-    <p style="font-size:.76em;color:var(--text3);margin-top:12px;">设置自动保存。背景图对全部页面生效。
-    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">💾 数据存档</label>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-sm btn-primary" onclick="exportAll()">📥 导出全部</button>
-      <button class="btn btn-sm btn-secondary" onclick="document.getElementById('import-file').click()">📤 导入恢复</button>
-      <input type="file" id="import-file" accept=".json" onchange="importAll(this)" style="display:none;">
-    </div>
-    <p style="font-size:.72em;color:var(--text3);margin-top:6px;">导出包含每日复盘、周总结、设置等全部数据。</p>
-    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:10px;">📋 Tab 顺序</label>
-    <div id="tab-order-list"></div>
-    <div style="margin-top:8px;">
-      <button class="btn btn-sm btn-secondary" onclick="resetTabOrder()">重置默认顺序</button>
-    </div>
-    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
-    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">🏠 网站首页</label>
-    <select id="homepage-tab-select" onchange="saveHomepage()" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;font-family:inherit;background:var(--bg);color:var(--text);margin-bottom:4px;">
-      <option value="">上次关闭的页面</option>
-    </select>
-    <p style="font-size:.72em;color:var(--text3);">每次打开网站时默认显示的页面。选"上次关闭的页面"则恢复上次浏览位置。</p>
-
   </div>
 </div>
 
@@ -1158,7 +1206,8 @@ function resetTabOrder() {
 // Apply saved order on page load (after all consts defined)
 (function(){ applyTabOrder(); })();
 
-function toggleSettings(){var o=document.getElementById('settings-overlay');var show=o.style.display==='none'||!o.style.display;o.style.display=show?'flex':'none';if(show)loadSettings();o.onclick=function(e){if(e.target===o)toggleSettings();};}
+function toggleSettings(){var o=document.getElementById('settings-overlay');var show=o.style.display==='none'||!o.style.display;o.style.display=show?'flex':'none';if(show)loadSettings();}
+function switchSettingsTab(name){document.querySelectorAll('.set-panel-section').forEach(function(s){s.classList.remove('active');});document.querySelectorAll('.set-panel-nav button').forEach(function(b){b.classList.remove('active');});var sec=document.getElementById('ssec-'+name);var btn=document.querySelector('.set-panel-nav button[data-stab="'+name+'"]');if(sec)sec.classList.add('active');if(btn)btn.classList.add('active');}
 function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();var hp=localStorage.getItem('kaoyan_homepage_tab')||'';var sel=document.getElementById('homepage-tab-select');if(sel){var opts='<option value="">上次关闭的页面</option>';DEFAULT_TAB_ORDER.forEach(function(id){opts+='<option value="'+id+'"'+(hp===id?' selected':'')+'>'+TAB_NAMES[id]+'</option>';});sel.innerHTML=opts;}}
 function applySettings(s){s=s||{};var r=document.documentElement;r.style.setProperty('--bg-image',s.bg?'url('+s.bg+')':'none');r.style.setProperty('--bg-blur',(s.blur||0)+'px');r.style.setProperty('--card-alpha',(s.alpha||92)/100);
   r.style.setProperty('--bg-overlay',(s.overlay!=null?s.overlay:35)/100);
