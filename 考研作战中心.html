@@ -315,6 +315,12 @@
     <div style="margin-top:8px;">
       <button class="btn btn-sm btn-secondary" onclick="resetTabOrder()">重置默认顺序</button>
     </div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">🏠 网站首页</label>
+    <select id="homepage-tab-select" onchange="saveHomepage()" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;font-family:inherit;background:var(--bg);color:var(--text);margin-bottom:4px;">
+      <option value="">上次关闭的页面</option>
+    </select>
+    <p style="font-size:.72em;color:var(--text3);">每次打开网站时默认显示的页面。选"上次关闭的页面"则恢复上次浏览位置。</p>
 
   </div>
 </div>
@@ -341,8 +347,13 @@ let currentDayDate = formatDate(new Date());
 let currentMood = 'ok';
 
 (function(){
-  const saved = localStorage.getItem('kaoyan_active_tab');
-  if (saved && tabs.includes(saved)) switchTab(saved);
+  const homepage = localStorage.getItem('kaoyan_homepage_tab');
+  if (homepage && tabs.includes(homepage)) {
+    switchTab(homepage);
+  } else {
+    const saved = localStorage.getItem('kaoyan_active_tab');
+    if (saved && tabs.includes(saved)) switchTab(saved);
+  }
 })();
 
 function showToast(msg, isError) {
@@ -1050,9 +1061,14 @@ function updateEncouragement(streak, frozen) {
 }
 
 (function(){
-  const activeTab = localStorage.getItem('kaoyan_active_tab');
-  if (activeTab && tabs.includes(activeTab)) {
-    switchTab(activeTab);
+  const homepage = localStorage.getItem('kaoyan_homepage_tab');
+  if (homepage && tabs.includes(homepage)) {
+    switchTab(homepage);
+  } else {
+    const activeTab = localStorage.getItem('kaoyan_active_tab');
+    if (activeTab && tabs.includes(activeTab)) {
+      switchTab(activeTab);
+    }
   }
 })();
 
@@ -1143,7 +1159,7 @@ function resetTabOrder() {
 (function(){ applyTabOrder(); })();
 
 function toggleSettings(){var o=document.getElementById('settings-overlay');var show=o.style.display==='none'||!o.style.display;o.style.display=show?'flex':'none';if(show)loadSettings();o.onclick=function(e){if(e.target===o)toggleSettings();};}
-function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();}
+function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();var hp=localStorage.getItem('kaoyan_homepage_tab')||'';var sel=document.getElementById('homepage-tab-select');if(sel){var opts='<option value="">上次关闭的页面</option>';DEFAULT_TAB_ORDER.forEach(function(id){opts+='<option value="'+id+'"'+(hp===id?' selected':'')+'>'+TAB_NAMES[id]+'</option>';});sel.innerHTML=opts;}}
 function applySettings(s){s=s||{};var r=document.documentElement;r.style.setProperty('--bg-image',s.bg?'url('+s.bg+')':'none');r.style.setProperty('--bg-blur',(s.blur||0)+'px');r.style.setProperty('--card-alpha',(s.alpha||92)/100);
   r.style.setProperty('--bg-overlay',(s.overlay!=null?s.overlay:35)/100);
   r.style.setProperty('--body-bg',s.bg?'transparent':'var(--bg)');}
@@ -1154,6 +1170,8 @@ function applyOverlay(v){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||
 function applyAlpha(v){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');s.alpha=parseInt(v)||92;localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
 (function(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');if(s.bg||s.blur){applySettings(s);}else{document.documentElement.style.setProperty('--body-bg','var(--bg)');}})();
 
+
+function saveHomepage(){var v=document.getElementById('homepage-tab-select').value;if(v){localStorage.setItem('kaoyan_homepage_tab',v);showToast('首页已设为 '+TAB_NAMES[v]);}else{localStorage.removeItem('kaoyan_homepage_tab');showToast('已恢复为上次关闭的页面');}}
 
 function exportAll(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.startsWith('kaoyan_'))data[k]=localStorage.getItem(k);}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='考研作战中心_备份_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);}
 function importAll(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var count=0;for(var k in data){if(k.startsWith('kaoyan_')){localStorage.setItem(k,data[k]);count++;}}showToast('✅ 已恢复 '+count+' 条数据，刷新页面生效');}catch(err){showToast('❌ 文件格式错误',true);}};reader.readAsText(file);}
