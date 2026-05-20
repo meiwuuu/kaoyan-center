@@ -321,11 +321,25 @@ async function apiCall(path) {
 async function preloadWeekStats() {
   dailyCache = {};
   reviewCache = {};
+  // Build all 14 URLs first, then fetch in parallel
+  var urls = [];
+  var dateMap = [];
   for (var i = 0; i < 7; i++) {
     var d = new Date(weekMonday); d.setDate(d.getDate() + i);
     var ds = fmtDate(d);
-    var daily = await apiCall('/api/stats/daily?date=' + ds);
-    var review = await apiCall('/api/stats/review?date=' + ds);
+    urls.push('/api/stats/daily?date=' + ds);
+    urls.push('/api/stats/review?date=' + ds);
+    dateMap.push(ds); dateMap.push(ds);
+  }
+  // Fire all 14 requests at once
+  var results = await Promise.all(urls.map(function(u) {
+    return fetch(API + u).then(function(r) { return r.json(); }).catch(function() { return null; });
+  }));
+  // Distribute results
+  for (var i = 0; i < 14; i += 2) {
+    var ds = dateMap[i];
+    var daily = results[i];
+    var review = results[i + 1];
     if (daily && daily.total_time !== undefined) {
       dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
     } else {
@@ -344,8 +358,12 @@ async function loadDay(ds) {
   var container = document.getElementById('content');
   container.innerHTML = '<div class="loading">加载中...</div>';
 
-  var daily = await apiCall('/api/stats/daily?date=' + ds);
-  var review = await apiCall('/api/stats/review?date=' + ds);
+  var results = await Promise.all([
+    fetch(API + '/api/stats/daily?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; }),
+    fetch(API + '/api/stats/review?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; })
+  ]);
+  var daily = results[0];
+  var review = results[1];
   if (!review || !review.text) review = null;
 
   render(ds, daily, review);
