@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍩</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日复盘 · 考研作战中心</title>
+<style>
+  :root {
+    --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
+    --blue: #2563eb; --blue-bg: #eff4ff; --green: #16a34a; --orange: #ea580c; --red: #dc2626; --cs: #7c3aed;
+    --border: #e7e4de; --radius: 12px; --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+      --blue: #60a5fa; --blue-bg: #1a2740; --green: #4ade80; --orange: #fb923c; --red: #f87171; --cs: #a78bfa;
+      --border: #35322c; }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  main { max-width:800px; margin:0 auto; padding:24px 20px 72px; }
+
+  .card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:12px 0; box-shadow:var(--shadow-sm); }
+  @media (prefers-color-scheme:dark){ .card{background:#24231f} }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border:none; border-radius:var(--radius-sm); font-size:.82em; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { opacity:.85; }
+  .btn-secondary { background:var(--bg); color:var(--text); border:1px solid var(--border); } .btn-secondary:hover { background:var(--border); }
+  .btn-sm { padding:5px 12px; font-size:.76em; }
+  .tag { display:inline-flex; align-items:center; padding:2px 10px; border-radius:99px; font-weight:600; white-space:nowrap; font-size:.72em; }
+  .tag-green { background:#e6f4ea; color:#166534; } .tag-orange { background:#fff7ed; color:#9a4700; } .tag-red { background:#fef2f2; color:#991b1b; }
+  @media (prefers-color-scheme:dark){ .tag-green{background:#152b19;color:#4ade80}.tag-orange{background:#2b1f14;color:#fb923c}.tag-red{background:#2d1516;color:#f87171} }
+  .alert { padding:10px 16px; border-radius:var(--radius-sm); margin:8px 0; font-size:.86em; }
+  .alert-blue { background:var(--blue-bg); color:#1e40af; } @media (prefers-color-scheme:dark){ .alert-blue{color:#bfdbfe} }
+  .text-math { color:var(--blue); } .text-cs { color:var(--cs); } .text-eng { color:var(--orange); } .text-pol { color:var(--red); }
+  .subtitle { font-size:.88em; color:var(--text2); margin-bottom:8px; }
+  input,select,textarea { font-family:inherit; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:.88em; background:#fff; color:var(--text); width:100%; }
+  @media (prefers-color-scheme:dark){ input,select,textarea{background:#2a2924;border-color:#3d3a33} }
+  input:focus,select:focus,textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+  textarea { resize:both; min-height:52px; min-width:100%; }
+
+  h2 { font-size:1.15em; font-weight:750; margin:28px 0 8px; }
+
+  .header-bar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+  .header-bar h1 { font-size:1.6em; margin-bottom:2px; font-weight:750; }
+  .badge { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:99px; font-size:.84em; font-weight:600; }
+  .badge.good { background:#e6f4ea; color:var(--green); }
+  .badge.ok   { background:#fff7ed; color:var(--orange); }
+  .badge.bad  { background:#fef2f2; color:var(--red); }
+  @media (prefers-color-scheme:dark){ .badge.good{background:#152b19}.badge.ok{background:#2b1f14}.badge.bad{background:#2d1516} }
+  .stats { display:flex; gap:24px; flex-wrap:wrap; font-size:.86em; padding:14px 20px; }
+  .encourage-box { padding:14px 20px; border-radius:var(--radius); font-size:.91em; text-align:center; margin-bottom:16px; background:var(--blue-bg); color:#1e40af; font-weight:500; }
+  @media (prefers-color-scheme:dark){ .encourage-box{color:#bfdbfe} }
+  .week-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:12px 20px; }
+  .week-row .week-label { font-size:.93em; font-weight:600; }
+  .week-progress { display:flex; gap:5px; align-items:center; }
+  .week-progress .p-dot { width:28px; height:28px; border-radius:8px; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:.68em; font-weight:700; color:var(--text3); transition:all .2s; background:#fff; }
+  @media (prefers-color-scheme:dark){ .week-progress .p-dot{background:#24231f} }
+  .week-progress .p-dot.filled { background:var(--green); border-color:var(--green); color:#fff; }
+  .week-progress .p-dot.off    { background:var(--red); border-color:var(--red); color:#fff; }
+  .week-progress .p-dot.b      { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .week-progress .progress-label { font-size:.78em; color:var(--text3); margin-left:10px; }
+
+  .day-selector { display:flex; gap:6px; margin-bottom:18px; }
+  .day-dot { flex:1; min-width:52px; text-align:center; padding:14px 6px 12px; border-radius:12px; border:1.5px solid var(--border); cursor:pointer; transition:all .2s; font-size:.86em; background:#fff; position:relative; box-shadow:var(--shadow-sm); }
+  @media (prefers-color-scheme:dark){ .day-dot{background:#24231f} }
+  .day-dot:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .day-dot.active { border-color:var(--blue); background:var(--blue-bg); font-weight:700; color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+  .day-dot.today::after { content:'今天'; position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--orange); color:#fff; font-size:.6em; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; }
+  .day-dot .dot-label { display:block; font-size:.7em; color:var(--text3); margin-top:3px; }
+  .day-dot .dot-stat  { display:block; font-size:.66em; font-weight:600; margin-top:2px; }
+
+  .form-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; margin-bottom:22px; box-shadow:var(--shadow-sm); }
+  @media (prefers-color-scheme:dark){ .form-card{background:#24231f} }
+  .form-title-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
+  .form-title { font-size:1.05em; font-weight:700; }
+  .form-sub   { font-size:.74em; color:var(--text2); }
+  .form-actions { display:flex; gap:6px; }
+
+  /* Version tabs */
+  .ver-tabs { display:flex; gap:4px; }
+  .ver-tab { padding:7px 18px; border-radius:99px; font-size:.84em; font-weight:600; cursor:pointer; border:1.5px solid transparent; transition:all .15s; background:transparent; font-family:inherit; }
+  .ver-tab.ver-a { color:var(--blue); } .ver-tab.ver-a.sel { background:var(--blue-bg); border-color:var(--blue); }
+  .ver-tab.ver-b { color:var(--orange); } .ver-tab.ver-b.sel { background:#fff7ed; border-color:var(--orange); }
+  .ver-tab.ver-o { color:var(--red); } .ver-tab.ver-o.sel { background:#fef2f2; border-color:var(--red); }
+  .ver-tab:hover { opacity:.7; }
+
+  .quick-row { display:grid; grid-template-columns:1fr auto auto auto auto; gap:10px; margin-bottom:14px; align-items:end; }
+  .quick-field label { display:block; font-weight:600; font-size:.76em; margin-bottom:3px; color:var(--text2); }
+  .quick-field input, .quick-field select { font-size:.88em; }
+  .comp-wrap { display:flex; align-items:center; gap:6px; }
+  .comp-wrap input[type=range] { flex:1; accent-color:var(--blue); padding:0; }
+  .comp-wrap input[type=number] { width:64px; text-align:center; font-weight:700; font-size:.95em; }
+
+  .mood-strip { display:flex; gap:4px; align-items:center; }
+  .mood-chip { width:36px; height:36px; border-radius:10px; border:1.5px solid transparent; cursor:pointer; font-size:1.2em; background:transparent; transition:all .15s; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .mood-chip:hover { background:var(--bg); border-color:var(--border); transform:scale(1.1); }
+  .mood-chip.sel { border-color:var(--border); background:var(--bg); transform:scale(1.15); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+
+  .subject-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; }
+  .subj-field { background:var(--bg); border-radius:10px; padding:12px 14px; border:1px solid transparent; transition:border-color .15s; }
+  .subj-field:focus-within { border-color:var(--blue); }
+  .subj-field label { display:block; font-weight:700; font-size:.74em; margin-bottom:4px; }
+  .subj-field input { background:transparent; border:none; padding:2px 0; font-size:1.05em; font-weight:650; width:100%; }
+  .subj-field input:focus { outline:none; box-shadow:none; }
+
+  .error-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr; gap:8px; }
+  .err-cell { text-align:center; }
+  .err-cell label { font-size:.67em; display:block; margin-bottom:3px; color:var(--text3); }
+  .err-cell input { font-size:.86em; text-align:center; }
+
+  .history-item { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius-sm); margin:8px 0; font-size:.91em; background:#fff; transition:all .2s; box-shadow:var(--shadow-sm); }
+  .history-item:hover { border-color:var(--blue); transform:translateX(3px); box-shadow:var(--shadow); }
+  @media (prefers-color-scheme:dark){ .history-item{background:#24231f} }
+  .toast { position:fixed; bottom:28px; right:28px; background:#fff; padding:12px 22px; border-radius:var(--radius-sm); font-weight:600; font-size:.91em; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; transform:translateY(8px); transition:all .25s; z-index:200; pointer-events:none; }
+  @media (prefers-color-scheme:dark){ .toast{background:#24231f} }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast.error { border-color:rgba(220,38,38,.25); background:#fff5f5; }
+
+  @media(max-width:640px){ .quick-row{grid-template-columns:1fr 1fr}.subject-grid{grid-template-columns:1fr 1fr}.error-grid{grid-template-columns:1fr 1fr 1fr}.day-selector{overflow-x:auto} }
+
+  .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.header-card{background:#24231f}}
+</style>
+</head>
+<body>
+<main>
+
+<div class="header-bar header-card">
+  <div>
+    <h1>📝 每日复盘</h1>
+    <p class="subtitle">每天睡前 1 分钟 · 只填最核心的</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span style="font-size:.76em;color:var(--text3);" id="exam-countdown"></span>
+    <div class="badge good" id="streak-badge">🔥 连续 0 天</div>
+  </div>
+</div>
+
+<div class="card stats-bar">
+  <span>📅 距初试 <b id="days-left">218</b> 天</span>
+  <span>⏱ 累计 <b id="total-hours">0</b>h</span>
+  <span>✍️ 已填 <b id="total-days">0</b> 天</span>
+</div>
+
+<div class="encourage-box" id="encourage-msg">迈出第一步就是胜利 👊</div>
+
+<div class="card week-row">
+  <span class="week-label" id="current-week-label">📅 本周</span>
+  <div class="week-progress" id="week-progress-dots"></div>
+</div>
+
+<div class="day-selector" id="day-selector"></div>
+
+<div class="form-card">
+  <div class="form-title-row">
+    <div>
+      <div class="form-title" id="form-day-title">📝 今天</div>
+      <div class="form-sub" id="form-day-sub"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-sm btn-secondary" onclick="copyYesterday()">📋 复制昨天</button>
+      <button class="btn btn-sm btn-secondary" onclick="loadDailyDefaults()">🪄 智能预填</button>
+      <button class="btn btn-primary btn-sm" onclick="saveDaily()">💾 保存</button>
+    </div>
+  </div>
+
+  <div style="font-size:.84em;color:var(--text2);margin-bottom:16px;padding:10px 16px;background:var(--bg);border-radius:var(--radius-sm);" id="today-goal"></div>
+
+  <input type="hidden" id="d-mood" value="ok">
+
+  <!-- Version tabs + hidden select -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+    <span style="font-size:.76em;font-weight:600;color:var(--text2);">版本</span>
+    <div class="ver-tabs" id="ver-tabs">
+      <button class="ver-tab ver-a sel" onclick="setVersion('A',this)">🔵 全负荷 A</button>
+      <button class="ver-tab ver-b" onclick="setVersion('B',this)">🟠 最低 B</button>
+      <button class="ver-tab ver-o" onclick="setVersion('-',this)">🔴 断档</button>
+    </div>
+    <select id="d-version" onchange="onVersionChange()" hidden>
+      <option value="A">A</option><option value="B">B</option><option value="-">断档</option>
+    </select>
+  </div>
+
+  <div class="quick-row">
+    <div class="quick-field">
+      <label>完成度</label>
+      <div class="comp-wrap">
+        <input type="range" id="d-comp-slider" min="0" max="100" value="65" oninput="syncComp(this.value,'slider')">
+        <input type="number" id="d-completion" min="0" max="100" value="65" oninput="syncComp(this.value,'num')">
+      </div>
+    </div>
+    <div>
+      <label style="font-size:.76em;color:var(--text2);display:block;margin-bottom:3px;">心情</label>
+      <div class="mood-strip" id="mood-strip">
+        <span class="mood-chip" data-mood="great" onclick="setMood('great',this)">😊</span>
+        <span class="mood-chip sel" data-mood="ok" onclick="setMood('ok',this)">😐</span>
+        <span class="mood-chip" data-mood="bad" onclick="setMood('bad',this)">😞</span>
+      </div>
+    </div>
+    <div class="quick-field">
+      <label>昨晚睡眠</label>
+      <select id="d-sleep">
+        <option value="">—</option><option value="<6">&lt;6h</option><option value="6-7">6-7h</option><option value="7-8" selected>7-8h</option><option value=">8">&gt;8h</option>
+      </select>
+    </div>
+    <div class="quick-field" style="display:flex;align-items:flex-end;">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;margin:0;">
+        <input type="checkbox" id="d-exercise" style="width:auto;accent-color:var(--green);"> 🏃 运动
+      </label>
+    </div>
+  </div>
+
+  <div id="subject-section" style="margin-top:18px;">
+    <h3 style="margin:0 0 10px;font-size:.86em;font-weight:650;">📚 各科用时
+      <button class="btn btn-sm btn-secondary" onclick="toggleAdvanced()" style="margin-left:8px;font-size:.72em;" id="advanced-toggle">⚙️ 高级 ▸</button>
+    </h3>
+    <div class="subject-grid">
+      <div class="subj-field"><label class="text-math">🧮 数学</label><input type="number" id="d-math-hrs" step="0.5" min="0" value="3.5" placeholder="小时"></div>
+      <div class="subj-field"><label class="text-cs">💻 408</label><input type="number" id="d-cs-hrs" step="0.5" min="0" value="3" placeholder="小时"></div>
+      <div class="subj-field"><label class="text-eng">📖 英语</label><input type="number" id="d-eng-hrs" step="0.5" min="0" value="1.5" placeholder="小时"></div>
+      <div class="subj-field"><label class="text-pol">🏛 政治</label><input type="number" id="d-pol-hrs" step="0.25" min="0" value="0.25" placeholder="小时"></div>
+    </div>
+  </div>
+
+  <div id="advanced-section" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+    <div class="subject-grid" style="margin-bottom:12px;">
+      <div class="quick-field"><label class="text-math">数学正确率</label><input id="d-math-acc" placeholder="52→58" style="font-size:.84em;"></div>
+      <div class="quick-field"><label class="text-cs">408正确率</label><input id="d-cs-acc" placeholder="55→60" style="font-size:.84em;"></div>
+      <div class="quick-field"><label class="text-eng">英语正确率</label><input id="d-eng-acc" placeholder="60→63" style="font-size:.84em;"></div>
+      <div class="quick-field"><label>整体感受</label><select id="d-feel-overall"><option value="">—</option><option value="3">😄 好</option><option value="2" selected>😐 一般</option><option value="1">😞 差</option></select></div>
+    </div>
+    <div class="error-grid">
+      <div class="err-cell"><label>盲区·新</label><input type="number" id="d-err-blind-new" min="0" value="0"></div>
+      <div class="err-cell"><label>盲区·消</label><input type="number" id="d-err-blind-fix" min="0" value="0"></div>
+      <div class="err-cell"><label>偏差·新</label><input type="number" id="d-err-mis-new" min="0" value="0"></div>
+      <div class="err-cell"><label>偏差·消</label><input type="number" id="d-err-mis-fix" min="0" value="0"></div>
+      <div class="err-cell"><label>粗心·新</label><input type="number" id="d-err-care-new" min="0" value="0"></div>
+      <div class="err-cell"><label>粗心·消</label><input type="number" id="d-err-care-fix" min="0" value="0"></div>
+    </div>
+  </div>
+
+  <h3 style="margin:18px 0 8px;font-size:.86em;font-weight:650;">💬 反思</h3>
+  <textarea id="d-reflect" placeholder="今天有什么想说的？一句话就好……"></textarea>
+
+  <div style="margin-top:18px;text-align:center;">
+    <button class="btn btn-primary" onclick="saveDaily()" style="font-size:.96em;padding:10px 40px;">💾 保存今日复盘</button>
+  </div>
+</div>
+
+<div class="card" style="margin-top:24px;">
+<h2 style="margin-top:0;">📋 本周记录</h2>
+<div id="daily-week-list">
+  <p style="color:var(--text3);font-size:.91em;">还没有记录。选择日期后填写表单。</p>
+</div>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+function fmtLocal(d) { var m=d.getMonth()+1; var day=d.getDate(); return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day; }
+function getMonday(d) { var dt=new Date(d); dt.setDate(dt.getDate()-((dt.getDay()+6)%7)); dt.setHours(0,0,0,0); return dt; }
+function getWeekLabel(mon) { var sun=new Date(mon); sun.setDate(sun.getDate()+6); return (mon.getMonth()+1)+'/'+mon.getDate()+' - '+(sun.getMonth()+1)+'/'+sun.getDate(); }
+
+var DAILY_KEY = 'kaoyan_daily_reviews';
+function loadData() { try { return JSON.parse(localStorage.getItem(DAILY_KEY)||'{}'); } catch(e) { return {}; } }
+function saveData(d) { localStorage.setItem(DAILY_KEY, JSON.stringify(d)); }
+var currentDayDate = fmtLocal(new Date());
+var currentMood = 'ok';
+
+function showToast(msg, isErr) { var t=document.getElementById('toast'); t.textContent=msg; t.className='toast'+(isErr?' error':''); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},2500); }
+
+function setVersion(v, el) {
+  document.getElementById('d-version').value = v;
+  var tabs = document.querySelectorAll('.ver-tab');
+  for (var i=0;i<tabs.length;i++) tabs[i].classList.remove('sel');
+  el.classList.add('sel');
+  onVersionChange();
+}
+
+function setMood(mood, el) { var c=document.querySelectorAll('.mood-chip'); for(var i=0;i<c.length;i++)c[i].classList.remove('sel'); el.classList.add('sel'); document.getElementById('d-mood').value=mood; }
+function getMoodVal() { var s=document.querySelector('.mood-chip.sel'); return s?(s.getAttribute('data-mood')||'ok'):'ok'; }
+
+function syncComp(val, src) {
+  var slider = document.getElementById('d-comp-slider');
+  var num = document.getElementById('d-completion');
+  var v = parseInt(val)||0;
+  if (src==='slider') num.value = v;
+  else slider.value = v;
+  updateCompletionDisplay();
+}
+
+function computeDefaults() {
+  var all=loadData(); var dates=Object.keys(all).sort().reverse(); if(dates.length===0)return null;
+  var recent=dates.slice(0,14).map(function(d){return all[d];});
+  var vc={}; for(var i=0;i<recent.length;i++){var v=recent[i].version;vc[v]=(vc[v]||0)+1;}
+  var bestVer='A',bestCnt=0; for(var k in vc){if(vc[k]>bestCnt){bestCnt=vc[k];bestVer=k;}}
+  var compSum=0,compW=0; for(var i=0;i<recent.length;i++){var w=recent.length-i;compSum+=(recent[i].completion||0)*w;compW+=w;}
+  var avgComp=compW>0?Math.round(compSum/compW):65;
+  var last7=dates.slice(0,7).map(function(d){return all[d];});
+  function avgHrs(sub){var vals=[];for(var i=0;i<last7.length;i++){var v=parseFloat(last7[i].subjects&&last7[i].subjects[sub]?last7[i].subjects[sub].hrs:0);if(v>0)vals.push(v);}return vals.length>0?(vals.reduce(function(a,b){return a+b;},0)/vals.length).toFixed(1):null;}
+  return {version:bestVer,completion:avgComp,math_hrs:avgHrs('math')||'3.5',cs_hrs:avgHrs('cs')||'3',eng_hrs:avgHrs('eng')||'1.5',pol_hrs:avgHrs('pol')||'0.25'};
+}
+
+function applyDefaults(def) {
+  if(!def)return;
+  document.getElementById('d-version').value=def.version;
+  document.getElementById('d-completion').value=def.completion;
+  document.getElementById('d-comp-slider').value=def.completion;
+  updateCompletionDisplay();
+  document.getElementById('d-math-hrs').value=def.math_hrs; document.getElementById('d-cs-hrs').value=def.cs_hrs;
+  document.getElementById('d-eng-hrs').value=def.eng_hrs; document.getElementById('d-pol-hrs').value=def.pol_hrs;
+  var moodEl=document.querySelector('.mood-chip[data-mood="ok"]'); if(moodEl)setMood('ok',moodEl);
+  // sync version tabs
+  var ver = def.version; var vt = document.querySelectorAll('.ver-tab');
+  for (var i=0;i<vt.length;i++) {
+    vt[i].classList.remove('sel');
+    if ((ver==='A'&&vt[i].classList.contains('ver-a'))||(ver==='B'&&vt[i].classList.contains('ver-b'))||(ver==='-'&&vt[i].classList.contains('ver-o'))) vt[i].classList.add('sel');
+  }
+}
+function loadDailyDefaults(){var def=computeDefaults();if(def){applyDefaults(def);showToast('🪄 已根据历史数据智能预填');}else showToast('还没有历史数据',true);}
+
+function copyYesterday(){
+  var all=loadData();var today=new Date(currentDayDate+'T00:00:00');var yd=new Date(today);yd.setDate(yd.getDate()-1);
+  var yds=fmtLocal(yd);var data=all[yds];if(!data){showToast('昨天还没有记录',true);return;}
+  document.getElementById('d-version').value=data.version||'A';document.getElementById('d-completion').value=data.completion||65;
+  document.getElementById('d-comp-slider').value=data.completion||65;
+  updateCompletionDisplay();onVersionChange();var s=data.subjects||{};
+  document.getElementById('d-math-hrs').value=(s.math&&s.math.hrs)||'';document.getElementById('d-math-acc').value=(s.math&&s.math.acc)||'';
+  document.getElementById('d-cs-hrs').value=(s.cs&&s.cs.hrs)||'';document.getElementById('d-cs-acc').value=(s.cs&&s.cs.acc)||'';
+  document.getElementById('d-eng-hrs').value=(s.eng&&s.eng.hrs)||'';document.getElementById('d-eng-acc').value=(s.eng&&s.eng.acc)||'';
+  document.getElementById('d-pol-hrs').value=(s.pol&&s.pol.hrs)||'';
+  if(data.mood){var moodEl=document.querySelector('.mood-chip[data-mood="'+data.mood+'"]');if(moodEl)setMood(data.mood,moodEl);}
+  // sync version tabs
+  var ver = data.version||'A'; var vt = document.querySelectorAll('.ver-tab');
+  for (var i=0;i<vt.length;i++) {
+    vt[i].classList.remove('sel');
+    if ((ver==='A'&&vt[i].classList.contains('ver-a'))||(ver==='B'&&vt[i].classList.contains('ver-b'))||(ver==='-'&&vt[i].classList.contains('ver-o'))) vt[i].classList.add('sel');
+  }
+  showToast('📋 已复制昨天的数据');
+}
+
+function toggleAdvanced(){var sec=document.getElementById('advanced-section');var btn=document.getElementById('advanced-toggle');if(sec.style.display==='none'){sec.style.display='block';btn.innerHTML='⚙️ 收起 ▾';}else{sec.style.display='none';btn.innerHTML='⚙️ 高级 ▸';}}
+function updateCompletionDisplay(){var v=parseInt(document.getElementById('d-completion').value)||0;var sl=document.getElementById('d-comp-slider');sl.value=v;if(v>=80)sl.style.accentColor='var(--green)';else if(v>=50)sl.style.accentColor='var(--orange)';else sl.style.accentColor='var(--red)';}
+function onVersionChange(){var ver=document.getElementById('d-version').value;var subj=document.getElementById('subject-section');if(ver==='-')subj.style.opacity='0.4';else subj.style.opacity='1';}
+
+function renderDaySelector(){
+  var container=document.getElementById('day-selector');var monday=getMonday(new Date(currentDayDate));
+  var today=fmtLocal(new Date());var allDaily=loadData();var dayNames=['一','二','三','四','五','六','日'];var html='';
+  for(var i=0;i<7;i++){var d=new Date(monday);d.setDate(d.getDate()+i);var ds=fmtLocal(d);var isToday=ds===today;var isActive=ds===currentDayDate;var data=allDaily[ds];var cls='day-dot';if(isActive)cls+=' active';if(isToday)cls+=' today';var stat=data?(data.version==='-'?'断':(data.version+' '+data.completion+'%')):'—';html+='<div class="'+cls+'" data-date="'+ds+'" onclick="selectDay(this.dataset.date)">'+(d.getMonth()+1)+'/'+d.getDate()+'<span class="dot-label">周'+dayNames[i]+'</span><span class="dot-stat">'+stat+'</span></div>';}
+  container.innerHTML=html;
+  document.getElementById('current-week-label').innerHTML='<button class="btn btn-sm btn-secondary" onclick="navigateWeek(-1)">◀</button> 📅 本周 '+getWeekLabel(monday)+' <button class="btn btn-sm btn-secondary" onclick="navigateWeek(1)">▶</button>';
+}
+function navigateWeek(dir){var mon=getMonday(new Date(currentDayDate));mon.setDate(mon.getDate()+dir*7);currentDayDate=fmtLocal(mon);init();}
+function selectDay(ds){currentDayDate=ds;loadDay(ds);renderDaySelector();}
+
+function renderWeekProgress(){
+  var container=document.getElementById('week-progress-dots');var monday=getMonday(new Date(currentDayDate));var allDaily=loadData();var dayNames=['一','二','三','四','五','六','日'];var filled=0,html='';
+  for(var i=0;i<7;i++){var d=new Date(monday);d.setDate(d.getDate()+i);var ds=fmtLocal(d);var data=allDaily[ds];var cls='p-dot';if(data){filled++;if(data.version==='-')cls+=' off';else if(data.version==='B')cls+=' b';else cls+=' filled';}html+='<div class="'+cls+'" title="'+ds+'">'+dayNames[i]+'</div>';}
+  html+='<span class="progress-label">'+filled+'/7 天</span>';container.innerHTML=html;
+}
+
+function renderDailyWeekList(){
+  var container=document.getElementById('daily-week-list');var monday=getMonday(new Date(currentDayDate));var allDaily=loadData();var dayNames=['周一','周二','周三','周四','周五','周六','周日'];var items=[];
+  for(var i=0;i<7;i++){var d=new Date(monday);d.setDate(d.getDate()+i);var ds=fmtLocal(d);var data=allDaily[ds];if(data)items.push({ds:ds,data:data,label:dayNames[i]+' '+(d.getMonth()+1)+'/'+d.getDate()});}
+  if(items.length===0){container.innerHTML='<p style=\"color:var(--text3);font-size:.91em;\">还没有记录。选择日期后填写表单。</p>';return;}
+  var html='';
+  for(var i=0;i<items.length;i++){var item=items[i];var verTag=item.data.version==='-'?'<span class=\"tag tag-red\">断档</span>':item.data.version==='B'?'<span class=\"tag tag-orange\">B</span>':'<span class=\"tag tag-green\">A</span>';var reflect=item.data.reflect||'';html+='<div class=\"history-item\"><div style=\"flex:1\"><b>'+item.label+'</b> '+verTag+' <span style=\"color:var(--text3);font-size:.84em;\">完成 '+item.data.completion+'%</span>'+(reflect?' <span style=\"color:var(--text2);font-size:.82em;\">💬 '+reflect.slice(0,30)+(reflect.length>30?'...':'')+'</span>':'')+'</div><button class=\"btn btn-sm btn-secondary\" data-date="'+item.ds+'" onclick="selectDay(this.dataset.date)">✏️</button></div>';}
+  container.innerHTML=html;
+}
+
+function loadDay(ds){
+  document.getElementById('form-day-title').textContent='📝 '+ds;document.getElementById('form-day-sub').textContent='星期'+['日','一','二','三','四','五','六'][new Date(ds+'T00:00:00').getDay()];
+  var all=loadData();var data=all[ds];
+  if(data){
+    document.getElementById('d-version').value=data.version||'A';document.getElementById('d-completion').value=data.completion||65;document.getElementById('d-comp-slider').value=data.completion||65;
+    updateCompletionDisplay();onVersionChange();var s=data.subjects||{};
+    document.getElementById('d-math-hrs').value=(s.math&&s.math.hrs)||'';document.getElementById('d-math-acc').value=(s.math&&s.math.acc)||'';
+    document.getElementById('d-cs-hrs').value=(s.cs&&s.cs.hrs)||'';document.getElementById('d-cs-acc').value=(s.cs&&s.cs.acc)||'';
+    document.getElementById('d-eng-hrs').value=(s.eng&&s.eng.hrs)||'';document.getElementById('d-eng-acc').value=(s.eng&&s.eng.acc)||'';
+    document.getElementById('d-pol-hrs').value=(s.pol&&s.pol.hrs)||'';document.getElementById('d-feel-overall').value=data.feelOverall||'2';
+    var e=data.errors||{};document.getElementById('d-err-blind-new').value=(e.blind&&e.blind.new)||0;document.getElementById('d-err-blind-fix').value=(e.blind&&e.blind.fix)||0;
+    document.getElementById('d-err-mis-new').value=(e.mis&&e.mis.new)||0;document.getElementById('d-err-mis-fix').value=(e.mis&&e.mis.fix)||0;
+    document.getElementById('d-err-care-new').value=(e.care&&e.care.new)||0;document.getElementById('d-err-care-fix').value=(e.care&&e.care.fix)||0;
+    document.getElementById('d-reflect').value=data.reflect||'';document.getElementById('d-sleep').value=data.sleep||'7-8';document.getElementById('d-exercise').checked=data.exercise||false;
+    if(data.mood){var moodEl=document.querySelector('.mood-chip[data-mood=\"'+data.mood+'\"]');if(moodEl)setMood(data.mood,moodEl);}
+    // sync version tabs
+    var ver = data.version||'A'; var vt = document.querySelectorAll('.ver-tab');
+    for (var i=0;i<vt.length;i++) {
+      vt[i].classList.remove('sel');
+      if ((ver==='A'&&vt[i].classList.contains('ver-a'))||(ver==='B'&&vt[i].classList.contains('ver-b'))||(ver==='-'&&vt[i].classList.contains('ver-o'))) vt[i].classList.add('sel');
+    }
+  }else{
+    var def=computeDefaults();if(def)applyDefaults(def);
+    document.getElementById('d-math-acc').value='';document.getElementById('d-cs-acc').value='';document.getElementById('d-eng-acc').value='';
+    document.getElementById('d-feel-overall').value='2';document.getElementById('d-err-blind-new').value=0;document.getElementById('d-err-blind-fix').value=0;
+    document.getElementById('d-err-mis-new').value=0;document.getElementById('d-err-mis-fix').value=0;document.getElementById('d-err-care-new').value=0;document.getElementById('d-err-care-fix').value=0;
+    document.getElementById('d-reflect').value='';onVersionChange();
+  }
+}
+
+function saveDaily(){
+  var ds=currentDayDate;
+  var data={version:document.getElementById('d-version').value,completion:parseInt(document.getElementById('d-completion').value)||0,mood:getMoodVal(),sleep:document.getElementById('d-sleep').value,exercise:document.getElementById('d-exercise').checked,feelOverall:document.getElementById('d-feel-overall').value,subjects:{math:{hrs:document.getElementById('d-math-hrs').value,acc:document.getElementById('d-math-acc').value},cs:{hrs:document.getElementById('d-cs-hrs').value,acc:document.getElementById('d-cs-acc').value},eng:{hrs:document.getElementById('d-eng-hrs').value,acc:document.getElementById('d-eng-acc').value},pol:{hrs:document.getElementById('d-pol-hrs').value}},errors:{blind:{new:parseInt(document.getElementById('d-err-blind-new').value)||0,fix:parseInt(document.getElementById('d-err-blind-fix').value)||0},mis:{new:parseInt(document.getElementById('d-err-mis-new').value)||0,fix:parseInt(document.getElementById('d-err-mis-fix').value)||0},care:{new:parseInt(document.getElementById('d-err-care-new').value)||0,fix:parseInt(document.getElementById('d-err-care-fix').value)||0}},reflect:document.getElementById('d-reflect').value,savedAt:new Date().toISOString()};
+  var all=loadData();all[ds]=data;saveData(all);
+  showToast('✅ '+ds+' 复盘已保存！');renderDaySelector();renderWeekProgress();renderDailyWeekList();updateStreak();updateProgress();
+}
+
+function updateStreak(){
+  var all=loadData();var dates=Object.keys(all).sort().reverse();var streak=0,frozen=false;var today=new Date();today.setHours(0,0,0,0);
+  for(var i=0;i<dates.length;i++){var d=new Date(dates[i]+'T00:00:00');var expected=new Date(today);expected.setDate(expected.getDate()-i);if(fmtLocal(d)!==fmtLocal(expected))break;if(all[dates[i]].version==='-'){if(i===0)frozen=true;break;}streak++;}
+  if(streak===0&&dates.length>=2&&!frozen){var yd=new Date(today);yd.setDate(yd.getDate()-1);var yds=fmtLocal(yd);var ydata=all[yds];if(!ydata||ydata.version==='-'){var bd=new Date(today);bd.setDate(bd.getDate()-2);if(all[fmtLocal(bd)]&&all[fmtLocal(bd)].version!=='-'){var s=1;for(var i=3;i<=dates.length;i++){var ed=new Date(today);ed.setDate(ed.getDate()-i);if(all[fmtLocal(ed)]&&all[fmtLocal(ed)].version!=='-')s++;else break;}if(s>0){streak=s;frozen=true;}}}}
+  var badge=document.getElementById('streak-badge');if(frozen){badge.textContent='🔥 连续 '+streak+' 天（冻结中）';badge.className='badge ok';}else{badge.textContent='🔥 连续 '+streak+' 天';badge.className='badge '+(streak>=7?'good':streak>=3?'ok':'bad');}
+  updateEncouragement(streak,frozen);
+}
+function updateEncouragement(streak,frozen){var msg=document.getElementById('encourage-msg');if(frozen)msg.innerHTML='🧊 连续 '+streak+' 天（冻结中）—— 今天回来，明天继续 🔥';else if(streak===0)msg.innerHTML='迈出第一步就是胜利 👊';else if(streak<3)msg.innerHTML='好的开始！坚持到第 3 天就形成习惯了 💪';else if(streak<7)msg.innerHTML='连续 '+streak+' 天！习惯正在养成 🔥';else if(streak<21)msg.innerHTML='整整 '+streak+' 天！你已经超过 90% 的考研人了 🎉';else msg.innerHTML=streak+' 天不间断！这不是意志力，这是你的日常 🏆';}
+function updateProgress(){var all=loadData();var dates=Object.keys(all);document.getElementById('total-days').textContent=dates.length;var hrs=0;for(var i=0;i<dates.length;i++){var s=all[dates[i]].subjects||{};hrs+=parseFloat((s.math&&s.math.hrs)||0)+parseFloat((s.cs&&s.cs.hrs)||0)+parseFloat((s.eng&&s.eng.hrs)||0)+parseFloat((s.pol&&s.pol.hrs)||0);}document.getElementById('total-hours').textContent=hrs.toFixed(1);var exam=new Date(2026,11,20);var daysLeft=Math.ceil((exam-new Date())/86400000);document.getElementById('days-left').textContent=daysLeft>0?daysLeft:0;}
+function updateGoal(){var m=new Date().getMonth()+1;var goal='';if(m>=5&&m<=6)goal='🎯 基础期 · 数学高数+线代基础，408计组一轮，英语阅读基础';else if(m>=7&&m<=8)goal='🎯 强化期 · 数学线代+概率，408 OS+计网，英语阅读强化';else if(m>=9&&m<=10)goal='🎯 真题期 · 数学660+880，408二轮+大题，英语真题限时';else if(m>=11)goal='🎯 冲刺期 · 数学真题模拟，408真题，英语作文，政治肖四';document.getElementById('today-goal').textContent=goal;}
+
+function init(){renderDaySelector();renderWeekProgress();renderDailyWeekList();loadDay(currentDayDate);updateStreak();updateProgress();updateGoal();}
+init();
+</script>
+
+<script>
+(function(){
+  var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');
+  var alpha=(s.alpha||92)/100;
+  var css='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats,.encourage-box,.header-bar,.day-selector .day-dot,.header-card,.zone-title-card{background:rgba(255,255,255,'+alpha+')!important}';
+  css+='@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.header-card{background:rgba(36,35,31,'+alpha+')!important}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+</script>
+
+</body>
+</html>

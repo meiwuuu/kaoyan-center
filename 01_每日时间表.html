@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍩</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日时间表 · 考研作战中心</title>
+<style>
+  :root {
+    --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
+    --blue: #2563eb; --blue-bg: #eff4ff; --orange: #ea580c;
+    --green: #16a34a; --red: #dc2626;
+    --border: #e7e4de; --border-strong: #d4d0c8;
+    --card: #fff;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+      --blue: #60a5fa; --blue-bg: #1a2740; --orange: #fb923c;
+      --green: #4ade80; --red: #f87171;
+      --border: #35322c; --border-strong: #4a4740;
+      --card: #24231f; }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 26px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.card{background:#24231f}}
+  main { max-width:780px; margin:0 auto; padding:40px 24px 24px; }
+
+  h1 { font-size:2em; font-weight:800; letter-spacing:.02em; margin-bottom:6px; }
+  .subtitle { font-size:.88em; color:var(--text); margin-bottom:40px; }
+
+  /* ══ 版本卡片 ══ */
+  .ver { background:var(--card); border-radius:var(--radius); padding:32px; margin:28px 0; box-shadow:var(--shadow-sm); border:1px solid var(--border); }
+  .ver-tag { display:inline-block; font-size:.85em; font-weight:700; letter-spacing:.04em; padding:7px 20px; border-radius:8px; margin-bottom:10px; }
+  .ver.a .ver-tag { background:var(--blue); color:#fff; box-shadow:0 2px 8px rgba(37,99,235,.3); }
+  .ver.b .ver-tag { background:var(--orange); color:#fff; box-shadow:0 2px 8px rgba(234,88,12,.3); }
+  @media (prefers-color-scheme:dark){ .ver.b .ver-tag{background:var(--orange)} }
+  .ver h3 { font-size:1.2em; font-weight:750; margin:6px 0 4px; }
+  .ver .ver-desc { font-size:.86em; color:var(--text2); margin-bottom:28px; }
+
+  /* ══ 时间表 ══ */
+  .tt { width:100%; border-collapse:separate; border-spacing:0; }
+  .tt th { text-align:left; font-size:.8em; font-weight:700; color:var(--text); letter-spacing:.02em; padding:0 14px 14px; border-bottom:2px solid #3d3a35; border-right:1px solid #3d3a35; }
+  .tt td { padding:11px 14px; vertical-align:top; border-bottom:1px solid #3d3a35; border-right:1px solid #3d3a35; font-size:.88em; }
+  .tt tr:last-child td { border-bottom:none; }
+  .tt td:last-child, .tt th:last-child { border-right:none; }
+  .tt .tt-time { width:80px; font-weight:700; font-size:.92em; font-variant-numeric:tabular-nums; color:var(--text); white-space:nowrap; letter-spacing:.02em; }
+  .tt .tt-task { font-weight:650; font-size:.92em; letter-spacing:.01em; }
+  .tt .tt-desc { font-size:.82em; color:var(--text); margin-top:2px; line-height:1.55; }
+  .tt tr.hilit td { font-weight:650; }
+
+  /* ══ 禁止 ══ */
+  .sec-head { font-size:1.15em; font-weight:750; margin:48px 0 12px; letter-spacing:.02em; }
+  .ban { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+  .ban-item { display:flex; align-items:center; gap:14px; padding:18px 20px; background:var(--card); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm); border:1px solid var(--border); font-size:.9em; font-weight:600; }
+  .ban-num { width:32px; height:32px; border-radius:8px; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.78em; font-weight:700; flex-shrink:0; }
+
+  @media(max-width:600px){ .ban{grid-template-columns:1fr} .tt .tt-time{width:68px;font-size:.82em} }
+
+  .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.header-card{background:#24231f}}
+</style>
+</head>
+<body>
+<main>
+
+<div class="header-card">
+<h1>⏱️ 每日时间表 V6.0</h1>
+<p class="subtitle">全负荷日 + 最低可行日 · 双版本</p>
+</div>
+
+<!-- ═══ 版本 A ═══ -->
+<div class="ver a">
+  <div class="ver-tag">版本 A</div>
+  <h3>全负荷日</h3>
+  <p class="ver-desc">状态好时执行。纯学习 ~8h，留足休息和自由时间。</p>
+  <table class="tt">
+    <tr><th>时间</th><th>任务</th><th>内容</th></tr>
+    <tr><td class="tt-time">07:30</td><td class="tt-task">🌅 起床</td><td class="tt-desc">洗漱、喝水、拉伸。不看屏幕。</td></tr>
+    <tr><td class="tt-time">08:00</td><td class="tt-task">📖 单词</td><td class="tt-desc">墨墨 80–100 词。</td></tr>
+    <tr class="math"><td class="tt-time">08:40</td><td class="tt-task">🧮 数学核心段</td><td class="tt-desc">看课 40% + 手算例题 60%。<b>2h50min</b>。</td></tr>
+    <tr class="hi"><td class="tt-time">11:30</td><td class="tt-task">🍚 午餐 + 散步</td><td class="tt-desc">离屏，不边吃边刷。</td></tr>
+    <tr><td class="tt-time">12:30</td><td class="tt-task">😴 午睡</td><td class="tt-desc">30min。</td></tr>
+    <tr><td class="tt-time">13:00</td><td class="tt-task">💻 408 学新课</td><td class="tt-desc">王道视频 + 精读教材。<b>2h</b>。</td></tr>
+    <tr><td class="tt-time">15:00</td><td class="tt-task">💻 408 做题 + 代码</td><td class="tt-desc">选择题 + 数据结构算法手写。<b>1h30min</b>。</td></tr>
+    <tr><td class="tt-time">16:30</td><td class="tt-task">🐍 C 语言专项</td><td class="tt-desc">链表 / 树代码。非 408 日可跳过。1h。</td></tr>
+    <tr class="hi"><td class="tt-time">17:30</td><td class="tt-task">🏃 晚餐 + 运动</td><td class="tt-desc">跑步或散步。物理换脑。1h。</td></tr>
+    <tr class="math"><td class="tt-time">18:30</td><td class="tt-task">🧮 数学错题复习</td><td class="tt-desc"><b>只做白天错了的题</b>，不学新内容。1h30min。</td></tr>
+    <tr><td class="tt-time">20:00</td><td class="tt-task">📝 408 回顾</td><td class="tt-desc">整理思维导图，标记难点。1h。</td></tr>
+    <tr><td class="tt-time">21:00</td><td class="tt-task">🔧 弹性清零</td><td class="tt-desc">30min。</td></tr>
+    <tr class="hilit"><td class="tt-time">21:30</td><td class="tt-task">🎨 自由时间 🔒</td><td class="tt-desc"><b>雷打不动。</b>开发 / 画画 / 小说。不因白天未完而剥夺。30min。</td></tr>
+    <tr><td class="tt-time">22:00</td><td class="tt-task">📝 复盘</td><td class="tt-desc">写日记。30min。</td></tr>
+    <tr><td class="tt-time">22:30</td><td class="tt-task">🌙 熄灯</td><td class="tt-desc">强制。物理断网。</td></tr>
+  </table>
+</div>
+
+<!-- ═══ 版本 B ═══ -->
+<div class="ver b">
+  <div class="ver-tag">版本 B</div>
+  <h3>最低可行日</h3>
+  <p class="ver-desc">状态差时执行。<b>今天可以差，但不能断。</b></p>
+  <table class="tt">
+    <tr><th>时间</th><th>任务</th><th>说明</th></tr>
+    <tr><td class="tt-time">08:00</td><td class="tt-task">📖 单词</td><td class="tt-desc">50 词，不要求全记住。</td></tr>
+    <tr><td class="tt-time">08:30</td><td class="tt-task">🧮 数学</td><td class="tt-desc"><b>只看视频不做题。</b></td></tr>
+    <tr><td class="tt-time">10:30</td><td class="tt-task">— 自由</td><td class="tt-desc">想干嘛干嘛。</td></tr>
+    <tr><td class="tt-time">13:00</td><td class="tt-task">💻 408</td><td class="tt-desc"><b>只看视频 1–2 节。</b></td></tr>
+    <tr><td class="tt-time">15:00</td><td class="tt-task">🏃 自由 / 运动</td><td class="tt-desc">出门走走。</td></tr>
+    <tr class="hilit"><td class="tt-time">20:00</td><td class="tt-task">🎨 自由时间</td><td class="tt-desc">尽情休息。</td></tr>
+    <tr><td class="tt-time">22:00</td><td class="tt-task">📝 极简复盘</td><td class="tt-desc">一句话日记。</td></tr>
+  </table>
+</div>
+
+<!-- ═══ 禁止 ═══ -->
+<div class="card" style="margin-top:32px;padding-bottom:8px;">
+<h2 style="font-size:1.15em;font-weight:750;letter-spacing:.02em;margin:0 0 14px;">🚫 四个绝对禁止</h2>
+<div class="ban">
+  <div class="ban-item"><div class="ban-num">1</div>没完成任务就砍自由时间</div>
+  <div class="ban-item"><div class="ban-num">2</div>一天没做好第二天「加倍补」</div>
+  <div class="ban-item"><div class="ban-num">3</div>连续断档 3 天以上不自救</div>
+  <div class="ban-item"><div class="ban-num">4</div>在床上用手机看课</div>
+</div>
+</div>
+
+</main>
+
+<script>
+(function(){
+  var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');
+  var alpha=(s.alpha||92)/100;
+  var css='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats,.encourage-box,.header-bar,.day-selector .day-dot,.week-progress .p-dot,.header-card,.zone-title-card{background:rgba(255,255,255,'+alpha+')!important}';
+  css+='@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.header-card{background:rgba(36,35,31,'+alpha+')!important}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+</script>
+
+</body>
+</html>

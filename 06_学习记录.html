@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>学习记录</title>
+<style>
+:root {
+  --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
+  --blue: #2563eb; --blue-bg: #eff4ff; --green: #16a34a; --orange: #ea580c; --red: #dc2626;
+  --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626;
+  --border: #e7e4de; --border-strong: #d4d0c8;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
+  --card-alpha: 0.92;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+    --blue: #60a5fa; --blue-bg: #1a2740; --green: #4ade80; --orange: #fb923c; --red: #f87171;
+    --math: #60a5fa; --cs: #a78bfa; --eng: #fb923c; --pol: #f87171;
+    --border: #35322c; --border-strong: #4a4740; }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:transparent; color:var(--text); font-size:16px; line-height:1.7;
+  -webkit-font-smoothing:antialiased; padding:16px 20px 20px;
+}
+
+/* ── Week selector ── */
+.week-nav {
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.week-nav-btn {
+  width:32px; height:32px; border-radius:var(--radius-sm);
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border);
+  color:var(--text); cursor:pointer; font-size:.9em;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0;
+}
+@media(prefers-color-scheme:dark){ .week-nav-btn{background:#24231f} }
+.week-nav-btn:hover { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
+.week-label {
+  font-size:.92em; font-weight:650; color:var(--text);
+  min-width:160px; text-align:center;
+}
+.week-today-btn {
+  background:var(--blue); color:#fff; border:none;
+  padding:6px 14px; border-radius:var(--radius-sm);
+  font-size:.78em; font-weight:600; cursor:pointer;
+  font-family:inherit; transition:opacity .2s;
+  white-space:nowrap;
+}
+.week-today-btn:hover { opacity:.85; }
+
+.day-strip {
+  display:grid; grid-template-columns:repeat(7,1fr); gap:4px;
+  margin-bottom:16px;
+}
+.day-cell {
+  text-align:center; padding:10px 6px; border-radius:var(--radius-sm);
+  cursor:pointer; transition:all .2s;
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border);
+}
+@media(prefers-color-scheme:dark){ .day-cell{background:#24231f} }
+.day-cell:hover { border-color:var(--blue); }
+.day-cell.today { border:2px solid var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.08); }
+.day-cell.selected { background:var(--blue-bg); border-color:var(--blue); }
+.day-cell .day-name { font-size:.68em; color:var(--text3); margin-bottom:2px; }
+.day-cell .day-date { font-size:.82em; font-weight:600; }
+.day-cell .day-time { font-size:.66em; color:var(--text2); margin-top:3px; font-weight:500; }
+
+/* ── Card ── */
+.card {
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 22px; margin:12px 0;
+  box-shadow:var(--shadow-sm);
+}
+@media(prefers-color-scheme:dark){ .card{background:#24231f} }
+.sec-title {
+  font-size:.88em; font-weight:700; color:var(--text2);
+  margin-bottom:12px; display:flex; align-items:center; gap:6px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:7px 16px; border:none; border-radius:var(--radius-sm);
+  font-size:.82em; font-weight:600; cursor:pointer; transition:all .15s;
+  font-family:inherit;
+}
+.btn-primary { background:var(--blue); color:#fff; }
+.btn-primary:hover { opacity:.88; }
+.btn-sm { padding:5px 12px; font-size:.76em; }
+
+/* ── Summary ── */
+.summary-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:12px;
+}
+.summary-item { text-align:center; padding:8px 4px; }
+.summary-item .val { font-size:1.3em; font-weight:750; }
+.summary-item .lbl { font-size:.68em; color:var(--text3); margin-top:2px; }
+
+/* ── Subject bars ── */
+.subj-row {
+  display:flex; align-items:center; gap:10px; margin-bottom:5px; font-size:.82em;
+}
+.subj-row .subj-name { width:40px; font-weight:600; flex-shrink:0; }
+.subj-row .subj-bar {
+  flex:1; height:10px; background:var(--border);
+  border-radius:5px; overflow:hidden;
+}
+.subj-row .subj-fill { height:100%; border-radius:5px; transition:width .4s; }
+.subj-row .subj-time { width:64px; text-align:right; color:var(--text2); flex-shrink:0; }
+
+/* ── Table ── */
+.log-table { width:100%; border-collapse:collapse; font-size:.86em; }
+.log-table th {
+  text-align:left; padding:8px 12px; border-bottom:2px solid var(--border-strong);
+  color:var(--text2); font-weight:600; font-size:.80em;
+}
+.log-table td { padding:8px 12px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); }
+.log-table td:last-child, .log-table th:last-child { border-right:none; }
+.log-table tr:last-child td { border-bottom:none; }
+
+/* ── Review card ── */
+.review-card {
+  background:var(--blue-bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 24px; margin:14px 0;
+}
+.review-card .review-title {
+  font-size:.88em; font-weight:700; color:var(--blue);
+  margin-bottom:10px; display:flex; align-items:center; gap:8px;
+}
+.review-card .review-body { font-size:.9em; line-height:1.8; color:var(--text); white-space:pre-line; }
+.review-meta { font-size:.72em; color:var(--text3); margin-top:10px; }
+
+/* ── Empty / Loading ── */
+.empty-state {
+  text-align:center; padding:40px 20px; color:var(--text3);
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border); border-radius:var(--radius);
+}
+@media(prefers-color-scheme:dark){ .empty-state{background:#24231f} }
+.empty-state .icon { font-size:2.5em; margin-bottom:10px; }
+.loading { text-align:center; padding:30px; color:var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- Week selector -->
+<div class="week-nav">
+  <button class="week-nav-btn" onclick="navWeek(-1)" title="上一周">&lt;</button>
+  <span class="week-label" id="week-label"></span>
+  <button class="week-nav-btn" onclick="navWeek(1)" title="下一周">&gt;</button>
+  <span style="flex:1"></span>
+  <button class="week-today-btn" onclick="goToday()">今天</button>
+</div>
+
+<div class="day-strip" id="day-strip"></div>
+
+<div id="content">
+  <div class="loading">加载中...</div>
+</div>
+
+<script>
+var API = 'http://localhost:8765';
+var SUBJECT_NAMES = {math:'数学', cs:'408', eng:'英语', pol:'政治'};
+var SUBJECT_HEX = {math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#f87171'};
+
+// ── Week navigation ──
+var weekMonday = getMonday(new Date());
+var selectedDate = new Date().toISOString().slice(0,10);
+var dailyCache = {};  // date -> {total_time, segments_count}
+
+function getMonday(d) {
+  var dt = new Date(d); dt.setDate(dt.getDate() - ((dt.getDay()+6)%7));
+  dt.setHours(0,0,0,0); return dt;
+}
+function fmtDate(d) {
+  var m=d.getMonth()+1, day=d.getDate();
+  return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;
+}
+
+function navWeek(dir) {
+  weekMonday.setDate(weekMonday.getDate() + dir*7);
+  renderWeekStrip();
+}
+
+function goToday() {
+  weekMonday = getMonday(new Date());
+  selectedDate = new Date().toISOString().slice(0,10);
+  renderWeekStrip();
+  loadDay(selectedDate);
+}
+
+function renderWeekStrip() {
+  var today = fmtDate(new Date());
+  var container = document.getElementById('day-strip');
+  var dayNames = ['周一','周二','周三','周四','周五','周六','周日'];
+  var html = '';
+
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(weekMonday); d.setDate(d.getDate() + i);
+    var ds = fmtDate(d);
+    var isToday = ds === today;
+    var isSel = ds === selectedDate;
+    var cls = 'day-cell';
+    if (isToday) cls += ' today';
+    if (isSel) cls += ' selected';
+
+    var timeStr = '';
+    if (dailyCache[ds] && dailyCache[ds].total_time > 0) {
+      timeStr = fmtTimeShort(dailyCache[ds].total_time);
+    } else if (dailyCache[ds]) {
+      timeStr = '—';
+    }
+
+    html += '<div class="'+cls+'" onclick="selectDay(\''+ds+'\')">';
+    html += '<div class="day-name">'+dayNames[i]+'</div>';
+    html += '<div class="day-date">'+(d.getMonth()+1)+'/'+d.getDate()+'</div>';
+    html += '<div class="day-time">'+timeStr+'</div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+
+  // Update week label
+  var sun = new Date(weekMonday); sun.setDate(sun.getDate()+6);
+  var label = (weekMonday.getMonth()+1)+'/'+weekMonday.getDate()+' - '+(sun.getMonth()+1)+'/'+sun.getDate();
+  document.getElementById('week-label').textContent = '本周 ' + label;
+}
+
+function selectDay(ds) {
+  selectedDate = ds;
+  renderWeekStrip();
+  loadDay(ds);
+}
+
+// ── API ──
+async function apiCall(path) {
+  try {
+    var res = await fetch(API + path);
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+// ── Preload week stats ──
+async function preloadWeekStats() {
+  dailyCache = {};
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(weekMonday); d.setDate(d.getDate() + i);
+    var ds = fmtDate(d);
+    var daily = await apiCall('/api/stats/daily?date=' + ds);
+    if (daily && daily.total_time !== undefined) {
+      dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+    } else {
+      dailyCache[ds] = { total_time: 0, segments_count: 0 };
+    }
+  }
+}
+
+// ── Load & render ──
+async function loadDay(ds) {
+  if (!ds) ds = selectedDate;
+  selectedDate = ds;
+  var container = document.getElementById('content');
+  container.innerHTML = '<div class="loading">加载中...</div>';
+
+  var daily = await apiCall('/api/stats/daily?date=' + ds);
+  var review = await apiCall('/api/stats/review?date=' + ds);
+  if (!review || !review.text) review = null;
+
+  render(ds, daily, review);
+}
+
+function render(date, daily, review) {
+  var container = document.getElementById('content');
+  var hasData = daily && daily.segments && daily.segments.length > 0;
+
+  if (!hasData && !review) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div>'+date+' 暂无学习记录</div><div style="font-size:.82em;color:var(--text3);margin-top:4px;">开始番茄钟专注后会自动记录</div></div>';
+    return;
+  }
+
+  var html = '';
+
+  if (hasData) {
+    var segs = daily.segments;
+    var totalTime = daily.total_time || 0;
+    var totalPomos = daily.pomodoros || 0;
+
+    // Subject distribution
+    var subjDist = {};
+    segs.forEach(function(s) {
+      var subj = s.subject || 'other';
+      if (!subjDist[subj]) subjDist[subj] = {time:0, segs:0};
+      subjDist[subj].time += s.duration;
+      subjDist[subj].segs += 1;
+    });
+    var maxDist = 0;
+    Object.values(subjDist).forEach(function(s){ if (s.time > maxDist) maxDist = s.time; });
+
+    // ── Summary card ──
+    html += '<div class="card">';
+    html += '<div class="sec-title">📊 ' + date + ' 学习汇总</div>';
+    html += '<div class="summary-grid">';
+    html += '<div class="summary-item"><div class="val" style="color:var(--blue);">'+fmtTimeShort(totalTime)+'</div><div class="lbl">总时长</div></div>';
+    html += '<div class="summary-item"><div class="val">'+segs.length+'</div><div class="lbl">学习段数</div></div>';
+    html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+totalPomos+'</div><div class="lbl">番茄数</div></div>';
+    html += '<div class="summary-item"><div class="val" style="color:var(--orange);">'+(totalTime>0&&segs.length>0?fmtTimeShort(Math.round(totalTime/segs.length)):'—')+'</div><div class="lbl">平均每段</div></div>';
+    html += '</div>';
+
+    // Subject bars
+    if (Object.keys(subjDist).length > 0) {
+      html += '<div style="margin-top:16px;">';
+      var keys = Object.keys(subjDist);
+      keys.sort(function(a,b){return subjDist[b].time - subjDist[a].time;});
+      keys.forEach(function(k) {
+        var name = SUBJECT_NAMES[k] || '其他';
+        var color = SUBJECT_HEX[k] || '#888';
+        var w = maxDist > 0 ? Math.max(subjDist[k].time / maxDist * 100, 3) : 0;
+        html += '<div class="subj-row">';
+        html += '<span class="subj-name" style="color:'+color+';">'+name+'</span>';
+        html += '<div class="subj-bar"><div class="subj-fill" style="width:'+w+'%;background:'+color+';"></div></div>';
+        html += '<span class="subj-time">'+fmtTimeShort(subjDist[k].time)+' ×'+subjDist[k].segs+'段</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // ── Segments table ──
+    html += '<div class="card">';
+    html += '<div class="sec-title">📋 学习时段</div>';
+    html += '<div style="overflow-x:auto;">';
+    html += '<table class="log-table"><thead><tr>';
+    html += '<th>#</th><th>开始</th><th>结束</th><th>时长</th><th>科目</th>';
+    html += '</tr></thead><tbody>';
+
+    segs.forEach(function(s,i) {
+      var name = SUBJECT_NAMES[s.subject] || '—';
+      var color = SUBJECT_HEX[s.subject] || 'var(--text2)';
+      html += '<tr>';
+      html += '<td style="color:var(--text3);">'+(i+1)+'</td>';
+      html += '<td style="font-family:monospace;">'+(s.start||'--')+'</td>';
+      html += '<td style="font-family:monospace;">'+(s.end||'--')+'</td>';
+      html += '<td style="font-family:monospace;">'+fmtDuration(s.duration||0)+'</td>';
+      html += '<td style="color:'+color+';font-weight:600;">'+name+'</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  }
+
+  // ── Expert review ──
+  if (review) {
+    html += '<div class="review-card">';
+    html += '<div class="review-title">🧠 考研教练点评</div>';
+    html += '<div class="review-body">'+escHtml(review.text||'')+'</div>';
+    html += '<div class="review-meta">生成于 '+(review.generatedAt||'')+' · 基于 '+(review.source||'')+' 的学习数据</div>';
+    html += '</div>';
+  } else if (hasData) {
+    html += '<div class="card" style="text-align:center;padding:24px;color:var(--text3);">';
+    html += '<div style="font-size:1.5em;margin-bottom:6px;">🧠</div>';
+    html += '<div style="font-size:.88em;">专家评价将在次日早上 7:00 自动生成</div>';
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ── Helpers ──
+function fmtDuration(s) {
+  var h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  if (h > 0) return h + 'h ' + m + 'min';
+  return m + 'min';
+}
+function fmtTimeShort(s) {
+  var h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  if (h > 0) return h + 'h' + m + 'm';
+  return m + 'm';
+}
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──
+(async function init() {
+  renderWeekStrip();
+  await preloadWeekStats();
+  renderWeekStrip();
+  loadDay(selectedDate);
+})();
+</script>
+
+<script>
+// Inject transparency from parent theme (runs after onload injection via setTimeout)
+setTimeout(function(){
+  try {
+    var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
+    var alpha = (s.alpha || 92) / 100;
+    var st = document.createElement('style');
+    st.textContent = '.card,.day-cell,.week-nav-btn,.empty-state,.review-card{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.day-cell,.week-nav-btn,.empty-state{background:rgba(36,35,31,'+alpha+')!important}.review-card{background:rgba(26,39,64,'+alpha+')!important}}';
+    document.head.appendChild(st);
+  } catch(e) {}
+}, 200);
+</script>
+</body>
+</html>

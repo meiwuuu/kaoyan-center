@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍩</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考研作战中心</title>
+<style>
+  :root {
+    --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
+    --blue: #2563eb; --blue-bg: #eff4ff; --blue-hover: #1d4ed8;
+    --green: #16a34a; --orange: #ea580c; --red: #dc2626;
+    --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626;
+    --border: #e7e4de; --border-strong: #d4d0c8;
+    --radius: 12px; --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
+    --text-secondary: #5f5b55; --text-muted: #8b857d; --bg-alt: #f4f2ef;
+    --nav-h: 54px; --bg-image: none; --bg-blur: 0px; --bg-overlay: 0.35; --card-alpha: 0.92; --body-bg: var(--bg);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+      --blue: #60a5fa; --blue-bg: #1a2740; --blue-hover: #93bbfd;
+      --green: #4ade80; --orange: #fb923c; --red: #f87171;
+      --math: #60a5fa; --cs: #a78bfa; --eng: #fb923c; --pol: #f87171;
+      --text-secondary: #b5b0a6; --text-muted: #736e65; --bg-alt: #23221e;
+      --border: #35322c; --border-strong: #4a4740; }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--body-bg, var(--bg)); color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; position:relative; }
+  body::before { content:''; position:fixed; inset:0; z-index:-1; background-image:var(--bg-image); background-size:cover; background-position:center; background-attachment:fixed; filter:blur(var(--bg-blur)); opacity:var(--bg-overlay); transition:filter .3s; }
+  main { max-width:900px; margin:0 auto; padding:28px 20px 24px; }
+
+  .card { background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:12px 0; box-shadow:var(--shadow-sm); }
+  @media (prefers-color-scheme:dark){ .card{background:#24231f} }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border:none; border-radius:var(--radius-sm); font-size:.82em; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { background:var(--blue-hover); }
+  .btn-secondary { background:var(--bg); color:var(--text); border:1px solid var(--border); } .btn-secondary:hover { background:var(--border); }
+  .btn-sm { padding:5px 12px; font-size:.76em; }
+  .btn-danger { background:#fef2f2; color:var(--red); border:1px solid #fecaca; } .btn-danger:hover { background:#fee2e2; }
+  @media (prefers-color-scheme:dark){ .btn-danger{background:#2d1516;border-color:#3d2020}.btn-danger:hover{background:#3d2020} }
+  .tag { display:inline-flex; align-items:center; padding:2px 10px; border-radius:99px; font-weight:600; white-space:nowrap; font-size:.72em; }
+  .tag-green { background:#e6f4ea; color:#166534; } .tag-orange { background:#fff7ed; color:#9a4700; } .tag-red { background:#fef2f2; color:#991b1b; }
+  @media (prefers-color-scheme:dark){ .tag-green{background:#152b19;color:#4ade80}.tag-orange{background:#2b1f14;color:#fb923c}.tag-red{background:#2d1516;color:#f87171} }
+  .subtitle { font-size:.88em; color:var(--text3); }
+  h1 { font-size:1.6em; font-weight:750; letter-spacing:.02em; margin-bottom:6px; }
+  h2 { font-size:1.1em; font-weight:750; margin:28px 0 10px; }
+  .stat { display:inline-flex; flex-direction:column; align-items:center; }
+  .stat-val { font-size:1.4em; font-weight:750; }
+  .stat-label { font-size:.68em; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; }
+  .divider { border:none; border-top:1px solid var(--border); margin:24px 0; }
+  label { display:block; font-weight:600; font-size:.86em; margin:10px 0 3px; color:var(--text2); }
+  ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--text3); }
+
+  /* ── Navigation ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 2px;
+    height: var(--nav-h); padding: 0 20px;
+    background: rgba(255,255,255,calc(var(--card-alpha)));
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  @media (prefers-color-scheme:dark) { nav{background:rgba(27,26,23,.92)} }
+  nav .brand {
+    font-weight: 750; font-size: 1.05em; color: var(--text);
+    margin-right: 20px; letter-spacing: -.01em; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  nav .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  }
+  nav a {
+    text-decoration: none; color: var(--text-secondary);
+    font-size: .85em; font-weight: 500; padding: 7px 14px;
+    border-radius: 8px; transition: all .18s ease;
+    cursor: pointer; white-space: nowrap;
+  }
+  nav a:hover { background: var(--bg-alt); color: var(--text); }
+  nav a.active {
+    background: var(--blue); color: #fff;
+    font-weight: 600; box-shadow: 0 2px 10px rgba(37,99,235,.25);
+  }
+
+  /* ── Tab visibility ── */
+  .tab { display: none; }
+  .tab.active { display: block; animation: fadeSlideIn .3s ease; }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 200;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 22px; border-radius: 12px;
+    font-weight: 600; font-size: .91em;
+    background: #fff; color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0,0,0,.1);
+    opacity: 0; transform: translateY(12px);
+    transition: all .3s ease; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { border-color: rgba(220,38,38,.25); background: #fff5f5; }
+  @media (prefers-color-scheme:dark) { .toast{background:#24231f} }
+
+  /* ── Weekly Summary Styles ── */
+  .summary-cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px; margin-bottom: 18px;
+  }
+  .summary-card {
+    text-align: center; padding: 20px 12px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; transition: all .2s ease; box-shadow: var(--shadow-sm);
+  }
+  .summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--border-strong); }
+  @media (prefers-color-scheme:dark) { .summary-card{background:#24231f} }
+  .summary-card .num { font-size: 1.7em; font-weight: 750; line-height: 1.1; letter-spacing:-.01em; }
+  .summary-card .lbl { font-size: .7em; color: var(--text-muted); margin-top: 4px; letter-spacing: .03em; }
+
+  .completion-strip { display: flex; gap: 6px; align-items: flex-end; height: 70px; padding-top: 8px; }
+  .strip-day {
+    flex: 1; text-align: center; border-radius: 6px 6px 0 0;
+    font-size: .65em; font-weight: 700; color: #fff;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 4px; min-height: 8px; transition: height .4s ease;
+  }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 42px; font-size: .86em; font-weight: 600; }
+  .bar-track { flex: 1; height: 14px; background: var(--bg-alt); border-radius: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 7px; transition: width .5s ease; }
+  .bar-val { font-size: .82em; color: var(--text-secondary); width: 46px; text-align: right; font-variant-numeric:tabular-nums; }
+
+  .highlight-item {
+    padding: 12px 16px; margin: 8px 0;
+    border-radius: var(--radius-sm); font-size: .89em;
+    border-left: 3px solid var(--blue); background: var(--blue-bg);
+  }
+  .highlight-item.negative { border-left-color: var(--red); background: #fef2f2; }
+
+  .week-summary-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 22px; flex-wrap: wrap; }
+
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); margin: 8px 0;
+    font-size: .92em; background: #fff;
+    transition: all .2s ease; box-shadow: var(--shadow-sm);
+  }
+  .history-item:hover { background: var(--bg-alt); border-color: var(--blue); transform: translateX(3px); box-shadow:var(--shadow); }
+  @media (prefers-color-scheme:dark) { .history-item{background:#24231f} }
+
+  /* ── Form ── */
+  label { display: block; font-weight: 600; font-size: .86em; margin: 10px 0 3px; color: var(--text-secondary); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* ── Tab order in settings ── */
+  .taborder-item {
+    display:flex; align-items:center; gap:8px; padding:8px 10px; margin:2px 0;
+    background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
+    font-size:.85em; transition:all .15s;
+  }
+  .taborder-item:hover { border-color:var(--border-strong); }
+  .taborder-item .to-label { flex:1; font-weight:500; }
+  .taborder-btn {
+    width:26px; height:26px; border-radius:6px;
+    border:1px solid var(--border); background:var(--bg-alt);
+    color:var(--text2); cursor:pointer; font-size:.9em;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s;
+  }
+  .taborder-btn:hover { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
+  .taborder-btn:disabled { opacity:.25; cursor:default; }
+  .taborder-btn:disabled:hover { background:var(--bg-alt); color:var(--text2); border-color:var(--border); }
+</style>
+<body>
+
+<nav>
+  <div class="brand">🍩 考研作战中心</div>
+  <a onclick="switchTab('daily')" class="active" id="nav-daily">每日复盘</a>
+  <a onclick="switchTab('weekly')" id="nav-weekly">每周总结</a>
+  <a onclick="switchTab('schedule')" id="nav-schedule">时间表</a>
+  <a onclick="switchTab('plan')" id="nav-plan">阶段计划</a>
+  <a onclick="switchTab('emergency')" id="nav-emergency">应急方案</a>
+    <a onclick="switchTab('courses')" id="nav-courses">课程表</a>
+  <a onclick="switchTab('learnlog')" id="nav-learnlog">学习记录</a>
+  <span style="flex:1"></span>
+  <a href="file:///E:/code/hermes/focus/index.html" target="_blank" style="font-size:.9em;padding:6px 14px;background:var(--blue-bg);color:var(--blue);border-radius:8px;" title="打开专注学习工具">🍅 专注工具</a>
+  <a onclick="toggleSettings()" style="font-size:.9em;padding:6px 12px;" title="设置">⚙️</a>
+</nav>
+
+<main>
+
+
+<div class="tab" id="tab-schedule" style="padding:0;min-height:0;">
+  <iframe src="01_每日时间表.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var a=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');var alpha=(a.alpha||92)/100;var s=d.createElement('style');s.textContent='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.day-selector .day-dot{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card{background:rgba(36,35,31,'+alpha+')!important}}';d.head.appendChild(s);var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab" id="tab-plan" style="padding:0;min-height:0;">
+  <iframe src="02_分科阶段计划.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var a=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');var alpha=(a.alpha||92)/100;var s=d.createElement('style');s.textContent='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.day-selector .day-dot{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card{background:rgba(36,35,31,'+alpha+')!important}}';d.head.appendChild(s);var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab active" id="tab-daily" style="padding:0;min-height:0;">
+  <iframe src="03_每日复盘.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var a=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');var alpha=(a.alpha||92)/100;var s=d.createElement('style');s.textContent='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.day-selector .day-dot{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card{background:rgba(36,35,31,'+alpha+')!important}}';d.head.appendChild(s);var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab" id="tab-weekly">
+  <div class="card" style="margin-bottom:20px;">
+  <h1 style="margin-top:0;">📊 每周总结</h1>
+  <p class="subtitle">由每日复盘自动汇总生成 · 每周日晚自动合成</p>
+
+  <div class="week-summary-nav">
+    <select id="ws-week-select" onchange="renderWeeklySummary()"></select>
+    <button class="btn btn-sm btn-primary" onclick="generateWeekly()" style="margin-left:4px;">重新生成本周</button>
+  </div>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;"><div id="weekly-summary-content">
+    <div class="card" style="text-align:center;padding:48px;color:var(--text-muted);">
+      <p style="font-size: 2.5em;margin-bottom:10px;"></p>
+      <p>还没有周数据。去「每日复盘」页填写至少 7 天数据后，这里会自动生成总结。</p>
+    </div>
+  </div></div>
+
+  <div class="card" style="margin-top:24px;">
+  <h2 style="margin-top:0;">历史周总结</h2>
+  <div id="weekly-history-list">
+    <p style="color:var(--text-muted);font-size: .91em;">暂无历史记录。</p>
+  </div>
+  </div>
+</div>
+
+<div class="tab" id="tab-courses" style="padding:0;min-height:0;">
+  <iframe src="05_课程表.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var a=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');var alpha=(a.alpha||92)/100;var s=d.createElement('style');s.textContent='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.day-selector .day-dot{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card{background:rgba(36,35,31,'+alpha+')!important}}';d.head.appendChild(s);var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab" id="tab-emergency" style="padding:0;min-height:0;">
+  <iframe src="04_防崩盘应急方案.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var a=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');var alpha=(a.alpha||92)/100;var s=d.createElement('style');s.textContent='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.day-selector .day-dot{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card{background:rgba(36,35,31,'+alpha+')!important}}';d.head.appendChild(s);var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab" id="tab-learnlog" style="padding:0;min-height:0;">
+  <iframe src="06_学习记录.html" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;">
+  <div style="background:var(--card-bg, #fff);border-radius:14px;padding:32px;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.15);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <h2 style="margin:0;font-size:1.2em;">⚙️ 外观设置</h2>
+      <button class="btn btn-sm btn-secondary" onclick="toggleSettings()">✕</button>
+    </div>
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🖼 背景图片URL</label>
+    <div style="display:flex;gap:8px;margin-bottom:6px;">
+      <input id="bg-url" type="text" placeholder="https://... 或本地路径" style="flex:1;font-family:inherit;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;background:var(--bg);color:var(--text);">
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:20px;">
+      <button class="btn btn-sm btn-primary" onclick="applyBg()">应用</button>
+      <button class="btn btn-sm btn-secondary" onclick="clearBg()">清除</button>
+    </div>
+    
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🌫 遮罩不透明度: <span id="overlay-val">35%</span></label>
+    <input id="bg-overlay" type="range" min="0" max="100" value="35" oninput="document.getElementById('overlay-val').textContent=this.value+'%';applyOverlay(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
+
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">🔮 模糊强度: <span id="blur-val">0px</span></label>
+    <input id="bg-blur" type="range" min="0" max="20" value="0" oninput="document.getElementById('blur-val').textContent=this.value+'px';applyBlur(this.value)" style="width:100%;accent-color:var(--blue);margin-bottom:20px;">
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:6px;">📐 卡片透明度</label>
+    <input id="card-alpha" type="range" min="50" max="100" value="92" oninput="applyAlpha(this.value)" style="width:100%;accent-color:var(--blue);">
+    <p style="font-size:.76em;color:var(--text3);margin-top:12px;">设置自动保存。背景图对全部页面生效。
+    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:8px;">💾 数据存档</label>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-primary" onclick="exportAll()">📥 导出全部</button>
+      <button class="btn btn-sm btn-secondary" onclick="document.getElementById('import-file').click()">📤 导入恢复</button>
+      <input type="file" id="import-file" accept=".json" onchange="importAll(this)" style="display:none;">
+    </div>
+    <p style="font-size:.72em;color:var(--text3);margin-top:6px;">导出包含每日复盘、周总结、设置等全部数据。</p>
+    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+    <label style="display:block;font-weight:600;font-size:.86em;margin-bottom:10px;">📋 Tab 顺序</label>
+    <div id="tab-order-list"></div>
+    <div style="margin-top:8px;">
+      <button class="btn btn-sm btn-secondary" onclick="resetTabOrder()">重置默认顺序</button>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const tabs = ['schedule','plan','daily','weekly','courses','emergency','learnlog'];
+function switchTab(name) {
+  tabs.forEach(t => {
+    document.getElementById('tab-'+t).classList.remove('active');
+    document.getElementById('nav-'+t).classList.remove('active');
+  });
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  localStorage.setItem('kaoyan_active_tab', name);
+  if (name === 'weekly') { initWeeklyTab(); }
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+}
+
+let currentDayDate = formatDate(new Date());
+let currentMood = 'ok';
+
+(function(){
+  const saved = localStorage.getItem('kaoyan_active_tab');
+  if (saved && tabs.includes(saved)) switchTab(saved);
+})();
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getMonday(d) { const dt = new Date(d); dt.setDate(dt.getDate() - ((dt.getDay()+6)%7)); dt.setHours(0,0,0,0); return dt; }
+function formatDate(d) { var m=d.getMonth()+1; var day=d.getDate(); return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day; }
+function getWeekLabel(monday) {
+  const sun = new Date(monday); sun.setDate(sun.getDate()+6);
+  return `${monday.getMonth()+1}/${monday.getDate()} - ${sun.getMonth()+1}/${sun.getDate()}`;
+}
+
+const DAILY_KEY = 'kaoyan_daily_reviews';
+function loadDailyData() { return JSON.parse(localStorage.getItem(DAILY_KEY) || '{}'); }
+function saveDailyData(data) { localStorage.setItem(DAILY_KEY, JSON.stringify(data)); }
+
+const WEEKLY_KEY = 'kaoyan_weekly_summaries';
+function loadWeeklyData() { return JSON.parse(localStorage.getItem(WEEKLY_KEY) || '{}'); }
+function saveWeeklyData(data) { localStorage.setItem(WEEKLY_KEY, JSON.stringify(data)); }
+
+function computeSmartDefaults() {
+  const all = loadDailyData();
+  const dates = Object.keys(all).sort().reverse();
+  if (dates.length === 0) return null;
+  const recent = dates.slice(0, 14).map(d => all[d]);
+  const verCount = {};
+  recent.forEach(r => { const v = r.version; verCount[v] = (verCount[v]||0)+1; });
+  const bestVer = Object.entries(verCount).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'A';
+  let compSum = 0, compWeight = 0;
+  recent.forEach((r,i) => { const w = recent.length - i; compSum += (r.completion||0)*w; compWeight += w; });
+  const avgComp = compWeight > 0 ? Math.round(compSum / compWeight) : 65;
+  const last7 = dates.slice(0, 7).map(d => all[d]);
+  function avgHrs(sub) {
+    const vals = last7.map(r => parseFloat(r.subjects?.[sub]?.hrs) || 0).filter(v => v > 0);
+    return vals.length > 0 ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : null;
+  }
+  function avgFeel(sub) {
+    const vals = last7.map(r => parseInt(r.subjects?.[sub]?.feel) || 0).filter(v => v > 0);
+    return vals.length > 0 ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+  }
+  return {
+    version: bestVer, completion: avgComp,
+    math_hrs: avgHrs('math') || '3.5', math_feel: avgFeel('math') || 3,
+    cs_hrs: avgHrs('cs') || '3', cs_feel: avgFeel('cs') || 3,
+    eng_hrs: avgHrs('eng') || '1.5', eng_feel: avgFeel('eng') || 3,
+    pol_hrs: avgHrs('pol') || '0.25', pol_feel: avgFeel('pol') || 2
+  };
+}
+
+function applyDefaults(def) {
+  if (!def) return;
+  document.getElementById('d-version').value = def.version;
+  document.getElementById('d-completion').value = def.completion;
+  updateCompletionDisplay();
+  document.getElementById('d-math-hrs').value = def.math_hrs;
+  document.getElementById('d-cs-hrs').value = def.cs_hrs;
+  document.getElementById('d-eng-hrs').value = def.eng_hrs;
+  document.getElementById('d-pol-hrs').value = def.pol_hrs;
+  setMood('ok', document.querySelector('#mood-strip .mood-chip:nth-child(2)'));
+  updateCompletionDisplay();
+}
+
+function setFeelBtn(sub, val) {
+  const group = document.getElementById('feel-'+sub);
+  if (!group) return;
+  const btns = group.querySelectorAll('.feel-btn');
+  btns.forEach((b,i) => { b.classList.toggle('sel', i+1 === val); });
+}
+function getFeelVal(sub) {
+  const sel = document.querySelector('#feel-'+sub+' .feel-btn.sel');
+  return sel ? parseInt(sel.dataset.val) : 0;
+}
+
+function syncCompletion(val, fromInput) {
+  const slider = document.getElementById('d-completion-slider');
+  const input = document.getElementById('d-completion');
+  const v = parseInt(val) || 0;
+  if (fromInput) slider.value = v;
+  else input.value = v;
+  updateCompletionColor(v);
+}
+function updateCompletionColor(v) {
+  const input = document.getElementById('d-completion');
+  if (v >= 80) input.style.color = 'var(--green)';
+  else if (v >= 50) input.style.color = 'var(--orange)';
+  else input.style.color = 'var(--red)';
+}
+
+function onVersionChange() {
+  const ver = document.getElementById('d-version').value;
+  const msg = document.getElementById('encourage-msg');
+  if (ver === 'A') msg.innerHTML = '全力输出的一天，完成后记得犒劳自己';
+  else if (ver === 'B') msg.innerHTML = '最低可行日也是胜利——今天可以差，但不能断';
+  else msg.innerHTML = '断档没关系，明天切回 B 版本就行';
+}
+
+function setMood(mood, el) {
+  document.querySelectorAll('#mood-strip .mood-chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('d-mood').value = mood;
+}
+function getMoodVal() {
+  const sel = document.querySelector('#mood-strip .mood-chip.sel');
+  return sel ? sel.dataset.mood || 'ok' : 'ok';
+}
+
+function copyYesterday() {
+  const all = loadDailyData();
+  const today = new Date(currentDayDate+'T00:00:00');
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+  const yds = formatDate(yesterday);
+  const data = all[yds];
+  if (!data) { showToast('昨天还没有记录', true); return; }
+  document.getElementById('d-version').value = data.version || 'A';
+  document.getElementById('d-completion').value = data.completion || 65;
+  updateCompletionDisplay();
+  onVersionChange();
+  const s = data.subjects || {};
+  document.getElementById('d-math-hrs').value = s.math?.hrs || '';
+  document.getElementById('d-math-acc').value = s.math?.acc || '';
+  document.getElementById('d-cs-hrs').value = s.cs?.hrs || '';
+  document.getElementById('d-cs-acc').value = s.cs?.acc || '';
+  document.getElementById('d-eng-hrs').value = s.eng?.hrs || '';
+  document.getElementById('d-eng-acc').value = s.eng?.acc || '';
+  document.getElementById('d-pol-hrs').value = s.pol?.hrs || '';
+  if (data.mood) setMood(data.mood, document.querySelector('#mood-strip .mood-chip[data-mood="'+data.mood+'"]') || document.querySelector('#mood-strip .mood-chip:nth-child(2)'));
+  showToast('已复制昨天的数据，改改就能保存');
+}
+
+function updateStreak() {
+  const all = loadDailyData();
+  const dates = Object.keys(all).sort().reverse();
+  let streak = 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 0; i < dates.length; i++) {
+    const d = new Date(dates[i]+'T00:00:00');
+    const expected = new Date(today); expected.setDate(expected.getDate()-i);
+    if (formatDate(d) !== formatDate(expected)) break;
+    if (all[dates[i]].version !== '-') streak++;
+    else break;
+  }
+  const badge = document.getElementById('streak-badge');
+  badge.textContent = '连续 ' + streak + ' 天';
+  badge.className = 'today-badge ' + (streak >= 7 ? 'good' : streak >= 3 ? 'ok' : 'bad');
+}
+
+function initFeelButtons() {
+  ['math','cs','eng','pol'].forEach(sub => {
+    const group = document.getElementById('feel-'+sub);
+    if (!group || group.children.length > 0) return;
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('span');
+      btn.className = 'feel-btn';
+      btn.dataset.val = i;
+      btn.textContent = i;
+      btn.title = i + '分';
+      btn.onclick = function() {
+        group.querySelectorAll('.feel-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+      };
+      group.appendChild(btn);
+    }
+  });
+  const moods = document.querySelectorAll('#mood-strip .mood-chip');
+  if (moods.length >= 3) {
+    moods[0].dataset.mood = 'great';
+    moods[1].dataset.mood = 'ok';
+    moods[2].dataset.mood = 'bad';
+  }
+}
+
+function loadDailyDefaults() {
+  const def = computeSmartDefaults();
+  if (def) {
+    applyDefaults(def);
+    showToast('已根据你最近 ' + Math.min(Object.keys(loadDailyData()).length, 14) + ' 天的数据智能预填');
+  } else {
+    showToast('还没有历史数据，已使用默认值', true);
+  }
+}
+
+function initDailyTab() {
+  renderDaySelector();
+  renderWeekProgress();
+  renderDailyWeekList();
+  loadDay(currentDayDate);
+  updateStreak();
+  updateProgress();
+  updateGoal();
+}
+
+function renderDaySelector() {
+  const container = document.getElementById('day-selector');
+  const monday = getMonday(new Date(currentDayDate));
+  const today = formatDate(new Date());
+  const allDaily = loadDailyData();
+  const dayNames = ['一','二','三','四','五','六','日'];
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const ds = formatDate(d);
+    const isToday = ds === today;
+    const isActive = ds === currentDayDate;
+    const data = allDaily[ds];
+    let cls = 'day-dot';
+    if (isActive) cls += ' active';
+    if (isToday) cls += ' today';
+    if (data) cls += ' done';
+    let stat = '';
+    if (data) {
+      stat = data.version === '-' ? '断' : (data.version + ' ' + data.completion + '%');
+    }
+    html += `<div class="${cls}" onclick="selectDay('${ds}')">
+      ${d.getMonth()+1}/${d.getDate()}<span class="dot-label">周${dayNames[i]}</span>
+      <span class="dot-stat">${stat || '—'}</span>
+    </div>`;
+  }
+  container.innerHTML = html;
+  document.getElementById('current-week-label').textContent = '本周 ' + getWeekLabel(monday);
+
+  const prevMon = new Date(monday); prevMon.setDate(prevMon.getDate()-7);
+  const nextMon = new Date(monday); nextMon.setDate(nextMon.getDate()+7);
+  document.getElementById('current-week-label').innerHTML = `
+    <button class="btn btn-sm btn-secondary" onclick="navigateWeek(-1)" style="margin-right:8px;"></button>
+    本周 ${getWeekLabel(monday)}
+    <button class="btn btn-sm btn-secondary" onclick="navigateWeek(1)" style="margin-left:8px;"></button>
+  `;
+}
+
+function navigateWeek(dir) {
+  const monday = getMonday(new Date(currentDayDate));
+  monday.setDate(monday.getDate() + dir * 7);
+  currentDayDate = formatDate(monday);
+  initDailyTab();
+}
+
+function selectDay(ds) {
+  currentDayDate = ds;
+  loadDay(ds);
+  renderDaySelector();
+}
+
+function loadDay(ds) {
+  document.getElementById('form-day-title').textContent = '' + ds;
+  document.getElementById('form-day-sub').textContent = '星期' + ['日','一','二','三','四','五','六'][new Date(ds+'T00:00:00').getDay()];
+  const all = loadDailyData();
+  const data = all[ds];
+  if (data) {
+    document.getElementById('d-version').value = data.version || 'A';
+    document.getElementById('d-completion').value = data.completion || 65;
+    updateCompletionDisplay();
+    onVersionChange();
+    const s = data.subjects || {};
+    document.getElementById('d-math-hrs').value = s.math?.hrs || '';
+    document.getElementById('d-math-acc').value = s.math?.acc || '';
+    document.getElementById('d-cs-hrs').value = s.cs?.hrs || '';
+    document.getElementById('d-cs-acc').value = s.cs?.acc || '';
+    document.getElementById('d-eng-hrs').value = s.eng?.hrs || '';
+    document.getElementById('d-eng-acc').value = s.eng?.acc || '';
+    document.getElementById('d-pol-hrs').value = s.pol?.hrs || '';
+    const e = data.errors || {};
+    document.getElementById('d-err-blind-new').value = e.blind?.new ?? 0;
+    document.getElementById('d-err-blind-fix').value = e.blind?.fix ?? 0;
+    document.getElementById('d-err-mis-new').value = e.mis?.new ?? 0;
+    document.getElementById('d-err-mis-fix').value = e.mis?.fix ?? 0;
+    document.getElementById('d-err-care-new').value = e.care?.new ?? 0;
+    document.getElementById('d-err-care-fix').value = e.care?.fix ?? 0;
+    document.getElementById('d-reflect').value = data.reflect || '';
+    document.getElementById('d-sleep').value = data.sleep || '7-8';
+    document.getElementById('d-exercise').checked = data.exercise || false;
+    document.getElementById('d-feel-overall').value = data.feelOverall || '2';
+    if (data.mood) {
+      const moodEl = document.querySelector('#mood-strip .mood-chip[data-mood="'+data.mood+'"]');
+      if (moodEl) setMood(data.mood, moodEl);
+    }
+  } else {
+    const def = computeSmartDefaults();
+    if (def) { applyDefaults(def); }
+    document.getElementById('d-math-acc').value = '';
+    document.getElementById('d-cs-acc').value = '';
+    document.getElementById('d-eng-acc').value = '';
+    document.getElementById('d-err-blind-new').value = 0;
+    document.getElementById('d-err-blind-fix').value = 0;
+    document.getElementById('d-err-mis-new').value = 0;
+    document.getElementById('d-err-mis-fix').value = 0;
+    document.getElementById('d-err-care-new').value = 0;
+    document.getElementById('d-err-care-fix').value = 0;
+    document.getElementById('d-reflect').value = '';
+    onVersionChange();
+  }
+}
+
+function saveDaily() {
+  const ds = currentDayDate;
+  const data = {
+    version: document.getElementById('d-version').value,
+    completion: parseInt(document.getElementById('d-completion').value) || 0,
+    mood: getMoodVal(),
+    sleep: document.getElementById('d-sleep').value,
+    exercise: document.getElementById('d-exercise').checked,
+    feelOverall: document.getElementById('d-feel-overall').value,
+    subjects: {
+      math: { hrs: document.getElementById('d-math-hrs').value, acc: document.getElementById('d-math-acc').value },
+      cs: { hrs: document.getElementById('d-cs-hrs').value, acc: document.getElementById('d-cs-acc').value },
+      eng: { hrs: document.getElementById('d-eng-hrs').value, acc: document.getElementById('d-eng-acc').value },
+      pol: { hrs: document.getElementById('d-pol-hrs').value }
+    },
+    errors: {
+      blind: { new: parseInt(document.getElementById('d-err-blind-new').value)||0, fix: parseInt(document.getElementById('d-err-blind-fix').value)||0 },
+      mis: { new: parseInt(document.getElementById('d-err-mis-new').value)||0, fix: parseInt(document.getElementById('d-err-mis-fix').value)||0 },
+      care: { new: parseInt(document.getElementById('d-err-care-new').value)||0, fix: parseInt(document.getElementById('d-err-care-fix').value)||0 }
+    },
+    reflect: document.getElementById('d-reflect').value,
+    savedAt: new Date().toISOString()
+  };
+  const all = loadDailyData();
+  all[ds] = data;
+  saveDailyData(all);
+  showToast('' + ds + ' 复盘已保存！');
+  renderDaySelector();
+  renderWeekProgress();
+  renderDailyWeekList();
+  updateStreak();
+  updateProgress();
+  autoGenerateWeekly(ds);
+}
+
+function renderWeekProgress() {
+  const container = document.getElementById('week-progress-dots');
+  const monday = getMonday(new Date(currentDayDate));
+  const allDaily = loadDailyData();
+  const dayNames = ['一','二','三','四','五','六','日'];
+  let filled = 0;
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const ds = formatDate(d);
+    const data = allDaily[ds];
+    let cls = 'p-dot';
+    let label = dayNames[i];
+    if (data) {
+      filled++;
+      if (data.version === '-') cls += ' off';
+      else if (data.version === 'B') cls += ' b';
+      else cls += ' filled';
+    }
+    html += `<div class="${cls}" title="${ds}">${label}</div>`;
+  }
+  html += `<span class="progress-label">${filled}/7 天</span>`;
+  container.innerHTML = html;
+}
+
+function renderDailyWeekList() {
+  const container = document.getElementById('daily-week-list');
+  const monday = getMonday(new Date(currentDayDate));
+  const allDaily = loadDailyData();
+  const dayNames = ['周一','周二','周三','周四','周五','周六','周日'];
+  let items = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const ds = formatDate(d);
+    const data = allDaily[ds];
+    if (data) {
+      items.push({ ds, data, label: dayNames[i] + ' ' + (d.getMonth()+1) + '/' + d.getDate() });
+    }
+  }
+  if (items.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size: 0.91em;">还没有记录。选择日期后填写表单。</p>';
+    return;
+  }
+  let html = '';
+  items.forEach(item => {
+    const verTag = item.data.version === '-' ? '<span class="tag tag-red">断档</span>' :
+                   item.data.version === 'B' ? '<span class="tag tag-orange">B</span>' :
+                   '<span class="tag tag-green">A</span>';
+    html += `<div class="history-item">
+      <div style="flex:1">
+        <b>${item.label}</b> ${verTag}
+        <span style="color:var(--text-muted);font-size: 0.84em;margin-left:6px;">完成 ${item.data.completion}%</span>
+        ${item.data.reflect ? '<span style="color:var(--text-secondary);font-size: 0.82em;margin-left:6px;">' + item.data.reflect.slice(0,40) + (item.data.reflect.length>40?'...':'') + '</span>' : ''}
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="selectDay('${item.ds}')"></button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function autoGenerateWeekly(ds) {
+  const monday = getMonday(new Date(ds+'T00:00:00'));
+  const weekKey = formatDate(monday);
+  const allDaily = loadDailyData();
+  let allFilled = true;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    if (!allDaily[formatDate(d)]) { allFilled = false; break; }
+  }
+  if (allFilled) {
+    generateWeeklyForWeek(weekKey);
+  }
+}
+
+function generateWeeklyForWeek(weekKey) {
+  const monday = new Date(weekKey+'T00:00:00');
+  const allDaily = loadDailyData();
+  const days = [];
+  let missingDays = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const data = allDaily[formatDate(d)] || null;
+    days.push(data);
+    if (!data) missingDays++;
+  }
+  if (missingDays > 0) return false;
+  const validDays = days.filter(d => d && d.version !== '-');
+  const aDays = days.filter(d => d && d.version === 'A').length;
+  const bDays = days.filter(d => d && d.version === 'B').length;
+  const offDays = days.filter(d => d && d.version === '-').length;
+  const avgComp = validDays.length > 0 ? Math.round(validDays.reduce((s,d) => s + d.completion, 0) / validDays.length) : 0;
+
+  function sumHrs(sub) { return days.reduce((s,d) => s + (parseFloat(d?.subjects?.[sub]?.hrs) || 0), 0); }
+  function sumErr(type, field) { return days.reduce((s,d) => s + (d?.errors?.[type]?.[field] || 0), 0); }
+
+  let highlights = [];
+  days.forEach((d,i) => {
+    if (!d || !d.reflect) return;
+    const dayLabel = ['周一','周二','周三','周四','周五','周六','周日'][i];
+    highlights.push({ day: dayLabel, text: d.reflect, completion: d.completion, version: d.version });
+  });
+
+  const summary = {
+    week: weekKey,
+    weekLabel: getWeekLabel(monday),
+    generatedAt: new Date().toISOString(),
+    days,
+    stats: {
+      daysA: aDays, daysB: bDays, daysOff: offDays,
+      avgCompletion: avgComp,
+      totalHours: sumHrs('math') + sumHrs('cs') + sumHrs('eng') + sumHrs('pol'),
+      subjectHours: { math: sumHrs('math'), cs: sumHrs('cs'), eng: sumHrs('eng'), pol: sumHrs('pol') },
+      errorsNew: sumErr('blind','new') + sumErr('mis','new') + sumErr('care','new'),
+      errorsFix: sumErr('blind','fix') + sumErr('mis','fix') + sumErr('care','fix'),
+      highlights
+    }
+  };
+
+  const allWeekly = loadWeeklyData();
+  allWeekly[weekKey] = summary;
+  saveWeeklyData(allWeekly);
+
+  const blob = new Blob([JSON.stringify(summary, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '周总结_' + weekKey + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function generateWeekly() {
+  const monday = getMonday(new Date(currentDayDate));
+  const weekKey = formatDate(monday);
+  const result = generateWeeklyForWeek(weekKey);
+  if (result === false) {
+    showToast('本周数据不完整，必须填满周一~周日 7 天才能生成周总结', true);
+  } else {
+    showToast('本周总结已生成！（自动下载 JSON）');
+  }
+  if (document.getElementById('tab-weekly').classList.contains('active')) {
+    initWeeklyTab();
+  }
+}
+
+function initWeeklyTab() {
+  const sel = document.getElementById('ws-week-select');
+  const allWeekly = loadWeeklyData();
+  const allDaily = loadDailyData();
+  let weeks = new Set(Object.keys(allWeekly));
+  Object.keys(allDaily).forEach(ds => {
+    const monday = getMonday(new Date(ds+'T00:00:00'));
+    const weekKey = formatDate(monday);
+    if (allWeekly[weekKey]) return;
+    let complete = true;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday); d.setDate(d.getDate() + i);
+      if (!allDaily[formatDate(d)]) { complete = false; break; }
+    }
+    if (complete) weeks.add(weekKey);
+  });
+  weeks = Array.from(weeks).sort().reverse();
+
+  sel.innerHTML = '';
+  if (weeks.length === 0) {
+    sel.innerHTML = '<option>-- 暂无数据 --</option>';
+    document.getElementById('weekly-summary-content').innerHTML =
+      '<div class="card" style="text-align:center;padding:48px;color:var(--text-muted);"><p style="font-size: 2.5em;margin-bottom:10px;"></p><p>还没有周数据。去「每日复盘」页填写至少 7 天数据后，这里会自动生成总结。</p></div>';
+    document.getElementById('weekly-history-list').innerHTML = '<p style="color:var(--text-muted);font-size: 0.91em;">暂无历史记录。</p>';
+    return;
+  }
+
+  weeks.forEach(wk => {
+    const m = new Date(wk+'T00:00:00');
+    const opt = document.createElement('option');
+    opt.value = wk;
+    opt.textContent = getWeekLabel(m) + ' (' + wk + ')';
+    sel.appendChild(opt);
+  });
+
+  sel.value = weeks[0];
+  renderWeeklySummary();
+  renderWeeklyHistory();
+}
+
+function renderWeeklySummary() {
+  const weekKey = document.getElementById('ws-week-select').value;
+  if (!weekKey || weekKey.startsWith('--')) return;
+
+  let summary = loadWeeklyData()[weekKey];
+  if (!summary) {
+    const result = generateWeeklyForWeek(weekKey);
+    if (result === false) {
+      document.getElementById('weekly-summary-content').innerHTML =
+        '<div class="card" style="text-align:center;padding:36px;color:var(--text-muted);"><p style="font-size: 2.5em;"></p><p>该周数据不完整。周总结必须填满周一~周日连续 7 天才能生成。</p><p style="font-size: 0.91em;margin-top:8px;">去「每日复盘」补填缺失的日期。</p></div>';
+      return;
+    }
+    summary = loadWeeklyData()[weekKey];
+  }
+
+  const s = summary.stats;
+  const subjectColors = { math: 'var(--math)', cs: 'var(--cs)', eng: 'var(--eng)', pol: 'var(--pol)' };
+  const subjectNames = { math: '数学', cs: '408', eng: '英语', pol: '政治' };
+  const maxHrs = Math.max(...Object.values(s.subjectHours), 1);
+
+  let html = '';
+
+  html += `<div class="summary-cards">
+    <div class="summary-card"><div class="num" style="color:var(--green)">${s.daysA}</div><div class="lbl">A 日</div></div>
+    <div class="summary-card"><div class="num" style="color:var(--orange)">${s.daysB}</div><div class="lbl">B 日</div></div>
+    <div class="summary-card"><div class="num" style="color:${s.daysOff>0?'var(--red)':'var(--text-muted)'}">${s.daysOff}</div><div class="lbl">断档</div></div>
+    <div class="summary-card"><div class="num">${s.avgCompletion}%</div><div class="lbl">均完成</div></div>
+    <div class="summary-card"><div class="num">${s.totalHours.toFixed(1)}h</div><div class="lbl">总学时</div></div>
+  </div>`;
+
+  html += '<div class="card"><h3 style="margin-top:0;">每日完成度</h3><div class="completion-strip">';
+  const dayLabels = ['一','二','三','四','五','六','日'];
+  summary.days.forEach((d,i) => {
+    if (!d) { html += `<div class="strip-day" style="background:#ddd;opacity:0.3;" title="未填">?</div>`; return; }
+    const pct = d.completion || 0;
+    const hue = d.version === '-' ? 0 : (pct < 40 ? 30 : pct < 70 ? 40 : 140);
+    const sat = d.version === '-' ? 80 : 70;
+    const light = d.version === '-' ? 50 : (50 - pct * 0.15);
+    html += `<div class="strip-day" style="height:${Math.max(pct*0.36,8)}px;background:hsl(${hue},${sat}%,${light}%);" title="${dayLabels[i]}: ${d.version} ${pct}%">${pct}%</div>`;
+  });
+  html += '</div></div>';
+
+  html += '<div class="card"><h3 style="margin-top:0;">各科用时</h3><div class="bar-chart">';
+  Object.entries(s.subjectHours).forEach(([sub, hrs]) => {
+    const w = maxHrs > 0 ? (hrs/maxHrs*100) : 0;
+    html += `<div class="bar-row">
+      <span class="bar-label" style="color:${subjectColors[sub]}">${subjectNames[sub]}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${subjectColors[sub]};"></div></div>
+      <span class="bar-val">${hrs.toFixed(1)}h</span>
+    </div>`;
+  });
+  html += '</div></div>';
+
+  html += `<div class="card"><h3 style="margin-top:0;">错题统计</h3>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div class="stat"><div class="stat-val" style="color:var(--red)">${s.errorsNew}</div><div class="stat-label">本周新增</div></div>
+      <div class="stat"><div class="stat-val" style="color:var(--green)">${s.errorsFix}</div><div class="stat-label">本周消灭</div></div>
+      <div class="stat"><div class="stat-val">${s.errorsNew - s.errorsFix}</div><div class="stat-label">净增</div></div>
+    </div>
+  </div>`;
+
+  if (s.highlights && s.highlights.length > 0) {
+    html += '<div class="card"><h3 style="margin-top:0;">每日反思摘要</h3>';
+    s.highlights.filter(h => h.text).forEach(h => {
+      const cls = h.completion < 50 ? 'highlight-item negative' : 'highlight-item';
+      html += `<div class="${cls}"><b>${h.day}</b> (${h.version} ${h.completion}%) &mdash; ${h.text}</div>`;
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('weekly-summary-content').innerHTML = html;
+}
+
+function renderWeeklyHistory() {
+  const allWeekly = loadWeeklyData();
+  const allDaily = loadDailyData();
+  let weeks = new Set(Object.keys(allWeekly));
+  Object.keys(allDaily).forEach(ds => weeks.add(formatDate(getMonday(new Date(ds+'T00:00:00')))));
+  weeks = Array.from(weeks).sort().reverse();
+
+  const container = document.getElementById('weekly-history-list');
+  if (weeks.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size: 0.91em;">暂无历史记录。</p>';
+    return;
+  }
+
+  let html = '';
+  weeks.forEach(wk => {
+    const summary = allWeekly[wk];
+    if (!summary) return;
+    const s = summary.stats;
+    html += `<div class="history-item">
+      <div style="flex:1">
+        <b>${summary.weekLabel}</b>
+        <span style="color:var(--text-muted);font-size: 0.84em;margin-left:8px;">${wk}</span>
+        <div style="margin-top:2px;font-size: 0.82em;">
+          <span class="tag tag-green">Ax${s.daysA}</span>
+          <span class="tag tag-orange">Bx${s.daysB}</span>
+          ${s.daysOff ? `<span class="tag tag-red">断x${s.daysOff}</span>` : ''}
+          <span style="color:var(--text-muted);margin-left:4px;">均${s.avgCompletion}% · ${s.totalHours.toFixed(1)}h</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-secondary" onclick="viewWeeklySummary('${wk}')">查看</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteWeekly('${wk}')">删</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html || '<p style="color:var(--text-muted);font-size: 0.91em;">暂无历史记录。</p>';
+}
+
+function viewWeeklySummary(wk) {
+  document.getElementById('ws-week-select').value = wk;
+  renderWeeklySummary();
+  document.getElementById('tab-weekly').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteWeekly(wk) {
+  if (!confirm('确定删除 ' + wk + ' 的周总结？')) return;
+  const all = loadWeeklyData();
+  delete all[wk];
+  saveWeeklyData(all);
+  initWeeklyTab();
+  showToast('已删除');
+}
+
+function toggleAdvanced() {
+  const sec = document.getElementById('advanced-section');
+  const btn = document.getElementById('advanced-toggle');
+  if (sec.style.display === 'none') {
+    sec.style.display = 'block';
+    btn.innerHTML = '收起';
+  } else {
+    sec.style.display = 'none';
+    btn.innerHTML = '高级选项';
+  }
+}
+
+function updateCompletionDisplay() {
+  const v = parseInt(document.getElementById('d-completion').value) || 0;
+  const disp = document.getElementById('comp-display');
+  disp.textContent = v + '%';
+  if (v >= 80) disp.style.color = 'var(--green)';
+  else if (v >= 50) disp.style.color = 'var(--orange)';
+  else disp.style.color = 'var(--red)';
+}
+
+function updateProgress() {
+  const all = loadDailyData();
+  const dates = Object.keys(all);
+  document.getElementById('total-days').textContent = dates.length;
+  let totalHrs = 0;
+  dates.forEach(d => {
+    const s = all[d].subjects || {};
+    totalHrs += parseFloat(s.math?.hrs)||0 + parseFloat(s.cs?.hrs)||0 + parseFloat(s.eng?.hrs)||0 + parseFloat(s.pol?.hrs)||0;
+  });
+  document.getElementById('total-hours').textContent = totalHrs.toFixed(1);
+  const exam = new Date(2026, 11, 20);
+  const daysLeft = Math.ceil((exam - new Date()) / 86400000);
+  document.getElementById('days-left').textContent = daysLeft > 0 ? daysLeft : 0;
+}
+
+function updateGoal() {
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  let goal = '';
+  if (m >= 5 && m <= 6) goal = '当前阶段：基础期 · 数学完成高数+线代基础，408计组一轮，英语阅读基础';
+  else if (m >= 7 && m <= 8) goal = '当前阶段：强化期 · 数学进入线代+概率，408 OS+计网，英语阅读强化';
+  else if (m >= 9 && m <= 10) goal = '当前阶段：真题期 · 数学660+880，408二轮+大题，英语真题限时';
+  else if (m >= 11) goal = '当前阶段：冲刺期 · 数学真题模拟，408真题，英语作文，政治肖四';
+  document.getElementById('today-goal').textContent = goal;
+}
+
+function updateEncouragement(streak, frozen) {
+  const msg = document.getElementById('encourage-msg');
+  if (frozen) {
+    msg.innerHTML = '连续 ' + streak + ' 天（冻结中）-- 今天回来，明天继续';
+  } else if (streak === 0) {
+    msg.innerHTML = '迈出第一步就是胜利';
+  } else if (streak < 3) {
+    msg.innerHTML = '好的开始！坚持到第 3 天就形成习惯了';
+  } else if (streak < 7) {
+    msg.innerHTML = '连续 ' + streak + ' 天！习惯正在养成';
+  } else if (streak < 21) {
+    msg.innerHTML = '整整 ' + streak + ' 天！你已经超过 90% 的考研人了';
+  } else {
+    msg.innerHTML = streak + ' 天不间断！这不是意志力，这是你的日常';
+  }
+}
+
+(function(){
+  const activeTab = localStorage.getItem('kaoyan_active_tab');
+  if (activeTab && tabs.includes(activeTab)) {
+    switchTab(activeTab);
+  }
+})();
+
+// ═══════════ Tab order ═══════════
+const TAB_NAMES = {
+  daily:'每日复盘', weekly:'每周总结', schedule:'时间表',
+  plan:'阶段计划', emergency:'应急方案', courses:'课程表', learnlog:'学习记录'
+};
+const DEFAULT_TAB_ORDER = ['schedule','plan','daily','weekly','courses','emergency','learnlog'];
+
+function getTabOrder() {
+  try {
+    var order = JSON.parse(localStorage.getItem('kaoyan_tab_order'));
+    if (Array.isArray(order) && order.length === DEFAULT_TAB_ORDER.length) return order;
+  } catch(e) {}
+  return DEFAULT_TAB_ORDER.slice();
+}
+
+function saveTabOrder(order) {
+  localStorage.setItem('kaoyan_tab_order', JSON.stringify(order));
+}
+
+function applyTabOrder(order) {
+  if (!order) order = getTabOrder();
+  var nav = document.querySelector('nav');
+  var main = document.querySelector('main');
+  // Find anchor points: spacer in nav, settings overlay in main
+  var spacer = nav ? nav.querySelector('span[style*="flex:1"]') : null;
+  var overlay = document.getElementById('settings-overlay');
+  // Reorder nav links: insert before spacer (so brand stays left, settings stays right)
+  order.forEach(function(id) {
+    var a = document.getElementById('nav-' + id);
+    if (a && spacer) nav.insertBefore(a, spacer);
+  });
+  // Reorder tab divs: insert before settings overlay
+  order.forEach(function(id) {
+    var tab = document.getElementById('tab-' + id);
+    if (tab && overlay) main.insertBefore(tab, overlay);
+  });
+  // Update active tab tracking
+  for (var i = 0; i < DEFAULT_TAB_ORDER.length; i++) {
+    tabs[i] = order[i];
+  }
+}
+
+function renderTabOrderList() {
+  var order = getTabOrder();
+  var container = document.getElementById('tab-order-list');
+  if (!container) return;
+  var html = '';
+  order.forEach(function(id, i) {
+    html += '<div class="taborder-item">';
+    html += '<span class="to-label">' + (TAB_NAMES[id] || id) + '</span>';
+    html += '<button class="taborder-btn" onclick="moveTabUp('+i+')" ' + (i===0?'disabled':'') + '>↑</button>';
+    html += '<button class="taborder-btn" onclick="moveTabDown('+i+')" ' + (i===order.length-1?'disabled':'') + '>↓</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function moveTabUp(idx) {
+  var order = getTabOrder();
+  if (idx <= 0) return;
+  var tmp = order[idx-1]; order[idx-1] = order[idx]; order[idx] = tmp;
+  saveTabOrder(order);
+  applyTabOrder(order);
+  renderTabOrderList();
+}
+
+function moveTabDown(idx) {
+  var order = getTabOrder();
+  if (idx >= order.length - 1) return;
+  var tmp = order[idx+1]; order[idx+1] = order[idx]; order[idx] = tmp;
+  saveTabOrder(order);
+  applyTabOrder(order);
+  renderTabOrderList();
+}
+
+function resetTabOrder() {
+  var order = DEFAULT_TAB_ORDER.slice();
+  saveTabOrder(order);
+  applyTabOrder(order);
+  renderTabOrderList();
+  showToast('已恢复默认 Tab 顺序');
+}
+
+// Apply saved order on page load (after all consts defined)
+(function(){ applyTabOrder(); })();
+
+function toggleSettings(){var o=document.getElementById('settings-overlay');var show=o.style.display==='none'||!o.style.display;o.style.display=show?'flex':'none';if(show)loadSettings();o.onclick=function(e){if(e.target===o)toggleSettings();};}
+function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();}
+function applySettings(s){s=s||{};var r=document.documentElement;r.style.setProperty('--bg-image',s.bg?'url('+s.bg+')':'none');r.style.setProperty('--bg-blur',(s.blur||0)+'px');r.style.setProperty('--card-alpha',(s.alpha||92)/100);
+  r.style.setProperty('--bg-overlay',(s.overlay!=null?s.overlay:35)/100);
+  r.style.setProperty('--body-bg',s.bg?'transparent':'var(--bg)');}
+function applyBg(){var url=document.getElementById('bg-url').value.trim();var blur=parseInt(document.getElementById('bg-blur').value)||0;var alpha=parseInt(document.getElementById('card-alpha').value)||92;var overlay=parseInt(document.getElementById('bg-overlay').value)||35;var s={bg:url,blur:blur,overlay:overlay,alpha:alpha};localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
+function clearBg(){document.getElementById('bg-url').value='';var s={bg:'',blur:0,overlay:35,alpha:92};localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);document.getElementById('bg-blur').value=0;document.getElementById('blur-val').textContent='0px';document.getElementById('card-alpha').value=92;document.getElementById('bg-overlay').value=35;document.getElementById('overlay-val').textContent='35%';}
+function applyBlur(v){document.getElementById('blur-val').textContent=v+'px';var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');s.blur=parseInt(v)||0;localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
+function applyOverlay(v){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');s.overlay=parseInt(v)||35;localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
+function applyAlpha(v){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');s.alpha=parseInt(v)||92;localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
+(function(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');if(s.bg||s.blur){applySettings(s);}else{document.documentElement.style.setProperty('--body-bg','var(--bg)');}})();
+
+
+function exportAll(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.startsWith('kaoyan_'))data[k]=localStorage.getItem(k);}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='考研作战中心_备份_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);}
+function importAll(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var count=0;for(var k in data){if(k.startsWith('kaoyan_')){localStorage.setItem(k,data[k]);count++;}}showToast('✅ 已恢复 '+count+' 条数据，刷新页面生效');}catch(err){showToast('❌ 文件格式错误',true);}};reader.readAsText(file);}
+
+</script>
+</body>
+</html>

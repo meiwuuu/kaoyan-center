@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍩</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>防崩盘应急方案 · 考研作战中心</title>
+<style>
+  :root {
+    --bg: #fafaf8; --text: #1c1b18; --text2: #3d3a35; --text3: #5f5b55;
+    --border: #e7e4de; --card: #fff; --radius: 16px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #d4d0c8; --text3: #9a958c; --border: #35322c; --card: #24231f; }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  main { max-width:760px; margin:0 auto; padding:40px 24px 24px; }
+
+  .hero { text-align:center; padding:24px 0 8px; }
+  .hero h1 { font-size:1.8em; font-weight:800; letter-spacing:.03em; margin-bottom:4px; text-align:center; position:relative; }
+  .h-emoji { position:absolute; margin-left:-1.6em; margin-top:.05em; }
+  .hero .sub { font-size:.88em; color:var(--text2); }
+
+  .zone { margin:32px 0; }
+  .zone-head { font-size:1.2em; font-weight:750; letter-spacing:.02em; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+  .zone-note { font-size:.9em; color:var(--text2); margin-bottom:0; }
+  .zone-title-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 28px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.zone-title-card{background:#24231f}}
+  .zone-title-card .zone-head { margin-bottom:4px; }
+  .zone-title-card .zone-note { margin-bottom:0; }
+
+  /* ── ZONE 1: 信号 ── */
+  .sig-panel { background:var(--card); border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  @media (prefers-color-scheme:dark){ .sig-panel{background:#24231f} }
+  @media (prefers-color-scheme:dark){ .step-panel{background:#24231f} }
+  @media (prefers-color-scheme:dark){ .trig-panel{background:#24231f} }
+  .sig-block { padding:20px 28px; border-bottom:1px solid #3d3a35; }
+  @media (prefers-color-scheme:dark){ .sig-block{border-color:#5a5650} }
+  .sig-block:last-child { border-bottom:none; }
+  .sig-label { display:inline-block; font-size:.76em; font-weight:700; letter-spacing:.04em; padding:3px 10px; border-radius:4px; margin-bottom:10px; }
+  .sig-label.yellow { background:#fff3e0; color:#9a4700; }
+  .sig-label.red    { background:#fef2f2; color:#991b1b; }
+  @media (prefers-color-scheme:dark){ .sig-label.yellow{background:#2b1f14;color:#fb923c} .sig-label.red{background:#2d1516;color:#f87171} }
+  .sig-block ul { list-style:none; padding:0; }
+  .sig-block li { font-size:.93em; padding:5px 0 5px 18px; position:relative; line-height:1.55; color:var(--text2); }
+  .sig-block li::before { content:'—'; position:absolute; left:0; color:#c4bfb6; }
+  .sig-block li b { color:var(--text); }
+
+  /* ── ZONE 2: 步骤 ── */
+  .step-panel { background:var(--card); border-radius:16px; padding:8px 28px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  @media (prefers-color-scheme:dark){ .step-panel{background:#24231f} }
+  .step { display:flex; gap:16px; padding:18px 0; border-bottom:1px solid #3d3a35; }
+  @media (prefers-color-scheme:dark){ .step{border-color:#5a5650} }
+  .step:last-child { border-bottom:none; }
+  .step-num { font-size:.82em; font-weight:700; color:var(--text3); width:28px; flex-shrink:0; padding-top:2px; }
+  .step b { display:block; font-size:1em; font-weight:750; margin-bottom:2px; }
+  .step p { font-size:.9em; color:var(--text2); line-height:1.6; margin:0; }
+
+  /* ── ZONE 3: 触发器 ── */
+  .trig-panel { background:var(--card); border-radius:16px; padding:8px 28px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  @media (prefers-color-scheme:dark){ .trig-panel{background:#24231f} }
+  .trig { display:flex; gap:14px; padding:16px 0; border-bottom:1px solid #3d3a35; align-items:flex-start; }
+  @media (prefers-color-scheme:dark){ .trig{border-color:#5a5650} }
+  .trig:last-child { border-bottom:none; }
+  .trig-icon { font-size:1.3em; flex-shrink:0; width:32px; text-align:center; padding-top:2px; }
+  .trig b { display:block; font-size:.95em; font-weight:750; margin-bottom:2px; }
+  .trig span { font-size:.88em; color:var(--text2); line-height:1.6; }
+
+  /* ── ZONE 4: 约定 ── */
+  .pledge-panel { background:#eff4ff; border-radius:16px; padding:28px 32px; color:#1e40af; border:1px solid #dbeafe; }
+  @media (prefers-color-scheme:dark){ .pledge-panel{background:#1a2740;color:#bfdbfe;border-color:#1e3050} }
+  .pledge-panel h3 { font-size:1.05em; font-weight:750; margin-bottom:18px; }
+  .pledge { list-style:none; padding:0; counter-reset:p; }
+  .pledge li { counter-increment:p; font-size:.95em; padding:10px 0; border-bottom:1px solid #3d3a35; display:flex; align-items:center; gap:12px; line-height:1.5; }
+  @media (prefers-color-scheme:dark){ .pledge li{border-color:#5a5650} }
+  .pledge li:last-child { border-bottom:none; }
+  .pledge li::before { content:counter(p); width:24px; height:24px; border-radius:6px; background:rgba(37,99,235,.15); display:flex; align-items:center; justify-content:center; font-size:.72em; font-weight:700; flex-shrink:0; }
+  @media (prefers-color-scheme:dark){ .pledge li::before{background:rgba(96,165,250,.15)} }
+  .pledge li b { font-weight:750; }
+
+  .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.header-card{background:#24231f}}
+</style>
+</head>
+<body>
+<main>
+
+<div class="hero header-card">
+  <h1><span class="h-emoji">🛟</span> 防崩盘应急方案</h1>
+  <p class="sub">基于真实轨迹：Day4倦怠 · Day14崩溃 · Day25-34断档</p>
+</div>
+
+<!-- ═══════════ ZONE 1: 预警信号 ═══════════ -->
+<div class="zone">
+  <div class="zone-title-card">
+    <h2 class="zone-head">⚠️ 识别崩盘前兆</h2>
+    <p class="zone-note">信号出现时立刻行动，不要等到崩盘才反应</p>
+  </div>
+  <div class="sig-panel">
+    <div class="sig-block">
+      <div class="sig-label yellow">🟡 黄灯信号 · 连续2天出现就干预</div>
+      <ul>
+        <li>早上赖床超 <b>30 分钟</b></li>
+        <li>坐桌前超 <b>10 分钟</b>没翻开书</li>
+        <li>看课时频繁暂停刷手机</li>
+        <li>以「查资料」为借口刷别的</li>
+        <li>晚上写不出今天具体完成了什么</li>
+      </ul>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label red">🔴 红灯信号 · 出现1条就当天切B版本</div>
+      <ul>
+        <li>醒来第一反应<b>「今天不想学」</b></li>
+        <li>刷视频或小说超 <b>1 小时</b>停不下来</li>
+        <li>对自己说<b>「反正废了，明天再说」</b></li>
+        <li>一整天没出过门</li>
+        <li>产生「我是不是不适合考研」的怀疑</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ZONE 2: 五步自救 ═══════════ -->
+<div class="zone">
+  <div class="zone-title-card">
+    <h2 class="zone-head">🚨 崩盘后 · 五步自救</h2>
+    <p class="zone-note">按顺序执行，不要跳过。每一步都是下一步的前提。</p>
+  </div>
+  <div class="step-panel">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div><b>立刻停止自责</b><p>崩了就崩了。自责的每一分钟都在延长崩盘。告诉自己：<b>「这很正常，所有人都会崩。」</b></p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div><b>物理换环境</b><p>出门，去操场走 3 圈。至少离开书桌 30 分钟。换个空间就是换个心态。</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div><b>做一件极小学习动作</b><p>只做一件：背 20 个词，或看 10 分钟视频。<b>做完就算今天成功。</b>目的是重建「我还能学」的信心。</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div><b>第二天切版本 B</b><p>不要「加倍补」。不要试图一天追回三天。2–3 天 B 版本后自然会想回到 A。</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div><b>复盘原因（只分析，不自责）</b><p>崩盘前一天发生了什么？找到触发器。知道为什么会崩，下次就能提前干预。</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ZONE 3: 触发器 ═══════════ -->
+<div class="zone">
+  <div class="zone-title-card">
+    <h2 class="zone-head">🎯 专属触发器应对</h2>
+    <p class="zone-note">从你的日记里提取的高危场景，每个都有具体应对方法</p>
+  </div>
+  <div class="trig-panel">
+    <div class="trig">
+      <div class="trig-icon">📱</div>
+      <div><b>手机 / 小说</b><span>Day18「松懈and小说」直接导致断档。学习时手机放另一个房间。晚上 21:30 你有合法的自由时间可以看。</span></div>
+    </div>
+    <div class="trig">
+      <div class="trig-icon">🤖</div>
+      <div><b>AI 焦虑</b><span>Day7「AI危机」。用 AI 辅助考研本身就是学习。408 + C + TA 这个技能组合有竞争力。焦虑来自信息不足——花30分钟查清楚比焦虑3小时有用。</span></div>
+    </div>
+    <div class="trig">
+      <div class="trig-icon">😮‍💨</div>
+      <div><b>完美主义反弹</b><span>Day13完美 → Day14崩溃。这是头号杀手。在桌前贴纸条——「昨天100分，今天60分就及格。及格就行。」</span></div>
+    </div>
+    <div class="trig">
+      <div class="trig-icon">💼</div>
+      <div><b>外部压力</b><span>Day35「还有找实习」。周末花2h专心做好简历投出去。5分钟焦虑×30天=2.5小时，不如一次性花2小时解决。</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ZONE 4: 约定 ═══════════ -->
+<div class="zone">
+  <div class="zone-title-card">
+    <h2 class="zone-head">🤝 和自己的约定</h2>
+    <p class="zone-note">打印出来贴在桌前。崩盘的时候不用思考，直接看这个。</p>
+  </div>
+  <div class="pledge-panel">
+    <ol class="pledge">
+      <li>崩盘不超过 <b>2 天</b>。第 3 天必须切 B。</li>
+      <li>崩盘后不「加倍补」。用一周慢慢追回来。</li>
+      <li><b>自由时间永不剥夺。</b>它是燃料，不是奖杯。</li>
+      <li>不对自己说「你真没用」。</li>
+      <li>连续 7 天执行率 &lt; 50%，找人聊聊或换环境。</li>
+    </ol>
+  </div>
+</div>
+
+</main>
+
+<script>
+(function(){
+  var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');
+  var alpha=(s.alpha||92)/100;
+  var css='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats,.encourage-box,.header-bar,.day-selector .day-dot,.week-progress .p-dot,.header-card,.zone-title-card{background:rgba(255,255,255,'+alpha+')!important}';
+  css+='@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.header-card{background:rgba(36,35,31,'+alpha+')!important}}';
+  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+})();
+</script>
+
+</body>
+</html>
