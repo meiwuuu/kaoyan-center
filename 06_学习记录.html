@@ -14,12 +14,6 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
   --card-alpha: 0.92;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
-    --blue: #60a5fa; --blue-bg: #1a2740; --green: #4ade80; --orange: #fb923c; --red: #f87171;
-    --math: #60a5fa; --cs: #a78bfa; --eng: #fb923c; --pol: #f87171;
-    --border: #35322c; --border-strong: #4a4740; }
-}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body {
   font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -40,10 +34,9 @@ body {
   display:flex; align-items:center; justify-content:center;
   transition:all .2s; flex-shrink:0;
 }
-@media(prefers-color-scheme:dark){ .week-nav-btn{background:#24231f} }
 .week-nav-btn:hover { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
 .week-label {
-  font-size:.92em; font-weight:650; color:var(--text);
+  font-size:.93em; font-weight:650; color:var(--text);
   min-width:160px; text-align:center;
 }
 .week-today-btn {
@@ -55,6 +48,32 @@ body {
 }
 .week-today-btn:hover { opacity:.85; }
 
+/* ── Week progress dots ── */
+.week-progress-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px; margin-bottom:16px;
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);
+}
+.week-progress-bar .wlabel {
+  font-size:.88em; font-weight:650; color:var(--text); white-space:nowrap;
+}
+.week-progress-bar .wdots {
+  display:flex; gap:5px; align-items:center; flex:1; justify-content:center;
+}
+.week-progress-bar .wdot {
+  width:30px; height:30px; border-radius:8px;
+  border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.72em; font-weight:700; color:var(--text3);
+  transition:all .2s; background:rgba(255,255,255,0.5);
+}
+.week-progress-bar .wdot.has-data { color:#fff; font-weight:700; }
+.week-progress-bar .wcount {
+  font-size:.78em; color:var(--text3); white-space:nowrap; margin-left:4px;
+}
+
 .day-strip {
   display:grid; grid-template-columns:repeat(7,1fr); gap:4px;
   margin-bottom:16px;
@@ -65,7 +84,6 @@ body {
   background:rgba(255,255,255,var(--card-alpha));
   border:1px solid var(--border);
 }
-@media(prefers-color-scheme:dark){ .day-cell{background:#24231f} }
 .day-cell:hover { border-color:var(--blue); }
 .day-cell.today { border:2px solid var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.08); }
 .day-cell.selected { background:var(--blue-bg); border-color:var(--blue); }
@@ -81,9 +99,8 @@ body {
   padding:18px 22px; margin:12px 0;
   box-shadow:var(--shadow-sm);
 }
-@media(prefers-color-scheme:dark){ .card{background:#24231f} }
 .sec-title {
-  font-size:.88em; font-weight:700; color:var(--text2);
+  font-size:.9em; font-weight:700; color:var(--text2);
   margin-bottom:12px; display:flex; align-items:center; gap:6px;
 }
 
@@ -120,14 +137,20 @@ body {
 .subj-row .subj-time { width:64px; text-align:right; color:var(--text2); flex-shrink:0; }
 
 /* ── Table ── */
-.log-table { width:100%; border-collapse:collapse; font-size:.86em; }
+.log-table { width:100%; border-collapse:collapse; font-size:.92em; font-variant-numeric:tabular-nums; }
 .log-table th {
-  text-align:left; padding:8px 12px; border-bottom:2px solid var(--border-strong);
-  color:var(--text2); font-weight:600; font-size:.80em;
+  text-align:left; padding:10px 14px; border-bottom:1px solid var(--border-strong);
+  color:var(--text2); font-weight:600; font-size:.82em; letter-spacing:.04em;
 }
-.log-table td { padding:8px 12px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); }
+.log-table td { padding:10px 14px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); }
 .log-table td:last-child, .log-table th:last-child { border-right:none; }
 .log-table tr:last-child td { border-bottom:none; }
+.log-table tbody tr { transition:background .15s; }
+.log-table tbody tr:hover { background:rgba(37,99,235,.04); }
+.log-table .col-num { color:var(--text3); font-size:.88em; width:32px; text-align:center; }
+.log-table .col-time { font-family:"SF Mono","Cascadia Code","JetBrains Mono",monospace; font-size:.9em; letter-spacing:.02em; }
+.log-table .col-dur { font-family:"SF Mono","Cascadia Code","JetBrains Mono",monospace; font-size:.9em; font-weight:600; color:var(--text); }
+.log-table .col-subj { font-weight:650; font-size:.92em; }
 
 /* ── Review card ── */
 .review-card {
@@ -149,7 +172,6 @@ body {
   background:rgba(255,255,255,var(--card-alpha));
   border:1px solid var(--border); border-radius:var(--radius);
 }
-@media(prefers-color-scheme:dark){ .empty-state{background:#24231f} }
 .empty-state .icon { font-size:2.5em; margin-bottom:10px; }
 .loading { text-align:center; padding:30px; color:var(--text3); }
 </style>
@@ -165,6 +187,13 @@ body {
   <button class="week-today-btn" onclick="goToday()">今天</button>
 </div>
 
+<!-- Week progress dots -->
+<div class="week-progress-bar">
+  <span class="wlabel">本周</span>
+  <div class="wdots" id="week-progress-dots"></div>
+  <span class="wcount" id="week-progress-count"></span>
+</div>
+
 <div class="day-strip" id="day-strip"></div>
 
 <div id="content">
@@ -176,10 +205,18 @@ var API = 'http://localhost:8765';
 var SUBJECT_NAMES = {math:'数学', cs:'408', eng:'英语', pol:'政治'};
 var SUBJECT_HEX = {math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#f87171'};
 
+// Score → color mapping for week dots
+var SCORE_COLORS = {S:'#f59e0b', A:'#16a34a', B:'#2563eb', C:'#ea580c', D:'#dc2626'};
+function gradeColor(grade) {
+  if (!grade) return null;
+  return SCORE_COLORS[grade.charAt(0)] || null;
+}
+
 // ── Week navigation ──
 var weekMonday = getMonday(new Date());
 var selectedDate = new Date().toISOString().slice(0,10);
-var dailyCache = {};  // date -> {total_time, segments_count}
+var dailyCache = {};    // date -> {total_time, segments_count}
+var reviewCache = {};   // date -> {score, grade}
 
 function getMonday(d) {
   var dt = new Date(d); dt.setDate(dt.getDate() - ((dt.getDay()+6)%7));
@@ -192,13 +229,13 @@ function fmtDate(d) {
 
 function navWeek(dir) {
   weekMonday.setDate(weekMonday.getDate() + dir*7);
-  renderWeekStrip();
+  renderWeek();
 }
 
 function goToday() {
   weekMonday = getMonday(new Date());
   selectedDate = new Date().toISOString().slice(0,10);
-  renderWeekStrip();
+  renderWeek();
   loadDay(selectedDate);
 }
 
@@ -231,7 +268,47 @@ function renderWeekStrip() {
     html += '</div>';
   }
   container.innerHTML = html;
+}
 
+function renderWeekProgress() {
+  var container = document.getElementById('week-progress-dots');
+  var dayNames = ['一','二','三','四','五','六','日'];
+  var html = '';
+  var filled = 0;
+
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(weekMonday); d.setDate(d.getDate() + i);
+    var ds = fmtDate(d);
+    var data = dailyCache[ds];
+    var review = reviewCache[ds];
+    var hasData = data && data.total_time > 0;
+
+    var bg = '';
+    var border = '';
+    var color = 'var(--text3)';
+
+    if (hasData) {
+      filled++;
+      if (review && review.grade) {
+        var gc = gradeColor(review.grade);
+        bg = gc; border = gc; color = '#fff';
+      } else {
+        bg = 'var(--blue)'; border = 'var(--blue)'; color = '#fff';
+      }
+    }
+
+    var style = '';
+    if (bg) style += 'background:'+bg+';border-color:'+border+';color:'+color+';';
+    html += '<div class="wdot'+(hasData?' has-data':'')+'" style="'+style+'" title="'+ds+'">'+dayNames[i]+'</div>';
+  }
+
+  container.innerHTML = html;
+  document.getElementById('week-progress-count').textContent = filled+'/7 天';
+}
+
+function renderWeek() {
+  renderWeekStrip();
+  renderWeekProgress();
   // Update week label
   var sun = new Date(weekMonday); sun.setDate(sun.getDate()+6);
   var label = (weekMonday.getMonth()+1)+'/'+weekMonday.getDate()+' - '+(sun.getMonth()+1)+'/'+sun.getDate();
@@ -241,6 +318,7 @@ function renderWeekStrip() {
 function selectDay(ds) {
   selectedDate = ds;
   renderWeekStrip();
+  renderWeekProgress();
   loadDay(ds);
 }
 
@@ -255,14 +333,19 @@ async function apiCall(path) {
 // ── Preload week stats ──
 async function preloadWeekStats() {
   dailyCache = {};
+  reviewCache = {};
   for (var i = 0; i < 7; i++) {
     var d = new Date(weekMonday); d.setDate(d.getDate() + i);
     var ds = fmtDate(d);
     var daily = await apiCall('/api/stats/daily?date=' + ds);
+    var review = await apiCall('/api/stats/review?date=' + ds);
     if (daily && daily.total_time !== undefined) {
       dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
     } else {
       dailyCache[ds] = { total_time: 0, segments_count: 0 };
+    }
+    if (review && review.text) {
+      reviewCache[ds] = { score: review.score, grade: review.grade };
     }
   }
 }
@@ -342,18 +425,18 @@ function render(date, daily, review) {
     html += '<div class="sec-title">📋 学习时段</div>';
     html += '<div style="overflow-x:auto;">';
     html += '<table class="log-table"><thead><tr>';
-    html += '<th>#</th><th>开始</th><th>结束</th><th>时长</th><th>科目</th>';
+    html += '<th class="col-num">#</th><th class="col-time">开始</th><th class="col-time">结束</th><th class="col-dur">时长</th><th class="col-subj">科目</th>';
     html += '</tr></thead><tbody>';
 
     segs.forEach(function(s,i) {
       var name = SUBJECT_NAMES[s.subject] || '—';
       var color = SUBJECT_HEX[s.subject] || 'var(--text2)';
       html += '<tr>';
-      html += '<td style="color:var(--text3);">'+(i+1)+'</td>';
-      html += '<td style="font-family:monospace;">'+(s.start||'--')+'</td>';
-      html += '<td style="font-family:monospace;">'+(s.end||'--')+'</td>';
-      html += '<td style="font-family:monospace;">'+fmtDuration(s.duration||0)+'</td>';
-      html += '<td style="color:'+color+';font-weight:600;">'+name+'</td>';
+      html += '<td class="col-num">'+(i+1)+'</td>';
+      html += '<td class="col-time">'+(s.start||'--')+'</td>';
+      html += '<td class="col-time">'+(s.end||'--')+'</td>';
+      html += '<td class="col-dur">'+fmtDuration(s.duration||0)+'</td>';
+      html += '<td class="col-subj" style="color:'+color+';">'+name+'</td>';
       html += '</tr>';
     });
 
@@ -406,21 +489,21 @@ function escHtml(s) {
 
 // ── Init ──
 (async function init() {
-  renderWeekStrip();
+  renderWeek();
   await preloadWeekStats();
-  renderWeekStrip();
+  renderWeek();
   loadDay(selectedDate);
 })();
 </script>
 
 <script>
-// Inject transparency from parent theme (runs after onload injection via setTimeout)
+// Inject transparency from parent theme
 setTimeout(function(){
   try {
     var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
     var alpha = (s.alpha || 92) / 100;
     var st = document.createElement('style');
-    st.textContent = '.card,.day-cell,.week-nav-btn,.empty-state,.review-card{background:rgba(255,255,255,'+alpha+')!important}@media(prefers-color-scheme:dark){.card,.day-cell,.week-nav-btn,.empty-state{background:rgba(36,35,31,'+alpha+')!important}.review-card{background:rgba(26,39,64,'+alpha+')!important}}';
+    st.textContent = '.card,.day-cell,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(255,255,255,'+alpha+')!important}';
     document.head.appendChild(st);
   } catch(e) {}
 }, 200);
