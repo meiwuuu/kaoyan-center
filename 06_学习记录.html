@@ -317,29 +317,25 @@ async function apiCall(path) {
   } catch(e) { return null; }
 }
 
-// ── Preload week stats ──
+// ── Preload week stats (background, skips today) ──
 async function preloadWeekStats() {
-  dailyCache = {};
-  reviewCache = {};
-  // Build all 14 URLs first, then fetch in parallel
-  var urls = [];
-  var dateMap = [];
+  var today = new Date().toISOString().slice(0,10);
+  var urls = [], dateMap = [];
   for (var i = 0; i < 7; i++) {
     var d = new Date(weekMonday); d.setDate(d.getDate() + i);
     var ds = fmtDate(d);
+    if (ds === today) continue;  // already loaded
     urls.push('/api/stats/daily?date=' + ds);
     urls.push('/api/stats/review?date=' + ds);
     dateMap.push(ds); dateMap.push(ds);
   }
-  // Fire all 14 requests at once
+  if (!urls.length) return;
   var results = await Promise.all(urls.map(function(u) {
     return fetch(API + u).then(function(r) { return r.json(); }).catch(function() { return null; });
   }));
-  // Distribute results
-  for (var i = 0; i < 14; i += 2) {
+  for (var i = 0; i < results.length; i += 2) {
     var ds = dateMap[i];
-    var daily = results[i];
-    var review = results[i + 1];
+    var daily = results[i], review = results[i + 1];
     if (daily && daily.total_time !== undefined) {
       dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
     } else {
@@ -494,10 +490,32 @@ function escHtml(s) {
 
 // ── Init ──
 (async function init() {
+  // 1. 立刻渲染空壳（周导航 + 空进度圆点）
   renderWeek();
-  await preloadWeekStats();
-  renderWeek();
-  loadDay(selectedDate);
+
+  // 2. 马上加载今天的数据，不等待本周其他天
+  var today = selectedDate;
+  var results = await Promise.all([
+    fetch(API + '/api/stats/daily?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; }),
+    fetch(API + '/api/stats/review?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; })
+  ]);
+  var daily = results[0], review = results[1];
+  if (!review || !review.text) review = null;
+
+  // 缓存今天数据 + 立即更新今天圆点
+  if (daily && daily.total_time !== undefined) {
+    dailyCache[today] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+  } else {
+    dailyCache[today] = { total_time: 0, segments_count: 0 };
+  }
+  if (review && review.text) {
+    reviewCache[today] = { score: review.score, grade: review.grade };
+  }
+  renderWeekProgress();
+  render(today, daily, review);
+
+  // 3. 后台慢慢加载本周其余6天，完成后更新圆点
+  preloadWeekStats().then(function() { renderWeekProgress(); });
 })();
 </script>
 
