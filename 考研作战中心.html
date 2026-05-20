@@ -186,6 +186,21 @@
   .taborder-btn:hover { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
   .taborder-btn:disabled { opacity:.25; cursor:default; }
   .taborder-btn:disabled:hover { background:var(--bg-alt); color:var(--text2); border-color:var(--border); }
+
+  /* ── 专注工具按钮 ── */
+  .nav-focus-btn {
+    font-size:.9em; padding:8px 18px;
+    background:var(--blue); color:#fff;
+    border-radius:10px; text-decoration:none;
+    font-weight:600; letter-spacing:.01em;
+    box-shadow:0 2px 8px rgba(37,99,235,.25);
+    transition:all .2s ease;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .nav-focus-btn:hover {
+    transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(37,99,235,.35);
+  }
 </style>
 <body>
 
@@ -199,7 +214,7 @@
     <a onclick="switchTab('courses')" id="nav-courses">课程表</a>
   <a onclick="switchTab('learnlog')" id="nav-learnlog">学习记录</a>
   <span style="flex:1"></span>
-  <a href="file:///E:/code/hermes/focus/index.html" target="_blank" style="font-size:.9em;padding:6px 14px;background:var(--blue-bg);color:var(--blue);border-radius:8px;" title="打开专注学习工具">🍅 专注工具</a>
+  <a href="file:///E:/code/hermes/focus/index.html" target="_blank" class="nav-focus-btn" title="打开专注学习工具">🍅 专注工具</a>
   <a onclick="toggleSettings()" style="font-size:.9em;padding:6px 12px;" title="设置">⚙️</a>
 </nav>
 
