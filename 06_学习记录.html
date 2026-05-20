@@ -362,8 +362,19 @@ function render(date, daily, review) {
 
   // ── Expert review ──
   if (review) {
+    var scoreHTML = '';
+    if (review.score !== undefined) {
+      var gc = '#fbbf24';
+      var g = review.grade || '';
+      if (g.charAt(0)==='S') gc='#f59e0b';
+      else if (g.charAt(0)==='A') gc='#16a34a';
+      else if (g.charAt(0)==='B') gc='#2563eb';
+      else if (g.charAt(0)==='C'||g.charAt(0)==='D') gc='#dc2626';
+      scoreHTML = '<span style="margin-left:10px;font-size:1.4em;font-weight:800;color:'+gc+';">'+review.score+'</span>' +
+        '<span style="font-size:.72em;color:'+gc+';opacity:.6;margin-left:2px;">分 / '+g+'</span>';
+    }
     html += '<div class="review-card">';
-    html += '<div class="review-title">🧠 考研教练点评</div>';
+    html += '<div class="review-title">🧠 考研教练点评' + scoreHTML + '</div>';
     html += '<div class="review-body">'+escHtml(review.text||'')+'</div>';
     html += '<div class="review-meta">生成于 '+(review.generatedAt||'')+' · 基于 '+(review.source||'')+' 的学习数据</div>';
     html += '</div>';
