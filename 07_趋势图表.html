@@ -123,18 +123,6 @@ function getMonthDates(year, month) {
 }
 
 // ── Aggregate ──
-function segmentDuration(s) {
-  if (s.start && s.end) {
-    var sp = s.start.split(':'), ep = s.end.split(':');
-    var ss = parseInt(sp[0])*3600 + parseInt(sp[1])*60;
-    var es = parseInt(ep[0])*3600 + parseInt(ep[1])*60;
-    if (es < ss) es += 86400;
-    var d = es - ss;
-    if (d > 0 && d < 86400) return d;
-  }
-  return s.duration || 0;
-}
-
 function aggregateDaily(logs, dates) {
   var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
 
@@ -144,14 +132,11 @@ function aggregateDaily(logs, dates) {
       var segs = day.segments || [];
       var sum = { math:0, cs:0, eng:0, pol:0 };
       segs.forEach(function(s) {
-        if (sum[s.subject] !== undefined) sum[s.subject] += segmentDuration(s);
+        if (sum[s.subject] !== undefined) sum[s.subject] += (s.duration||0);
       });
       SUBJ_KEYS.forEach(function(k) {
-        if (k === 'total') {
-          var realTotal = 0;
-          segs.forEach(function(s) { realTotal += segmentDuration(s); });
-          ds[k].push(parseFloat((realTotal/3600).toFixed(2)));
-        } else ds[k].push(parseFloat((sum[k]/3600).toFixed(2)));
+        if (k === 'total') ds[k].push(parseFloat(((day.total_time||0)/3600).toFixed(2)));
+        else ds[k].push(parseFloat((sum[k]/3600).toFixed(2)));
       });
     } else {
       SUBJ_KEYS.forEach(function(k) { ds[k].push(0); });
@@ -172,10 +157,10 @@ function aggregateWeekly(logs, allDates) {
     if (!weeks[wk]) weeks[wk] = { math:0, cs:0, eng:0, pol:0, total:0, end: date };
     var dayData = logs[date];
     var segs = dayData.segments || [];
+    weeks[wk].total += (dayData.total_time||0);
     weeks[wk].end = date;
     segs.forEach(function(s) {
-      if (weeks[wk][s.subject] !== undefined) weeks[wk][s.subject] += segmentDuration(s);
-      weeks[wk].total += segmentDuration(s);
+      if (weeks[wk][s.subject] !== undefined) weeks[wk][s.subject] += (s.duration||0);
     });
   });
 
@@ -203,9 +188,9 @@ function aggregateMonthly(logs, allDates) {
     if (!months[mk]) months[mk] = { math:0, cs:0, eng:0, pol:0, total:0 };
     var dayData = logs[date];
     var segs = dayData.segments || [];
+    months[mk].total += (dayData.total_time||0);
     segs.forEach(function(s) {
-      if (months[mk][s.subject] !== undefined) months[mk][s.subject] += segmentDuration(s);
-      months[mk].total += segmentDuration(s);
+      if (months[mk][s.subject] !== undefined) months[mk][s.subject] += (s.duration||0);
     });
   });
 
