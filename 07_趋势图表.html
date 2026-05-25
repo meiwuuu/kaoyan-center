@@ -8,7 +8,7 @@
 <style>
 :root {
   --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
-  --blue: #2563eb; --blue-bg: #eff4ff;
+  --blue: #2563eb; --blue-bg: #eff4ff; 
   --border: #e7e4de; --radius: 12px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
   --card-alpha: 0.92;
@@ -16,28 +16,52 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body {
   font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  background:transparent; color:var(--text); padding:16px 20px 20px;
+  background:transparent; color:var(--text); padding:10px 14px 14px;
 }
 .card {
   background:rgba(255,255,255,var(--card-alpha));
   border:1px solid var(--border);
   border-radius:var(--radius);
-  padding:20px 24px; margin:12px 0;
+  padding:16px 20px; margin:8px 0;
   box-shadow:var(--shadow-sm);
 }
 .sec-title {
-  font-size:1.1em; font-weight:750; margin-bottom:16px;
+  font-size:1.1em; font-weight:750; margin-bottom:12px;
 }
 .chart-container {
-  position: relative; height: 400px; width: 100%;
+  position: relative; height: 520px; width: 100%;
 }
 .loading { text-align:center; padding:40px; color:var(--text3); }
+
+/* ── Range buttons ── */
+.range-bar {
+  display:inline-flex; gap:2px; margin-bottom:14px;
+  border:1px solid var(--border); border-radius:8px;
+  overflow:hidden;
+}
+.range-btn {
+  padding:5px 16px; border:none; background:transparent;
+  font-size:.78em; color:var(--text2); cursor:pointer;
+  font-family:inherit; transition:all .15s;
+  border-right:1px solid var(--border);
+}
+.range-btn:last-child { border-right:none; }
+.range-btn:hover { background:var(--blue-bg); color:var(--blue); }
+.range-btn.active {
+  background:var(--blue); color:#fff;
+}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <div class="sec-title">📈 学习时长趋势 (近14天)</div>
+  <div class="sec-title">📈 学习时长趋势</div>
+  <div class="range-bar" id="range-bar">
+    <button class="range-btn" data-mode="week">周</button>
+    <button class="range-btn active" data-mode="14d">14天</button>
+    <button class="range-btn" data-mode="month">月</button>
+    <button class="range-btn" data-mode="year">年</button>
+  </div>
   <div id="loading" class="loading">正在加载数据...</div>
   <div class="chart-container" id="chart-wrapper" style="display:none;">
     <canvas id="trendChart"></canvas>
@@ -46,75 +70,225 @@ body {
 
 <script>
 var API = 'http://localhost:8765';
-var SUBJECT_NAMES = { math:'数学', cs:'408', eng:'英语', pol:'政治' };
-var SUBJECT_COLORS = { math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626' };
+var SUBJECT_NAMES = { total:'总时长', math:'数学', cs:'408', eng:'英语', pol:'政治' };
+var SUBJECT_COLORS = { total:'#10b981', math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626' };
+var SUBJ_KEYS = ['total','math','cs','eng','pol'];
 
+var currentMode = '14d';
+var cachedLogs = null;
+var chartInstance = null;
+
+// ── Mode switch ──
+document.getElementById('range-bar').addEventListener('click', function(e) {
+  var btn = e.target.closest('.range-btn');
+  if (!btn || btn.classList.contains('active')) return;
+  document.querySelectorAll('.range-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  currentMode = btn.dataset.mode;
+  if (cachedLogs) renderChart(cachedLogs, currentMode);
+});
+
+// ── Data ──
 async function loadData() {
   try {
     var res = await fetch(API + '/api/stats');
     var data = await res.json();
-    renderChart(data);
+    cachedLogs = data.daily_logs || {};
+    renderChart(cachedLogs, currentMode);
   } catch(e) {
     document.getElementById('loading').textContent = '数据加载失败，请检查专注工具后台是否运行。';
   }
 }
 
-function renderChart(data) {
-  var logs = data.daily_logs || {};
-  var dates = Object.keys(logs).sort();
-  if (dates.length > 14) dates = dates.slice(dates.length - 14);
+function fmtDate(d) {
+  var m = d.getMonth()+1, day = d.getDate();
+  return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;
+}
 
-  if (dates.length === 0) {
+function getMonday(d) {
+  var dt = new Date(d);
+  dt.setDate(dt.getDate() - ((dt.getDay()+6)%7));
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function getMonthDates(year, month) {
+  var dates = [];
+  var lastDay = new Date(year, month+1, 0).getDate();
+  for (var d = 1; d <= lastDay; d++) {
+    var m = month+1;
+    dates.push(year+'-'+(m<10?'0':'')+m+'-'+(d<10?'0':'')+d);
+  }
+  return dates;
+}
+
+// ── Aggregate ──
+function segmentDuration(s) {
+  if (s.start && s.end) {
+    var sp = s.start.split(':'), ep = s.end.split(':');
+    var ss = parseInt(sp[0])*3600 + parseInt(sp[1])*60;
+    var es = parseInt(ep[0])*3600 + parseInt(ep[1])*60;
+    if (es < ss) es += 86400;
+    var d = es - ss;
+    if (d > 0 && d < 86400) return d;
+  }
+  return s.duration || 0;
+}
+
+function aggregateDaily(logs, dates) {
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+
+  dates.forEach(function(date) {
+    var day = logs[date];
+    if (day) {
+      var segs = day.segments || [];
+      var sum = { math:0, cs:0, eng:0, pol:0 };
+      segs.forEach(function(s) {
+        if (sum[s.subject] !== undefined) sum[s.subject] += segmentDuration(s);
+      });
+      SUBJ_KEYS.forEach(function(k) {
+        if (k === 'total') {
+          var realTotal = 0;
+          segs.forEach(function(s) { realTotal += segmentDuration(s); });
+          ds[k].push(parseFloat((realTotal/3600).toFixed(2)));
+        } else ds[k].push(parseFloat((sum[k]/3600).toFixed(2)));
+      });
+    } else {
+      SUBJ_KEYS.forEach(function(k) { ds[k].push(0); });
+    }
+  });
+
+  return { labels: dates.map(function(d){ return d.slice(5); }), datasets: ds };
+}
+
+function aggregateWeekly(logs, allDates) {
+  var weeks = {};
+  allDates.forEach(function(date) {
+    var d = new Date(date + 'T00:00:00');
+    var day = d.getDay() || 7;
+    var mon = new Date(d);
+    mon.setDate(d.getDate() - day + 1);
+    var wk = fmtDate(mon);
+    if (!weeks[wk]) weeks[wk] = { math:0, cs:0, eng:0, pol:0, total:0, end: date };
+    var dayData = logs[date];
+    var segs = dayData.segments || [];
+    weeks[wk].end = date;
+    segs.forEach(function(s) {
+      if (weeks[wk][s.subject] !== undefined) weeks[wk][s.subject] += segmentDuration(s);
+      weeks[wk].total += segmentDuration(s);
+    });
+  });
+
+  var sorted = Object.keys(weeks).sort();
+  if (sorted.length > 26) sorted = sorted.slice(-26);
+
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+  var labels = [];
+  sorted.forEach(function(wk) {
+    var w = weeks[wk];
+    var endD = new Date(w.end + 'T00:00:00');
+    labels.push(wk.slice(5) + '-' + (endD.getMonth()+1)+'/'+endD.getDate());
+    SUBJ_KEYS.forEach(function(k) {
+      ds[k].push(parseFloat((w[k]/3600).toFixed(1)));
+    });
+  });
+
+  return { labels: labels, datasets: ds };
+}
+
+function aggregateMonthly(logs, allDates) {
+  var months = {};
+  allDates.forEach(function(date) {
+    var mk = date.slice(0,7);
+    if (!months[mk]) months[mk] = { math:0, cs:0, eng:0, pol:0, total:0 };
+    var dayData = logs[date];
+    var segs = dayData.segments || [];
+    segs.forEach(function(s) {
+      if (months[mk][s.subject] !== undefined) months[mk][s.subject] += segmentDuration(s);
+      months[mk].total += segmentDuration(s);
+    });
+  });
+
+  var sorted = Object.keys(months).sort();
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+  var labels = [];
+  sorted.forEach(function(mk) {
+    labels.push(parseInt(mk.slice(5))+'月');
+    SUBJ_KEYS.forEach(function(k) {
+      ds[k].push(parseFloat((months[mk][k]/3600).toFixed(1)));
+    });
+  });
+
+  return { labels: labels, datasets: ds };
+}
+
+// ── Render ──
+function renderChart(logs, mode) {
+  var allDates = Object.keys(logs).sort();
+  var result;
+
+  if (mode === 'week') {
+    var now = new Date();
+    var mon = getMonday(now);
+    var dates = [];
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(mon);
+      d.setDate(d.getDate() + i);
+      dates.push(fmtDate(d));
+    }
+    result = aggregateDaily(logs, dates);
+
+  } else if (mode === '14d') {
+    var dates = allDates.length > 14 ? allDates.slice(-14) : allDates;
+    result = aggregateDaily(logs, dates);
+
+  } else if (mode === 'month') {
+    var now = new Date();
+    var dates = getMonthDates(now.getFullYear(), now.getMonth());
+    result = aggregateDaily(logs, dates);
+
+  } else if (mode === 'year') {
+    result = aggregateMonthly(logs, allDates);
+  }
+
+  if (!result || result.labels.length === 0) {
+    document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').textContent = '暂无学习数据。';
+    document.getElementById('chart-wrapper').style.display = 'none';
     return;
   }
 
-  // 按科目汇总每天时长
-  var subjKeys = ['math','cs','eng','pol'];
-  var totals = {};
-  subjKeys.forEach(function(k) { totals[k] = []; });
-
-  dates.forEach(function(date) {
-    var dayData = logs[date];
-    var segs = dayData.segments || [];
-    var sum = { math:0, cs:0, eng:0, pol:0 };
-    segs.forEach(function(s) {
-      if (s.subject && sum[s.subject] !== undefined) {
-        sum[s.subject] += (s.duration || 0);
-      }
-    });
-    subjKeys.forEach(function(k) {
-      totals[k].push(parseFloat((sum[k] / 3600).toFixed(2)));
-    });
-  });
-
-  // 构建数据集（自动隐藏全为0的科目）
-  var chartDatasets = subjKeys.map(function(key) {
+  var chartDatasets = SUBJ_KEYS.map(function(key) {
+    var isTotal = key === 'total';
     return {
       label: SUBJECT_NAMES[key],
-      data: totals[key],
+      data: result.datasets[key],
       borderColor: SUBJECT_COLORS[key],
-      backgroundColor: SUBJECT_COLORS[key] + '20',
-      borderWidth: 2,
-      pointRadius: 4,
-      pointHoverRadius: 6,
+      backgroundColor: SUBJECT_COLORS[key] + (isTotal ? '15' : '20'),
+      borderWidth: isTotal ? 3 : 2,
+      borderDash: isTotal ? [5,5] : [],
+      pointRadius: isTotal ? 5 : 4,
+      pointHoverRadius: isTotal ? 7 : 6,
       tension: 0.3,
-      fill: false
+      fill: isTotal
     };
-  }).filter(function(ds) {
-    return ds.data.some(function(v) { return v > 0; });
-  });
+  }).filter(function(ds) { return ds.data.some(function(v){ return v > 0; }); });
+
+  if (chartDatasets.length === 0) {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('loading').textContent = '所选范围暂无学习数据。';
+    document.getElementById('chart-wrapper').style.display = 'none';
+    return;
+  }
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('chart-wrapper').style.display = 'block';
 
+  if (chartInstance) chartInstance.destroy();
   var ctx = document.getElementById('trendChart').getContext('2d');
-  new Chart(ctx, {
+  chartInstance = new Chart(ctx, {
     type: 'line',
-    data: {
-      labels: dates.map(function(d) { return d.slice(5); }),
-      datasets: chartDatasets
-    },
+    data: { labels: result.labels, datasets: chartDatasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -122,9 +296,7 @@ function renderChart(data) {
       plugins: {
         tooltip: {
           callbacks: {
-            label: function(context) {
-              return context.dataset.label + ': ' + context.parsed.y + ' h';
-            }
+            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + ' h'; }
           }
         },
         legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
@@ -135,9 +307,7 @@ function renderChart(data) {
           title: { display: true, text: '学习时长 (小时)' },
           grid: { color: 'rgba(0,0,0,0.05)' }
         },
-        x: {
-          grid: { display: false }
-        }
+        x: { grid: { display: false } }
       }
     }
   });

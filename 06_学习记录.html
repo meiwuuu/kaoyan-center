@@ -394,8 +394,8 @@ async function preloadWeekStats() {
   for (var i = 0; i < results.length; i += 2) {
     var ds = dateMap[i];
     var daily = results[i], review = results[i + 1];
-    if (daily && daily.total_time !== undefined) {
-      dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+    if (daily && daily.segments) {
+      dailyCache[ds] = { total_time: calcTotalFromSegs(daily.segments), segments_count: daily.segments.length };
     } else {
       dailyCache[ds] = { total_time: 0, segments_count: 0 };
     }
@@ -420,9 +420,10 @@ async function loadDay(ds) {
   var review = results[1];
   if (!review || !review.text) review = null;
 
-  // 更新缓存（驱动日期格子的热力色）
-  if (daily && daily.total_time !== undefined) {
-    dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+  // 更新缓存（驱动日期格子的热力色）——用重算的准确时长
+  if (daily && daily.segments) {
+    var realTotal = calcTotalFromSegs(daily.segments);
+    dailyCache[ds] = { total_time: realTotal, segments_count: daily.segments.length };
   } else if (!dailyCache[ds]) {
     dailyCache[ds] = { total_time: 0, segments_count: 0 };
   }
@@ -448,15 +449,16 @@ function render(date, daily, review) {
 
   if (hasData) {
     var segs = daily.segments;
-    var totalTime = daily.total_time || 0;
+    var totalTime = calcTotalFromSegs(segs);
     var totalPomos = daily.pomodoros || 0;
 
     // Subject distribution
     var subjDist = {};
     segs.forEach(function(s) {
       var subj = s.subject || 'other';
+      var dur = segmentDuration(s);
       if (!subjDist[subj]) subjDist[subj] = {time:0, segs:0};
-      subjDist[subj].time += s.duration;
+      subjDist[subj].time += dur;
       subjDist[subj].segs += 1;
     });
     var maxDist = 0;
@@ -506,7 +508,7 @@ function render(date, daily, review) {
       html += '<td class="col-num">'+(i+1)+'</td>';
       html += '<td class="col-time">'+(s.start||'--')+'</td>';
       html += '<td class="col-time">'+(s.end||'--')+'</td>';
-      html += '<td class="col-dur">'+fmtDuration(s.duration||0)+'</td>';
+      html += '<td class="col-dur">'+fmtDuration(segmentDuration(s))+'</td>';
       html += '<td class="col-subj" style="color:'+color+';">'+name+'</td>';
       html += '</tr>';
     });
@@ -553,6 +555,23 @@ function fmtTimeShort(s) {
   if (h > 0) return h + 'h' + m + 'm';
   return m + 'm';
 }
+// 从 start/end 时间差计算真实时长（避免 focus 工具提交错误 duration）
+function segmentDuration(s) {
+  if (s.start && s.end) {
+    var sp = s.start.split(':'), ep = s.end.split(':');
+    var ss = parseInt(sp[0])*3600 + parseInt(sp[1])*60;
+    var es = parseInt(ep[0])*3600 + parseInt(ep[1])*60;
+    if (es < ss) es += 86400;
+    var d = es - ss;
+    if (d > 0 && d < 86400) return d;
+  }
+  return s.duration || 0;
+}
+function calcTotalFromSegs(segs) {
+  var total = 0;
+  segs.forEach(function(s) { total += segmentDuration(s); });
+  return total;
+}
 function escHtml(s) {
   if (!s) return '';
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -573,8 +592,8 @@ function escHtml(s) {
   if (!review || !review.text) review = null;
 
   // 缓存今天数据 + 立即更新今天圆点
-  if (daily && daily.total_time !== undefined) {
-    dailyCache[today] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+  if (daily && daily.segments) {
+    dailyCache[today] = { total_time: calcTotalFromSegs(daily.segments), segments_count: daily.segments.length };
   } else {
     dailyCache[today] = { total_time: 0, segments_count: 0 };
   }
