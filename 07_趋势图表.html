@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>趋势图表</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
+  --blue: #2563eb; --blue-bg: #eff4ff;
+  --border: #e7e4de; --radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
+  --card-alpha: 0.92;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:transparent; color:var(--text); padding:16px 20px 20px;
+}
+.card {
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 24px; margin:12px 0;
+  box-shadow:var(--shadow-sm);
+}
+.sec-title {
+  font-size:1.1em; font-weight:750; margin-bottom:16px;
+}
+.chart-container {
+  position: relative; height: 400px; width: 100%;
+}
+.loading { text-align:center; padding:40px; color:var(--text3); }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="sec-title">📈 学习时长趋势 (近14天)</div>
+  <div id="loading" class="loading">正在加载数据...</div>
+  <div class="chart-container" id="chart-wrapper" style="display:none;">
+    <canvas id="trendChart"></canvas>
+  </div>
+</div>
+
+<script>
+var API = 'http://localhost:8765';
+var SUBJECT_NAMES = { math:'数学', cs:'408', eng:'英语', pol:'政治' };
+var SUBJECT_COLORS = { math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626' };
+
+async function loadData() {
+  try {
+    var res = await fetch(API + '/api/stats');
+    var data = await res.json();
+    renderChart(data);
+  } catch(e) {
+    document.getElementById('loading').textContent = '数据加载失败，请检查专注工具后台是否运行。';
+  }
+}
+
+function renderChart(data) {
+  var logs = data.daily_logs || {};
+  var dates = Object.keys(logs).sort();
+  if (dates.length > 14) dates = dates.slice(dates.length - 14);
+
+  if (dates.length === 0) {
+    document.getElementById('loading').textContent = '暂无学习数据。';
+    return;
+  }
+
+  // 按科目汇总每天时长
+  var subjKeys = ['math','cs','eng','pol'];
+  var totals = {};
+  subjKeys.forEach(function(k) { totals[k] = []; });
+
+  dates.forEach(function(date) {
+    var dayData = logs[date];
+    var segs = dayData.segments || [];
+    var sum = { math:0, cs:0, eng:0, pol:0 };
+    segs.forEach(function(s) {
+      if (s.subject && sum[s.subject] !== undefined) {
+        sum[s.subject] += (s.duration || 0);
+      }
+    });
+    subjKeys.forEach(function(k) {
+      totals[k].push(parseFloat((sum[k] / 3600).toFixed(2)));
+    });
+  });
+
+  // 构建数据集（自动隐藏全为0的科目）
+  var chartDatasets = subjKeys.map(function(key) {
+    return {
+      label: SUBJECT_NAMES[key],
+      data: totals[key],
+      borderColor: SUBJECT_COLORS[key],
+      backgroundColor: SUBJECT_COLORS[key] + '20',
+      borderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      tension: 0.3,
+      fill: false
+    };
+  }).filter(function(ds) {
+    return ds.data.some(function(v) { return v > 0; });
+  });
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('chart-wrapper').style.display = 'block';
+
+  var ctx = document.getElementById('trendChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates.map(function(d) { return d.slice(5); }),
+      datasets: chartDatasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': ' + context.parsed.y + ' h';
+            }
+          }
+        },
+        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: '学习时长 (小时)' },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// 注入主题透明度
+setTimeout(function(){
+  try {
+    var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
+    var alpha = (s.alpha || 92) / 100;
+    document.documentElement.style.setProperty('--card-alpha', alpha);
+    var st = document.createElement('style');
+    st.textContent = '.card{background:rgba(255,255,255,'+alpha+')!important}';
+    document.head.appendChild(st);
+  } catch(e) {}
+}, 200);
+
+loadData();
+</script>
+</body>
+</html>

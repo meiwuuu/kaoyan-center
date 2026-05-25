@@ -83,9 +83,15 @@ body {
 .day-cell:hover { border-color:var(--blue); }
 .day-cell.today { border:2px solid var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.08); }
 .day-cell.selected { background:var(--blue-bg); border-color:var(--blue); }
-.day-cell .day-name { font-size:.68em; color:var(--text3); margin-bottom:2px; }
+.day-cell .day-name { font-size:.68em; color:var(--text2); margin-bottom:2px; }
 .day-cell .day-date { font-size:.82em; font-weight:600; }
-.day-cell .day-time { font-size:.66em; color:var(--text2); margin-top:3px; font-weight:500; }
+.day-cell .day-time { font-size:.66em; color:var(--text); margin-top:3px; font-weight:500; }
+
+/* 热力格子的文字颜色 */
+.day-cell.hl-1 .day-name, .day-cell.hl-1 .day-time,
+.day-cell.hl-2 .day-name, .day-cell.hl-2 .day-time,
+.day-cell.hl-3 .day-name, .day-cell.hl-3 .day-time { color: var(--text); }
+.day-cell.hl-4 .day-name, .day-cell.hl-4 .day-date, .day-cell.hl-4 .day-time { color: #fff; }
 
 /* ── Card ── */
 .card {
@@ -170,6 +176,19 @@ body {
 }
 .empty-state .icon { font-size:2.5em; margin-bottom:10px; }
 .loading { text-align:center; padding:30px; color:var(--text3); }
+
+/* ── Heatmap legend ── */
+.heat-legend {
+  display:flex; align-items:center; gap:6px; margin-bottom:14px;
+  font-size:.7em; color:var(--text2);
+  background:rgba(255,255,255,var(--card-alpha));
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:8px 14px;
+}
+.heat-legend .swatch {
+  width:16px; height:16px; border-radius:4px; border:1px solid var(--border);
+  flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -186,6 +205,15 @@ body {
 
 <div class="day-strip" id="day-strip"></div>
 
+<div class="heat-legend" id="heat-legend">
+  <span>学习时长</span>
+  <span class="swatch" style="background:#fff;"></span><span>0</span>
+  <span class="swatch" style="background:#e8f0fe;"></span><span>&lt;1h</span>
+  <span class="swatch" style="background:#bdd7f5;"></span><span>&lt;3h</span>
+  <span class="swatch" style="background:#7aa9e5;"></span><span>&lt;6h</span>
+  <span class="swatch" style="background:var(--blue);"></span><span>≥6h</span>
+</div>
+
 <div id="content">
   <div class="loading">加载中...</div>
 </div>
@@ -194,6 +222,25 @@ body {
 var API = 'http://localhost:8765';
 var SUBJECT_NAMES = {math:'数学', cs:'408', eng:'英语', pol:'政治'};
 var SUBJECT_HEX = {math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#f87171'};
+
+// ── Heatmap: 学习时长的5级热力色 ──
+function heatmapLevel(seconds) {
+  if (!seconds || seconds <= 0) return 0;
+  if (seconds < 3600) return 1;      // <1h
+  if (seconds < 10800) return 2;     // <3h
+  if (seconds < 21600) return 3;     // <6h
+  return 4;                           // ≥6h
+}
+function heatmapInline(seconds) {
+  var lv = heatmapLevel(seconds);
+  if (lv === 0) return '';
+  // 纯色蓝底 + 同色系边框（消掉白圈）
+  var fills  = ['', '#e8f0fe', '#bdd7f5', '#7aa9e5', 'var(--blue)'];
+  var edges  = ['', '#cfddf0', '#a1c2e5', '#5b8dd2', 'var(--blue)'];
+  var style = 'background:' + fills[lv] + '!important;';
+  style += 'border-color:' + edges[lv] + '!important;';
+  return style;
+}
 
 // Score → color mapping for week dots
 var SCORE_COLORS = {S:'#f59e0b', A:'#16a34a', B:'#2563eb', C:'#ea580c', D:'#dc2626'};
@@ -217,14 +264,18 @@ function fmtDate(d) {
   return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;
 }
 
-function navWeek(dir) {
+async function navWeek(dir) {
   weekMonday.setDate(weekMonday.getDate() + dir*7);
+  renderWeek();
+  await preloadWeekStats();
   renderWeek();
 }
 
-function goToday() {
+async function goToday() {
   weekMonday = getMonday(new Date());
   selectedDate = new Date().toISOString().slice(0,10);
+  renderWeek();
+  await preloadWeekStats();
   renderWeek();
   loadDay(selectedDate);
 }
@@ -245,13 +296,17 @@ function renderWeekStrip() {
     if (isSel) cls += ' selected';
 
     var timeStr = '';
+    var heatStyle = '';
+    var heatClass = '';
     if (dailyCache[ds] && dailyCache[ds].total_time > 0) {
       timeStr = fmtTimeShort(dailyCache[ds].total_time);
+      heatStyle = heatmapInline(dailyCache[ds].total_time);
+      heatClass = ' hl-' + heatmapLevel(dailyCache[ds].total_time);
     } else if (dailyCache[ds]) {
       timeStr = '—';
     }
 
-    html += '<div class="'+cls+'" onclick="selectDay(\''+ds+'\')">';
+    html += '<div class="'+cls+heatClass+'" onclick="selectDay(\''+ds+'\')" style="'+heatStyle+'">';
     html += '<div class="day-name">'+dayNames[i]+'</div>';
     html += '<div class="day-date">'+(d.getMonth()+1)+'/'+d.getDate()+'</div>';
     html += '<div class="day-time">'+timeStr+'</div>';
@@ -364,6 +419,18 @@ async function loadDay(ds) {
   var daily = results[0];
   var review = results[1];
   if (!review || !review.text) review = null;
+
+  // 更新缓存（驱动日期格子的热力色）
+  if (daily && daily.total_time !== undefined) {
+    dailyCache[ds] = { total_time: daily.total_time || 0, segments_count: (daily.segments||[]).length };
+  } else if (!dailyCache[ds]) {
+    dailyCache[ds] = { total_time: 0, segments_count: 0 };
+  }
+  if (review && review.text) {
+    reviewCache[ds] = { score: review.score, grade: review.grade };
+  }
+  renderWeekProgress();
+  renderWeekStrip();
 
   render(ds, daily, review);
 }
@@ -528,6 +595,7 @@ setTimeout(function(){
   try {
     var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
     var alpha = (s.alpha || 92) / 100;
+    document.documentElement.style.setProperty('--card-alpha', alpha);
     var st = document.createElement('style');
     st.textContent = '.card,.day-cell,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(255,255,255,'+alpha+')!important}';
     document.head.appendChild(st);

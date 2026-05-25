@@ -244,6 +244,7 @@
   <a onclick="switchTab('emergency')" id="nav-emergency">应急方案</a>
     <a onclick="switchTab('courses')" id="nav-courses">课程表</a>
   <a onclick="switchTab('learnlog')" id="nav-learnlog">学习记录</a>
+  <a onclick="switchTab('trends')" id="nav-trends">趋势图表</a>
   <span style="flex:1"></span>
   <a href="file:///E:/code/hermes/focus/index.html" target="_blank" class="nav-focus-btn" title="打开专注学习工具">🍅 专注工具</a>
   <a onclick="toggleSettings()" style="font-size:.9em;padding:6px 12px;" title="设置">⚙️</a>
@@ -305,6 +306,11 @@
 
 <div class="tab" id="tab-learnlog" style="padding:0;min-height:0;">
   <iframe src="06_学习记录.html" id="iframe-learnlog" style="width:100%;height:9999px;border:none;display:block;"
+          scrolling="no" onload="var d=this.contentDocument;if(d){var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
+</div>
+
+<div class="tab" id="tab-trends" style="padding:0;min-height:0;">
+  <iframe src="07_趋势图表.html" id="iframe-trends" style="width:100%;height:600px;border:none;display:block;"
           scrolling="no" onload="var d=this.contentDocument;if(d){var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);this.style.height=(h+40)+'px'}"></iframe>
 </div>
 
@@ -378,7 +384,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const tabs = ['schedule','plan','daily','weekly','courses','emergency','learnlog'];
+const tabs = ['schedule','plan','daily','weekly','courses','emergency','learnlog','trends'];
 function switchTab(name) {
   tabs.forEach(t => {
     document.getElementById('tab-'+t).classList.remove('active');
@@ -1123,9 +1129,9 @@ function updateEncouragement(streak, frozen) {
 // ═══════════ Tab order ═══════════
 const TAB_NAMES = {
   daily:'每日复盘', weekly:'每周总结', schedule:'时间表',
-  plan:'阶段计划', emergency:'应急方案', courses:'课程表', learnlog:'学习记录'
+  plan:'阶段计划', emergency:'应急方案', courses:'课程表', learnlog:'学习记录', trends:'趋势图表'
 };
-const DEFAULT_TAB_ORDER = ['schedule','plan','daily','weekly','courses','emergency','learnlog'];
+const DEFAULT_TAB_ORDER = ['schedule','plan','daily','weekly','courses','emergency','learnlog','trends'];
 
 function getTabOrder() {
   try {
