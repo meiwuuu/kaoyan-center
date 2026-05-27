@@ -76,6 +76,7 @@ var SUBJ_KEYS = ['total','math','cs','eng','pol'];
 
 var currentMode = '14d';
 var cachedLogs = null;
+var cachedReviews = null;
 var chartInstance = null;
 
 // ── Mode switch ──
@@ -94,6 +95,7 @@ async function loadData() {
     var res = await fetch(API + '/api/stats');
     var data = await res.json();
     cachedLogs = data.daily_logs || {};
+    cachedReviews = data.reviews || {};
     renderChart(cachedLogs, currentMode);
   } catch(e) {
     document.getElementById('loading').textContent = '数据加载失败，请检查专注工具后台是否运行。';
@@ -120,6 +122,12 @@ function getMonthDates(year, month) {
     dates.push(year+'-'+(m<10?'0':'')+m+'-'+(d<10?'0':'')+d);
   }
   return dates;
+}
+
+function avgNonEmpty(arr) {
+  var vals = arr.filter(function(v){ return v !== null; });
+  if (vals.length === 0) return null;
+  return parseFloat((vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(1));
 }
 
 // ── Aggregate ──
@@ -223,17 +231,47 @@ function renderChart(logs, mode) {
     }
     result = aggregateDaily(logs, dates);
 
+    // AI打分数据
+    var scoreData = dates.map(function(date) {
+      var r = cachedReviews[date];
+      return (r && typeof r.score === 'number') ? r.score : null;
+    });
+
   } else if (mode === '14d') {
     var dates = allDates.length > 14 ? allDates.slice(-14) : allDates;
     result = aggregateDaily(logs, dates);
+
+    var scoreData = dates.map(function(date) {
+      var r = cachedReviews[date];
+      return (r && typeof r.score === 'number') ? r.score : null;
+    });
 
   } else if (mode === 'month') {
     var now = new Date();
     var dates = getMonthDates(now.getFullYear(), now.getMonth());
     result = aggregateDaily(logs, dates);
 
+    var scoreData = dates.map(function(date) {
+      var r = cachedReviews[date];
+      return (r && typeof r.score === 'number') ? r.score : null;
+    });
+
   } else if (mode === 'year') {
     result = aggregateMonthly(logs, allDates);
+
+    // AI打分 — 按月平均
+    var monthScores = {};
+    allDates.forEach(function(date) {
+      var mk = date.slice(0, 7);
+      var r = cachedReviews[date];
+      if (r && typeof r.score === 'number') {
+        if (!monthScores[mk]) monthScores[mk] = [];
+        monthScores[mk].push(r.score);
+      }
+    });
+    var scoreData = Object.keys(monthScores).sort().map(function(mk) {
+      return avgNonEmpty(monthScores[mk]);
+    });
   }
 
   if (!result || result.labels.length === 0) {
@@ -259,6 +297,26 @@ function renderChart(logs, mode) {
     };
   }).filter(function(ds) { return ds.data.some(function(v){ return v > 0; }); });
 
+  // AI打分折线（如果有评分数据）
+  var hasScores = scoreData && scoreData.some(function(v){ return v !== null; });
+  if (hasScores) {
+    chartDatasets.push({
+      label: 'AI评分',
+      data: scoreData,
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245,158,11,0.10)',
+      borderWidth: 2.5,
+      borderDash: [],
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      pointStyle: 'rectRounded',
+      tension: 0.3,
+      fill: false,
+      spanGaps: true,
+      yAxisID: 'y1'
+    });
+  }
+
   if (chartDatasets.length === 0) {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').textContent = '所选范围暂无学习数据。';
@@ -281,7 +339,12 @@ function renderChart(logs, mode) {
       plugins: {
         tooltip: {
           callbacks: {
-            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + ' h'; }
+            label: function(ctx) {
+              if (ctx.dataset.yAxisID === 'y1') {
+                return ctx.dataset.label + ': ' + ctx.parsed.y + ' 分';
+              }
+              return ctx.dataset.label + ': ' + ctx.parsed.y + ' h';
+            }
           }
         },
         legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
@@ -291,6 +354,15 @@ function renderChart(logs, mode) {
           beginAtZero: true,
           title: { display: true, text: '学习时长 (小时)' },
           grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        y1: {
+          position: 'right',
+          beginAtZero: false,
+          min: 0,
+          max: 100,
+          title: { display: true, text: 'AI评分' },
+          grid: { drawOnChartArea: false },
+          ticks: { stepSize: 20, callback: function(v) { return v + ' 分'; } }
         },
         x: { grid: { display: false } }
       }
