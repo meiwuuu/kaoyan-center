@@ -147,7 +147,7 @@ function aggregateDaily(logs, dates) {
         else ds[k].push(parseFloat((sum[k]/3600).toFixed(2)));
       });
     } else {
-      SUBJ_KEYS.forEach(function(k) { ds[k].push(0); });
+      SUBJ_KEYS.forEach(function(k) { ds[k].push(null); });
     }
   });
 
