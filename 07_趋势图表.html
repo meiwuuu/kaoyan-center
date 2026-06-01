@@ -50,6 +50,35 @@ body {
 .range-btn.active {
   background:var(--blue); color:#fff;
 }
+
+/* ── Navigation bar ── */
+.nav-bar {
+  display:none; align-items:center; gap:6px; margin-bottom:14px;
+  font-size:.82em; color:var(--text2);
+}
+.nav-bar.visible { display:inline-flex; }
+.nav-btn {
+  padding:4px 10px; border:1px solid var(--border);
+  background:transparent; color:var(--text2);
+  border-radius:6px; cursor:pointer; font-family:inherit;
+  font-size:.85em; transition:all .15s;
+  line-height:1.4;
+}
+.nav-btn:hover { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
+.nav-btn:active { transform:scale(0.95); }
+.nav-label {
+  min-width:120px; text-align:center;
+  font-weight:600; color:var(--text);
+  padding:4px 8px;
+}
+.nav-today {
+  padding:4px 12px; border:1px solid var(--border);
+  background:var(--blue-bg); color:var(--blue);
+  border-radius:6px; cursor:pointer; font-family:inherit;
+  font-size:.82em; transition:all .15s;
+  line-height:1.4; font-weight:500;
+}
+.nav-today:hover { background:var(--blue); color:#fff; border-color:var(--blue); }
 </style>
 </head>
 <body>
@@ -61,6 +90,12 @@ body {
     <button class="range-btn active" data-mode="14d">14天</button>
     <button class="range-btn" data-mode="month">月</button>
     <button class="range-btn" data-mode="year">年</button>
+  </div>
+  <div class="nav-bar" id="nav-bar">
+    <button class="nav-btn" data-dir="-1" title="上一周/月">&#9664;</button>
+    <span class="nav-label" id="nav-label"></span>
+    <button class="nav-btn" data-dir="1" title="下一周/月">&#9654;</button>
+    <button class="nav-today" id="nav-today">今天</button>
   </div>
   <div id="loading" class="loading">正在加载数据...</div>
   <div class="chart-container" id="chart-wrapper" style="display:none;">
@@ -75,6 +110,9 @@ var SUBJECT_COLORS = { total:'#10b981', math:'#2563eb', cs:'#7c3aed', eng:'#ea58
 var SUBJ_KEYS = ['total','math','cs','eng','pol'];
 
 var currentMode = '14d';
+var weekOffset = 0;       // 0=本周, -1=上周, 1=下周...
+var viewYear = null;      // 月模式下的年份
+var viewMonth = null;     // 月模式下的月份 (0-indexed)
 var cachedLogs = null;
 var cachedReviews = null;
 var chartInstance = null;
@@ -86,8 +124,97 @@ document.getElementById('range-bar').addEventListener('click', function(e) {
   document.querySelectorAll('.range-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
   currentMode = btn.dataset.mode;
-  if (cachedLogs) renderChart(cachedLogs, currentMode);
+
+  // Reset offsets when switching modes
+  weekOffset = 0;
+  viewYear = null;
+  viewMonth = null;
+
+  toggleNavBar();
+  updateNavLabel();
+  if (cachedLogs) renderChart();
 });
+
+// ── Navigation ──
+document.getElementById('nav-bar').addEventListener('click', function(e) {
+  var navBtn = e.target.closest('.nav-btn');
+  if (navBtn) {
+    var dir = parseInt(navBtn.dataset.dir);
+    navigate(dir);
+    return;
+  }
+  var todayBtn = e.target.closest('.nav-today');
+  if (todayBtn) {
+    goToday();
+    return;
+  }
+});
+
+function navigate(dir) {
+  if (currentMode === 'week') {
+    weekOffset += dir;
+    // Stop at earliest week with data
+    var allDates = Object.keys(cachedLogs).sort();
+    if (allDates.length > 0) {
+      var now = new Date();
+      var mon = getMonday(now);
+      mon.setDate(mon.getDate() + weekOffset * 7);
+      var firstDataDate = allDates[0];
+      if (fmtDate(mon) < firstDataDate && dir < 0) {
+        weekOffset -= dir; // undo
+        return;
+      }
+    }
+  } else if (currentMode === 'month') {
+    var m = viewMonth + dir;
+    var y = viewYear;
+    if (m < 0) { m = 11; y--; }
+    if (m > 11) { m = 0; y++; }
+    viewMonth = m;
+    viewYear = y;
+  }
+  updateNavLabel();
+  renderChart();
+}
+
+function goToday() {
+  weekOffset = 0;
+  viewYear = null;
+  viewMonth = null;
+  updateNavLabel();
+  renderChart();
+}
+
+function toggleNavBar() {
+  var nav = document.getElementById('nav-bar');
+  if (currentMode === 'week' || currentMode === 'month') {
+    nav.classList.add('visible');
+  } else {
+    nav.classList.remove('visible');
+  }
+}
+
+function updateNavLabel() {
+  var navToday = document.getElementById('nav-today');
+  var navLabel = document.getElementById('nav-label');
+
+  if (currentMode === 'week') {
+    var now = new Date();
+    var mon = getMonday(now);
+    mon.setDate(mon.getDate() + weekOffset * 7);
+    var sun = new Date(mon);
+    sun.setDate(sun.getDate() + 6);
+    navLabel.textContent = fmtShort(mon) + ' - ' + fmtShort(sun);
+    navToday.textContent = weekOffset === 0 ? '今天' : '本周';
+  } else if (currentMode === 'month') {
+    var y = viewYear !== null ? viewYear : new Date().getFullYear();
+    var m = viewMonth !== null ? viewMonth : new Date().getMonth();
+    navLabel.textContent = y + '年' + (m + 1) + '月';
+    var now = new Date();
+    var isCurrent = (y === now.getFullYear() && m === now.getMonth());
+    navToday.textContent = isCurrent ? '本月' : '本月';
+  }
+}
 
 // ── Data ──
 async function loadData() {
@@ -96,7 +223,9 @@ async function loadData() {
     var data = await res.json();
     cachedLogs = data.daily_logs || {};
     cachedReviews = data.reviews || {};
-    renderChart(cachedLogs, currentMode);
+    toggleNavBar();
+    updateNavLabel();
+    renderChart();
   } catch(e) {
     document.getElementById('loading').textContent = '数据加载失败，请检查专注工具后台是否运行。';
   }
@@ -105,6 +234,11 @@ async function loadData() {
 function fmtDate(d) {
   var m = d.getMonth()+1, day = d.getDate();
   return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;
+}
+
+function fmtShort(d) {
+  var m = d.getMonth()+1, day = d.getDate();
+  return (m<10?'0':'')+m+'/'+(day<10?'0':'')+day;
 }
 
 function getMonday(d) {
@@ -216,50 +350,50 @@ function aggregateMonthly(logs, allDates) {
 }
 
 // ── Render ──
-function renderChart(logs, mode) {
-  var allDates = Object.keys(logs).sort();
-  var result;
+function renderChart() {
+  var allDates = Object.keys(cachedLogs).sort();
+  var result, scoreData, dates;
 
-  if (mode === 'week') {
+  if (currentMode === 'week') {
     var now = new Date();
     var mon = getMonday(now);
-    var dates = [];
+    mon.setDate(mon.getDate() + weekOffset * 7);
+    dates = [];
     for (var i = 0; i < 7; i++) {
       var d = new Date(mon);
       d.setDate(d.getDate() + i);
       dates.push(fmtDate(d));
     }
-    result = aggregateDaily(logs, dates);
+    result = aggregateDaily(cachedLogs, dates);
 
-    // AI打分数据
-    var scoreData = dates.map(function(date) {
+    scoreData = dates.map(function(date) {
       var r = cachedReviews[date];
       return (r && typeof r.score === 'number') ? r.score : null;
     });
 
-  } else if (mode === '14d') {
-    var dates = allDates.length > 14 ? allDates.slice(-14) : allDates;
-    result = aggregateDaily(logs, dates);
+  } else if (currentMode === '14d') {
+    dates = allDates.length > 14 ? allDates.slice(-14) : allDates;
+    result = aggregateDaily(cachedLogs, dates);
 
-    var scoreData = dates.map(function(date) {
+    scoreData = dates.map(function(date) {
       var r = cachedReviews[date];
       return (r && typeof r.score === 'number') ? r.score : null;
     });
 
-  } else if (mode === 'month') {
-    var now = new Date();
-    var dates = getMonthDates(now.getFullYear(), now.getMonth());
-    result = aggregateDaily(logs, dates);
+  } else if (currentMode === 'month') {
+    var y = viewYear !== null ? viewYear : new Date().getFullYear();
+    var m = viewMonth !== null ? viewMonth : new Date().getMonth();
+    dates = getMonthDates(y, m);
+    result = aggregateDaily(cachedLogs, dates);
 
-    var scoreData = dates.map(function(date) {
+    scoreData = dates.map(function(date) {
       var r = cachedReviews[date];
       return (r && typeof r.score === 'number') ? r.score : null;
     });
 
-  } else if (mode === 'year') {
-    result = aggregateMonthly(logs, allDates);
+  } else if (currentMode === 'year') {
+    result = aggregateMonthly(cachedLogs, allDates);
 
-    // AI打分 — 按月平均
     var monthScores = {};
     allDates.forEach(function(date) {
       var mk = date.slice(0, 7);
@@ -269,7 +403,7 @@ function renderChart(logs, mode) {
         monthScores[mk].push(r.score);
       }
     });
-    var scoreData = Object.keys(monthScores).sort().map(function(mk) {
+    scoreData = Object.keys(monthScores).sort().map(function(mk) {
       return avgNonEmpty(monthScores[mk]);
     });
   }
@@ -297,7 +431,6 @@ function renderChart(logs, mode) {
     };
   }).filter(function(ds) { return ds.data.some(function(v){ return v > 0; }); });
 
-  // AI打分折线（如果有评分数据）
   var hasScores = scoreData && scoreData.some(function(v){ return v !== null; });
   if (hasScores) {
     chartDatasets.push({
@@ -370,7 +503,7 @@ function renderChart(logs, mode) {
   });
 }
 
-// 注入主题透明度
+// ── Theme ──
 setTimeout(function(){
   try {
     var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
