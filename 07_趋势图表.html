@@ -166,6 +166,9 @@ function navigate(dir) {
       }
     }
   } else if (currentMode === 'month') {
+    var now = new Date();
+    if (viewMonth === null) viewMonth = now.getMonth();
+    if (viewYear === null) viewYear = now.getFullYear();
     var m = viewMonth + dir;
     var y = viewYear;
     if (m < 0) { m = 11; y--; }
