@@ -42,7 +42,7 @@
   .day-cell:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow); }
   .day-cell.selected { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
   .day-cell.today { box-shadow:inset 0 0 0 2px var(--orange); }
-  @media (prefers-color-scheme:dark){ .day-cell{background:#24231f} }
+  @media (prefers-color-scheme:dark){ .day-cell{background:rgba(36,35,31,var(--card-alpha))} }
   .day-cell .dname { font-size:.74em; color:var(--text3); font-weight:600; }
   .day-cell .ddate { font-size:.9em; font-weight:700; margin:4px 0 8px; }
   .day-cell .nocls { font-size:.68em; color:var(--text3); }
@@ -51,7 +51,7 @@
   .ctag { display:block; font-size:.64em; color:var(--text3); margin-top:3px; line-height:1.35; }
 
   .detail-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 26px; margin-bottom:22px; box-shadow:var(--shadow-sm); }
-  @media (prefers-color-scheme:dark){ .detail-card{background:#24231f} }
+  @media (prefers-color-scheme:dark){ .detail-card{background:rgba(36,35,31,var(--card-alpha))} }
   .detail-card h3 { font-size:1.1em; font-weight:750; margin:0 0 18px; }
 
   .alert { padding:10px 16px; border-radius:var(--radius-sm); margin:8px 0; font-size:.86em; }
