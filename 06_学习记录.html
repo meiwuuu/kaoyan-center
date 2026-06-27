@@ -209,9 +209,9 @@ html{background:transparent}body{
 <div class="heat-legend" id="heat-legend">
   <span>学习时长</span>
   <span class="swatch" style="background:rgba(255,255,255,var(--card-alpha));"></span><span>0</span>
-  <span class="swatch" style="background:#e8f0fe;"></span><span>&lt;1h</span>
-  <span class="swatch" style="background:#bdd7f5;"></span><span>&lt;3h</span>
-  <span class="swatch" style="background:#7aa9e5;"></span><span>&lt;6h</span>
+  <span class="swatch" style="background:rgba(232,240,254,var(--card-alpha));"></span><span>&lt;1h</span>
+  <span class="swatch" style="background:rgba(189,215,245,var(--card-alpha));"></span><span>&lt;3h</span>
+  <span class="swatch" style="background:rgba(122,169,229,var(--card-alpha));"></span><span>&lt;6h</span>
   <span class="swatch" style="background:var(--blue);"></span><span>≥6h</span>
 </div>
 
@@ -235,9 +235,8 @@ function heatmapLevel(seconds) {
 function heatmapInline(seconds) {
   var lv = heatmapLevel(seconds);
   if (lv === 0) return '';
-  // 纯色蓝底 + 同色系边框（消掉白圈）
-  var fills  = ['', '#e8f0fe', '#bdd7f5', '#7aa9e5', 'var(--blue)'];
-  var edges  = ['', '#cfddf0', '#a1c2e5', '#5b8dd2', 'var(--blue)'];
+  var fills  = ['', 'rgba(232,240,254,var(--card-alpha))', 'rgba(189,215,245,var(--card-alpha))', 'rgba(122,169,229,var(--card-alpha))', 'var(--blue)'];
+  var edges  = ['', 'rgba(207,221,240,var(--card-alpha))', 'rgba(161,194,229,var(--card-alpha))', 'rgba(91,141,210,var(--card-alpha))', 'var(--blue)'];
   var style = 'background:' + fills[lv] + '!important;';
   style += 'border-color:' + edges[lv] + '!important;';
   return style;

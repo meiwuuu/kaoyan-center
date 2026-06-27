@@ -342,15 +342,7 @@ function renderSummary(){
 init();
 </script>
 
-<script>
-(function(){
-  var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');
-  var alpha=(s.alpha||92)/100;
-  var css='.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats,.encourage-box,.header-bar,.day-selector .day-dot,.week-progress .p-dot,.header-card,.zone-title-card{background:rgba(255,255,255,'+alpha+')!important}';
-  css+='@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.header-card{background:rgba(36,35,31,'+alpha+')!important}}';
-  var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
-})();
-</script>
+
 
 
 <script>
