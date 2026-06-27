@@ -26,7 +26,7 @@
   h1 { font-size:2em; font-weight:800; letter-spacing:.02em; margin-bottom:6px; }
   .subtitle { font-size:.88em; color:var(--text2); margin-bottom:32px; }
 
-  .stats { display:flex; gap:36px; flex-wrap:wrap; padding:24px 28px; border-radius:var(--radius); background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow-sm); margin-bottom:28px; }
+  .stats { display:flex; gap:36px; flex-wrap:wrap; padding:24px 28px; border-radius:var(--radius); background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); box-shadow:var(--shadow-sm); margin-bottom:28px; }
   .stat-item { display:flex; flex-direction:column; }
   .stat-item .val { font-size:1.4em; font-weight:750; letter-spacing:-.01em; }
   .stat-item .lbl { font-size:.7em; color:var(--text3); letter-spacing:.05em; margin-top:4px; text-transform:uppercase; }
@@ -167,7 +167,7 @@
   }
   function update(a){
     document.documentElement.style.setProperty('--card-alpha',a);
-    styleEl.textContent = '.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.header-card,.zone-title-card,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(255,255,255,'+a+')!important}.day-dot,.day-selector .day-dot{background:rgba(255,255,255,'+a+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.header-card,.zone-title-card,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(36,35,31,'+a+')!important}}';
+    styleEl.textContent = '.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.header-card,.zone-title-card,.stats,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(255,255,255,'+a+')!important}.day-dot,.day-selector .day-dot{background:rgba(255,255,255,'+a+')!important}@media(prefers-color-scheme:dark){.card,.form-card,.ver,.subj,.alloc,.detail-card,.fact-strip,.tl-panel,.str-panel,.prob,.sig-panel,.step-panel,.trig-panel,.pledge-panel,.day-cell,.history-item,.ban-item,.summary-card,.week-row,.stats-bar,.encourage-box,.header-bar,.header-card,.zone-title-card,.stats,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(36,35,31,'+a+')!important}}';
   }
   update(0.92);
   window.addEventListener('message',function(e){
