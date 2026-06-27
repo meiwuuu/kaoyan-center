@@ -58,7 +58,7 @@
   @media(max-width:600px){ .stats{gap:20px} }
 
   .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
-  @media(prefers-color-scheme:dark){.header-card{background:#24231f}}
+  @media(prefers-color-scheme:dark){.header-card{background:rgba(36,35,31,var(--card-alpha))}}
 </style>
 </head>
 <body>
@@ -170,6 +170,8 @@ window.addEventListener('message',function(e){
     document.documentElement.style.setProperty('--card-alpha',e.data.value);
   }
 });
+/* request initial alpha from parent */
+try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 </script>
 </body>
 </html>

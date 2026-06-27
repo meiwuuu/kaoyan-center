@@ -24,7 +24,7 @@
   .tag { display:inline-flex; align-items:center; padding:2px 10px; border-radius:99px; font-weight:600; white-space:nowrap; font-size:.72em; }
   .tag-green { background:#e6f4ea; color:#166534; } .tag-orange { background:#fff7ed; color:#9a4700; } .tag-red { background:#fef2f2; color:#991b1b; }
   .alert { padding:10px 16px; border-radius:var(--radius-sm); margin:8px 0; font-size:.86em; }
-  .alert-blue { background:var(--blue-bg); color:#1e40af; }
+  .alert-blue { background:rgba(239,244,255,var(--card-alpha)); color:#1e40af; }
   .text-math { color:var(--blue); } .text-cs { color:var(--cs); } .text-eng { color:var(--orange); } .text-pol { color:var(--red); }
   .subtitle { font-size:.88em; color:var(--text2); margin-bottom:8px; }
   input,select,textarea { font-family:inherit; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:.88em; background:rgba(255,255,255,var(--card-alpha)); color:var(--text); width:100%; }
@@ -40,7 +40,7 @@
   .badge.ok   { background:#fff7ed; color:var(--orange); }
   .badge.bad  { background:#fef2f2; color:var(--red); }
   .stats { display:flex; gap:24px; flex-wrap:wrap; font-size:.86em; padding:14px 20px; }
-  .encourage-box { padding:14px 20px; border-radius:var(--radius); font-size:.91em; text-align:center; margin-bottom:16px; background:var(--blue-bg); color:#1e40af; font-weight:500; }
+  .encourage-box { padding:14px 20px; border-radius:var(--radius); font-size:.91em; text-align:center; margin-bottom:16px; background:rgba(239,244,255,var(--card-alpha)); color:#1e40af; font-weight:500; }
   .week-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:12px 20px; }
   .week-row .week-label { font-size:.93em; font-weight:600; }
   .week-progress { display:flex; gap:5px; align-items:center; }
@@ -53,7 +53,7 @@
   .day-selector { display:flex; gap:6px; margin-bottom:18px; }
   .day-dot { flex:1; min-width:52px; text-align:center; padding:14px 6px 12px; border-radius:12px; border:1.5px solid var(--border); cursor:pointer; transition:all .2s; font-size:.86em; background:rgba(255,255,255,var(--card-alpha)); position:relative; box-shadow:var(--shadow-sm); }
   .day-dot:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow); }
-  .day-dot.active { border-color:var(--blue); background:var(--blue-bg); font-weight:700; color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+  .day-dot.active { border-color:var(--blue); background:rgba(239,244,255,var(--card-alpha)); font-weight:700; color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
   .day-dot.today::after { content:'今天'; position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--orange); color:#fff; font-size:.6em; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; }
   .day-dot .dot-label { display:block; font-size:.7em; color:var(--text3); margin-top:3px; }
   .day-dot .dot-stat  { display:block; font-size:.66em; font-weight:600; margin-top:2px; }
@@ -67,7 +67,7 @@
   /* Version tabs */
   .ver-tabs { display:flex; gap:4px; }
   .ver-tab { padding:7px 18px; border-radius:99px; font-size:.84em; font-weight:600; cursor:pointer; border:1.5px solid transparent; transition:all .15s; background:transparent; font-family:inherit; }
-  .ver-tab.ver-a { color:var(--blue); } .ver-tab.ver-a.sel { background:var(--blue-bg); border-color:var(--blue); }
+  .ver-tab.ver-a { color:var(--blue); } .ver-tab.ver-a.sel { background:rgba(239,244,255,var(--card-alpha)); border-color:var(--blue); }
   .ver-tab.ver-b { color:var(--orange); } .ver-tab.ver-b.sel { background:#fff7ed; border-color:var(--orange); }
   .ver-tab.ver-o { color:var(--red); } .ver-tab.ver-o.sel { background:#fef2f2; border-color:var(--red); }
   .ver-tab:hover { opacity:.7; }
@@ -415,6 +415,8 @@ window.addEventListener('message',function(e){
     document.documentElement.style.setProperty('--card-alpha',e.data.value);
   }
 });
+/* request initial alpha from parent */
+try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 </script>
 </body>
 </html>

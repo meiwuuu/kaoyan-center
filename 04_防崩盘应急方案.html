@@ -27,7 +27,7 @@
   .zone-head { font-size:1.2em; font-weight:750; letter-spacing:.02em; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
   .zone-note { font-size:.9em; color:var(--text2); margin-bottom:0; }
   .zone-title-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 28px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
-  @media(prefers-color-scheme:dark){.zone-title-card{background:#24231f}}
+  @media(prefers-color-scheme:dark){.zone-title-card{background:rgba(36,35,31,var(--card-alpha))}}
   .zone-title-card .zone-head { margin-bottom:4px; }
   .zone-title-card .zone-note { margin-bottom:0; }
 
@@ -69,7 +69,7 @@
   .trig span { font-size:.88em; color:var(--text2); line-height:1.6; }
 
   /* ── ZONE 4: 约定 ── */
-  .pledge-panel { background:#eff4ff; border-radius:16px; padding:28px 32px; color:#1e40af; border:1px solid #dbeafe; }
+  .pledge-panel { background:rgba(239,244,255,var(--card-alpha)); border-radius:16px; padding:28px 32px; color:#1e40af; border:1px solid #dbeafe; }
   @media (prefers-color-scheme:dark){ .pledge-panel{background:#1a2740;color:#bfdbfe;border-color:#1e3050} }
   .pledge-panel h3 { font-size:1.05em; font-weight:750; margin-bottom:18px; }
   .pledge { list-style:none; padding:0; counter-reset:p; }
@@ -81,7 +81,7 @@
   .pledge li b { font-weight:750; }
 
   .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
-  @media(prefers-color-scheme:dark){.header-card{background:#24231f}}
+  @media(prefers-color-scheme:dark){.header-card{background:rgba(36,35,31,var(--card-alpha))}}
 </style>
 </head>
 <body>
@@ -214,6 +214,8 @@ window.addEventListener('message',function(e){
     document.documentElement.style.setProperty('--card-alpha',e.data.value);
   }
 });
+/* request initial alpha from parent */
+try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 </script>
 </body>
 </html>

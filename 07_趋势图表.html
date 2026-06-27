@@ -46,7 +46,7 @@ html{background:transparent}body{
   border-right:1px solid var(--border);
 }
 .range-btn:last-child { border-right:none; }
-.range-btn:hover { background:var(--blue-bg); color:var(--blue); }
+.range-btn:hover { background:rgba(239,244,255,var(--card-alpha)); color:var(--blue); }
 .range-btn.active {
   background:var(--blue); color:#fff;
 }
@@ -64,7 +64,7 @@ html{background:transparent}body{
   font-size:.85em; transition:all .15s;
   line-height:1.4;
 }
-.nav-btn:hover { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
+.nav-btn:hover { background:rgba(239,244,255,var(--card-alpha)); color:var(--blue); border-color:var(--blue); }
 .nav-btn:active { transform:scale(0.95); }
 .nav-label {
   min-width:120px; text-align:center;
@@ -73,7 +73,7 @@ html{background:transparent}body{
 }
 .nav-today {
   padding:4px 12px; border:1px solid var(--border);
-  background:var(--blue-bg); color:var(--blue);
+  background:rgba(239,244,255,var(--card-alpha)); color:var(--blue);
   border-radius:6px; cursor:pointer; font-family:inherit;
   font-size:.82em; transition:all .15s;
   line-height:1.4; font-weight:500;
@@ -518,6 +518,8 @@ window.addEventListener('message',function(e){
     document.documentElement.style.setProperty('--card-alpha',e.data.value);
   }
 });
+/* request initial alpha from parent */
+try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 </script>
 </body>
 </html>

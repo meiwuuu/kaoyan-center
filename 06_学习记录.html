@@ -40,7 +40,7 @@ html{background:transparent}body{
   display:flex; align-items:center; justify-content:center;
   transition:all .2s; flex-shrink:0;
 }
-.week-nav-btn:hover { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
+.week-nav-btn:hover { background:rgba(239,244,255,var(--card-alpha)); border-color:var(--blue); color:var(--blue); }
 .week-label {
   font-size:.93em; font-weight:650; color:var(--text);
   min-width:150px; text-align:center;
@@ -82,7 +82,7 @@ html{background:transparent}body{
 }
 .day-cell:hover { border-color:var(--blue); }
 .day-cell.today { border:2px solid var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.08); }
-.day-cell.selected { background:var(--blue-bg); border-color:var(--blue); }
+.day-cell.selected { background:rgba(239,244,255,var(--card-alpha)); border-color:var(--blue); }
 .day-cell .day-name { font-size:.68em; color:var(--text2); margin-bottom:2px; }
 .day-cell .day-date { font-size:.82em; font-weight:600; }
 .day-cell .day-time { font-size:.66em; color:var(--text); margin-top:3px; font-weight:500; }
@@ -156,7 +156,7 @@ html{background:transparent}body{
 
 /* ── Review card ── */
 .review-card {
-  background:var(--blue-bg);
+  background:rgba(239,244,255,var(--card-alpha));
   border:1px solid var(--border);
   border-radius:var(--radius);
   padding:20px 24px; margin:14px 0;
@@ -597,6 +597,8 @@ window.addEventListener('message',function(e){
     document.documentElement.style.setProperty('--card-alpha',e.data.value);
   }
 });
+/* request initial alpha from parent */
+try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 </script>
 </body>
 </html>

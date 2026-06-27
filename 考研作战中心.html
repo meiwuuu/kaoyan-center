@@ -1224,6 +1224,13 @@ function applySettings(s){s=s||{};var r=document.documentElement;r.style.setProp
   document.querySelectorAll('iframe').forEach(function(f){
     try{f.contentWindow.postMessage({type:'kaoyan-alpha',value:a},'*');}catch(e){}
   });}
+
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-ready'&&e.source){
+    var a=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-alpha').trim())||0.92;
+    try{e.source.postMessage({type:'kaoyan-alpha',value:a},'*');}catch(ex){}
+  }
+});
 function applyBg(){var url=document.getElementById('bg-url').value.trim();var blur=parseInt(document.getElementById('bg-blur').value)||0;var alpha=parseInt(document.getElementById('card-alpha').value)||92;var overlay=parseInt(document.getElementById('bg-overlay').value)||35;var s={bg:url,blur:blur,overlay:overlay,alpha:alpha};localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
 function clearBg(){document.getElementById('bg-url').value='';var s={bg:'',blur:0,overlay:35,alpha:92};localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);document.getElementById('bg-blur').value=0;document.getElementById('blur-val').textContent='0px';document.getElementById('card-alpha').value=92;document.getElementById('bg-overlay').value=35;document.getElementById('overlay-val').textContent='35%';}
 function applyBlur(v){document.getElementById('blur-val').textContent=v+'px';var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');s.blur=parseInt(v)||0;localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
