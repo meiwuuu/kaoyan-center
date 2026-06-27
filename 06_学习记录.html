@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>学习记录</title>
 <style>
-:root {
+:root { --card-alpha:0.92;
   --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
   --blue: #2563eb; --blue-bg: #eff4ff; --green: #16a34a; --orange: #ea580c; --red: #dc2626;
   --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626;
@@ -18,7 +18,7 @@
   --card-alpha: 0.92;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body {
+html{background:transparent}body{
   font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   background:transparent; color:var(--text); font-size:16px; line-height:1.7;
   -webkit-font-smoothing:antialiased; padding:16px 20px 20px;
@@ -207,7 +207,7 @@ body {
 
 <div class="heat-legend" id="heat-legend">
   <span>学习时长</span>
-  <span class="swatch" style="background:#fff;"></span><span>0</span>
+  <span class="swatch" style="background:rgba(255,255,255,var(--card-alpha));"></span><span>0</span>
   <span class="swatch" style="background:#e8f0fe;"></span><span>&lt;1h</span>
   <span class="swatch" style="background:#bdd7f5;"></span><span>&lt;3h</span>
   <span class="swatch" style="background:#7aa9e5;"></span><span>&lt;6h</span>
@@ -601,6 +601,14 @@ setTimeout(function(){
     document.head.appendChild(st);
   } catch(e) {}
 }, 200);
+</script>
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
 </script>
 </body>
 </html>

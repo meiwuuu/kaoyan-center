@@ -6,17 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>每日复盘 · 考研作战中心</title>
 <style>
-  :root {
+  :root { --card-alpha:0.92;
     --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
     --blue: #2563eb; --blue-bg: #eff4ff; --green: #16a34a; --orange: #ea580c; --red: #dc2626; --cs: #7c3aed;
     --border: #e7e4de; --radius: 12px; --radius-sm: 8px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  html{background:transparent}body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
   main { max-width:800px; margin:0 auto; padding:24px 20px 72px; }
 
-  .card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:12px 0; box-shadow:var(--shadow-sm); }
+  .card { background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:12px 0; box-shadow:var(--shadow-sm); }
   .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border:none; border-radius:var(--radius-sm); font-size:.82em; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
   .btn-primary { background:var(--blue); color:#fff; } .btn-primary:hover { opacity:.85; }
   .btn-secondary { background:var(--bg); color:var(--text); border:1px solid var(--border); } .btn-secondary:hover { background:var(--border); }
@@ -27,7 +27,7 @@
   .alert-blue { background:var(--blue-bg); color:#1e40af; }
   .text-math { color:var(--blue); } .text-cs { color:var(--cs); } .text-eng { color:var(--orange); } .text-pol { color:var(--red); }
   .subtitle { font-size:.88em; color:var(--text2); margin-bottom:8px; }
-  input,select,textarea { font-family:inherit; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:.88em; background:#fff; color:var(--text); width:100%; }
+  input,select,textarea { font-family:inherit; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:.88em; background:rgba(255,255,255,var(--card-alpha)); color:var(--text); width:100%; }
   input:focus,select:focus,textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
   textarea { resize:both; min-height:52px; min-width:100%; }
 
@@ -51,14 +51,14 @@
   .week-progress .progress-label { font-size:.78em; color:var(--text3); margin-left:10px; }
 
   .day-selector { display:flex; gap:6px; margin-bottom:18px; }
-  .day-dot { flex:1; min-width:52px; text-align:center; padding:14px 6px 12px; border-radius:12px; border:1.5px solid var(--border); cursor:pointer; transition:all .2s; font-size:.86em; background:#fff; position:relative; box-shadow:var(--shadow-sm); }
+  .day-dot { flex:1; min-width:52px; text-align:center; padding:14px 6px 12px; border-radius:12px; border:1.5px solid var(--border); cursor:pointer; transition:all .2s; font-size:.86em; background:rgba(255,255,255,var(--card-alpha)); position:relative; box-shadow:var(--shadow-sm); }
   .day-dot:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow); }
   .day-dot.active { border-color:var(--blue); background:var(--blue-bg); font-weight:700; color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
   .day-dot.today::after { content:'今天'; position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--orange); color:#fff; font-size:.6em; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; }
   .day-dot .dot-label { display:block; font-size:.7em; color:var(--text3); margin-top:3px; }
   .day-dot .dot-stat  { display:block; font-size:.66em; font-weight:600; margin-top:2px; }
 
-  .form-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; margin-bottom:22px; box-shadow:var(--shadow-sm); }
+  .form-card { background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; margin-bottom:22px; box-shadow:var(--shadow-sm); }
   .form-title-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
   .form-title { font-size:1.05em; font-weight:700; }
   .form-sub   { font-size:.74em; color:var(--text2); }
@@ -96,9 +96,9 @@
   .err-cell label { font-size:.67em; display:block; margin-bottom:3px; color:var(--text3); }
   .err-cell input { font-size:.86em; text-align:center; }
 
-  .history-item { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius-sm); margin:8px 0; font-size:.91em; background:#fff; transition:all .2s; box-shadow:var(--shadow-sm); }
+  .history-item { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius-sm); margin:8px 0; font-size:.91em; background:rgba(255,255,255,var(--card-alpha)); transition:all .2s; box-shadow:var(--shadow-sm); }
   .history-item:hover { border-color:var(--blue); transform:translateX(3px); box-shadow:var(--shadow); }
-  .toast { position:fixed; bottom:28px; right:28px; background:#fff; padding:12px 22px; border-radius:var(--radius-sm); font-weight:600; font-size:.91em; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; transform:translateY(8px); transition:all .25s; z-index:200; pointer-events:none; }
+  .toast { position:fixed; bottom:28px; right:28px; background:rgba(255,255,255,var(--card-alpha)); padding:12px 22px; border-radius:var(--radius-sm); font-weight:600; font-size:.91em; border:1px solid var(--border); box-shadow:var(--shadow); opacity:0; transform:translateY(8px); transition:all .25s; z-index:200; pointer-events:none; }
   .toast.show { opacity:1; transform:translateY(0); }
   .toast.error { border-color:rgba(220,38,38,.25); background:#fff5f5; }
 
@@ -415,5 +415,13 @@ init();
 })();
 </script>
 
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
+</script>
 </body>
 </html>

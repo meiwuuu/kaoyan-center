@@ -6,18 +6,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>课程表 · 考研作战中心</title>
 <style>
-  :root {
+  :root { --card-alpha:0.92;
     --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
     --blue: #2563eb; --orange: #ea580c; --green: #16a34a; --red: #dc2626;
     --border: #e7e4de; --card: #fff; --radius: 14px; --radius-sm: 10px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.04); --shadow: 0 4px 16px rgba(0,0,0,.06);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+    :root { --card-alpha:0.92; --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
       --blue: #60a5fa; --orange: #fb923c; --green: #4ade80; --red: #f87171; --border: #35322c; --card: #24231f; }
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  html{background:transparent}body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
   main { max-width:800px; margin:0 auto; padding:40px 24px 24px; }
 
   .header-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
@@ -27,7 +27,7 @@
   @media (prefers-color-scheme:dark){ .badge{background:#152b19} }
 
   .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:14px 0; box-shadow:var(--shadow-sm); }
-  @media (prefers-color-scheme:dark){ .card{background:#24231f} }
+  @media (prefers-color-scheme:dark){ .card{background:rgba(36,35,31,var(--card-alpha))} }
 
   .picker { display:flex; gap:6px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
   select { font-family:inherit; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:.88em; background:var(--card); color:var(--text); }
@@ -352,5 +352,13 @@ init();
 })();
 </script>
 
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
+</script>
 </body>
 </html>

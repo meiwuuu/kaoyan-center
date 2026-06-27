@@ -6,7 +6,7 @@
 <title>趋势图表</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root {
+:root { --card-alpha:0.92;
   --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
   --blue: #2563eb; --blue-bg: #eff4ff; 
   --border: #e7e4de; --radius: 12px;
@@ -14,7 +14,7 @@
   --card-alpha: 0.92;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body {
+html{background:transparent}body{
   font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   background:transparent; color:var(--text); padding:10px 14px 14px;
 }
@@ -519,6 +519,14 @@ setTimeout(function(){
 }, 200);
 
 loadData();
+</script>
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
 </script>
 </body>
 </html>

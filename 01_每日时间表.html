@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>每日时间表 · 考研作战中心</title>
 <style>
-  :root {
+  :root { --card-alpha:0.92;
     --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
     --blue: #2563eb; --blue-bg: #eff4ff; --orange: #ea580c;
     --green: #16a34a; --red: #dc2626;
@@ -16,16 +16,16 @@
     --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
+    :root { --card-alpha:0.92; --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
       --blue: #60a5fa; --blue-bg: #1a2740; --orange: #fb923c;
       --green: #4ade80; --red: #f87171;
       --border: #35322c; --border-strong: #4a4740;
       --card: #24231f; }
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  html{background:transparent}body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 26px; box-shadow:var(--shadow-sm); }
-  @media(prefers-color-scheme:dark){.card{background:#24231f}}
+  @media(prefers-color-scheme:dark){.card{background:rgba(36,35,31,var(--card-alpha))}}
   main { max-width:780px; margin:0 auto; padding:40px 24px 24px; }
 
   h1 { font-size:2em; font-weight:800; letter-spacing:.02em; margin-bottom:6px; }
@@ -136,5 +136,13 @@
 })();
 </script>
 
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
+</script>
 </body>
 </html>

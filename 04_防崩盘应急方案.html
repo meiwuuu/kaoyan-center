@@ -6,16 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>防崩盘应急方案 · 考研作战中心</title>
 <style>
-  :root {
+  :root { --card-alpha:0.92;
     --bg: #fafaf8; --text: #1c1b18; --text2: #3d3a35; --text3: #5f5b55;
     --border: #e7e4de; --card: #fff; --radius: 16px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #1b1a17; --text: #ebe9e4; --text2: #d4d0c8; --text3: #9a958c; --border: #35322c; --card: #24231f; }
+    :root { --card-alpha:0.92; --bg: #1b1a17; --text: #ebe9e4; --text2: #d4d0c8; --text3: #9a958c; --border: #35322c; --card: #24231f; }
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  html{background:transparent}body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased; }
   main { max-width:760px; margin:0 auto; padding:40px 24px 24px; }
 
   .hero { text-align:center; padding:24px 0 8px; }
@@ -207,5 +207,13 @@
 })();
 </script>
 
+<script>
+/* alpha sync via postMessage */
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='kaoyan-alpha'){
+    document.documentElement.style.setProperty('--card-alpha',e.data.value);
+  }
+});
+</script>
 </body>
 </html>
