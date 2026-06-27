@@ -589,19 +589,7 @@ function escHtml(s) {
 })();
 </script>
 
-<script>
-// Inject transparency from parent theme
-setTimeout(function(){
-  try {
-    var s = JSON.parse(localStorage.getItem('kaoyan_theme') || '{}');
-    var alpha = (s.alpha || 92) / 100;
-    document.documentElement.style.setProperty('--card-alpha', alpha);
-    var st = document.createElement('style');
-    st.textContent = '.card,.day-cell,.week-nav-btn,.empty-state,.review-card,.week-progress-bar{background:rgba(255,255,255,'+alpha+')!important}';
-    document.head.appendChild(st);
-  } catch(e) {}
-}, 200);
-</script>
+
 <script>
 /* alpha sync via postMessage */
 window.addEventListener('message',function(e){
