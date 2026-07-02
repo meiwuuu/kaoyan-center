@@ -555,13 +555,19 @@ function render(date, daily, review) {
 
 // ── Helpers ──
 function getWeightForDate(date) {
-  // Return weight for date. If not recorded, inherit from the most recent previous date.
+  // Return weight for date.
+  // Before tracking start (today): null
+  // Today onwards: if recorded, show it; if not, inherit from previous recorded date.
+  // Future dates not yet recorded: null
+  var today = new Date().toISOString().slice(0,10);
+  if (date > today) return null;  // future
+  if (date < today) return null;  // before tracking started
   if (weightCache[date] !== undefined) return weightCache[date];
   var allDates = Object.keys(weightCache).sort();
   if (allDates.length === 0) return null;
   var latest = null;
   for (var i = 0; i < allDates.length; i++) {
-    if (allDates[i] < date) latest = weightCache[allDates[i]];
+    if (allDates[i] <= date && weightCache[allDates[i]] !== undefined) latest = weightCache[allDates[i]];
   }
   return latest;
 }

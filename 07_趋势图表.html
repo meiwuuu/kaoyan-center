@@ -423,13 +423,16 @@ function renderChart() {
   // Weight data for dates (with inheritance for daily modes)
   var weightData = null;
   if (dates && cachedWeights) {
+    var today = new Date().toISOString().slice(0,10);
     var weightDates = Object.keys(cachedWeights).sort();
     weightData = dates.map(function(date) {
       if (cachedWeights[date] !== undefined && typeof cachedWeights[date] === 'number') return cachedWeights[date];
-      // Inherit from previous date
+      // Before tracking start or future: null
+      if (date < today || date > today) return null;
+      // Today onwards: inherit from previous recorded date
       var latest = null;
       for (var i = 0; i < weightDates.length; i++) {
-        if (weightDates[i] < date && typeof cachedWeights[weightDates[i]] === 'number') latest = cachedWeights[weightDates[i]];
+        if (weightDates[i] <= date && typeof cachedWeights[weightDates[i]] === 'number') latest = cachedWeights[weightDates[i]];
       }
       return latest;
     });
