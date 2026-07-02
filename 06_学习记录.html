@@ -11,7 +11,7 @@
 :root { --card-alpha:0.92;
   --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
   --blue: #2563eb; --blue-bg: #eff4ff; --green: #16a34a; --orange: #ea580c; --red: #dc2626;
-  --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626;
+  --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626; --sport: #16a34a;
   --border: #e7e4de; --border-strong: #d4d0c8;
   --radius: 12px; --radius-sm: 8px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,.05); --shadow: 0 4px 16px rgba(0,0,0,.06);
@@ -221,8 +221,8 @@ html{background:transparent}body{
 
 <script>
 var API = 'http://localhost:8765';
-var SUBJECT_NAMES = {math:'数学', cs:'408', eng:'英语', pol:'政治'};
-var SUBJECT_HEX = {math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#f87171'};
+var SUBJECT_NAMES = {math:'数学', cs:'408', eng:'英语', pol:'政治', sport:'运动'};
+var SUBJECT_HEX = {math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#f87171', sport:'#16a34a'};
 
 // ── Heatmap: 学习时长的5级热力色 ──
 function heatmapLevel(seconds) {
@@ -254,6 +254,7 @@ var weekMonday = getMonday(new Date());
 var selectedDate = new Date().toISOString().slice(0,10);
 var dailyCache = {};    // date -> {total_time, segments_count}
 var reviewCache = {};   // date -> {score, grade}
+var weightCache = {};   // date -> weight (kg)
 
 function getMonday(d) {
   var dt = new Date(d); dt.setDate(dt.getDate() - ((dt.getDay()+6)%7));
@@ -414,11 +415,18 @@ async function loadDay(ds) {
 
   var results = await Promise.all([
     fetch(API + '/api/stats/daily?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; }),
-    fetch(API + '/api/stats/review?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; })
+    fetch(API + '/api/stats/review?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; }),
+    fetch(API + '/api/stats/weight?date=' + ds).then(function(r) { return r.json(); }).catch(function() { return null; })
   ]);
   var daily = results[0];
   var review = results[1];
+  var weightData = results[2];
   if (!review || !review.text) review = null;
+
+  // 更新体重缓存
+  if (weightData && typeof weightData.weight === 'number') {
+    weightCache[ds] = weightData.weight;
+  }
 
   // 更新缓存（驱动日期格子的热力色）
   if (daily && daily.total_time !== undefined) {
@@ -470,6 +478,9 @@ function render(date, daily, review) {
     html += '<div class="summary-item"><div class="val">'+segs.length+'</div><div class="lbl">学习段数</div></div>';
     html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+totalPomos+'</div><div class="lbl">番茄数</div></div>';
     html += '<div class="summary-item"><div class="val" style="color:var(--orange);">'+(totalTime>0&&segs.length>0?fmtTimeShort(Math.round(totalTime/segs.length)):'—')+'</div><div class="lbl">平均每段</div></div>';
+    // Weight display (with inheritance)
+    var w = getWeightForDate(date);
+    html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+(w !== null ? w.toFixed(1)+' kg' : '—')+'</div><div class="lbl">体重</div></div>';
     html += '</div>';
 
     // Subject bars
@@ -543,6 +554,17 @@ function render(date, daily, review) {
 }
 
 // ── Helpers ──
+function getWeightForDate(date) {
+  // Return weight for date. If not recorded, inherit from the most recent previous date.
+  if (weightCache[date] !== undefined) return weightCache[date];
+  var allDates = Object.keys(weightCache).sort();
+  if (allDates.length === 0) return null;
+  var latest = null;
+  for (var i = 0; i < allDates.length; i++) {
+    if (allDates[i] < date) latest = weightCache[allDates[i]];
+  }
+  return latest;
+}
 function fmtDuration(s) {
   var h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
   if (h > 0) return h + 'h ' + m + 'min';

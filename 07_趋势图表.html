@@ -105,9 +105,9 @@ html{background:transparent}body{
 
 <script>
 var API = 'http://localhost:8765';
-var SUBJECT_NAMES = { total:'总时长', math:'数学', cs:'408', eng:'英语', pol:'政治' };
-var SUBJECT_COLORS = { total:'#10b981', math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626' };
-var SUBJ_KEYS = ['total','math','cs','eng','pol'];
+var SUBJECT_NAMES = { total:'总时长', math:'数学', cs:'408', eng:'英语', pol:'政治', sport:'运动' };
+var SUBJECT_COLORS = { total:'#10b981', math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626', sport:'#16a34a' };
+var SUBJ_KEYS = ['total','math','cs','eng','pol','sport'];
 
 var currentMode = '14d';
 var weekOffset = 0;       // 0=本周, -1=上周, 1=下周...
@@ -115,6 +115,7 @@ var viewYear = null;      // 月模式下的年份
 var viewMonth = null;     // 月模式下的月份 (0-indexed)
 var cachedLogs = null;
 var cachedReviews = null;
+var cachedWeights = null;
 var chartInstance = null;
 
 // ── Mode switch ──
@@ -226,6 +227,7 @@ async function loadData() {
     var data = await res.json();
     cachedLogs = data.daily_logs || {};
     cachedReviews = data.reviews || {};
+    cachedWeights = data.weight_logs || {};
     toggleNavBar();
     updateNavLabel();
     renderChart();
@@ -269,13 +271,13 @@ function avgNonEmpty(arr) {
 
 // ── Aggregate ──
 function aggregateDaily(logs, dates) {
-  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[], sport:[] };
 
   dates.forEach(function(date) {
     var day = logs[date];
     if (day) {
       var segs = day.segments || [];
-      var sum = { math:0, cs:0, eng:0, pol:0 };
+      var sum = { math:0, cs:0, eng:0, pol:0, sport:0 };
       segs.forEach(function(s) {
         if (sum[s.subject] !== undefined) sum[s.subject] += (s.duration||0);
       });
@@ -299,7 +301,7 @@ function aggregateWeekly(logs, allDates) {
     var mon = new Date(d);
     mon.setDate(d.getDate() - day + 1);
     var wk = fmtDate(mon);
-    if (!weeks[wk]) weeks[wk] = { math:0, cs:0, eng:0, pol:0, total:0, end: date };
+    if (!weeks[wk]) weeks[wk] = { math:0, cs:0, eng:0, pol:0, sport:0, total:0, end: date };
     var dayData = logs[date];
     var segs = dayData.segments || [];
     weeks[wk].total += (dayData.total_time||0);
@@ -312,7 +314,7 @@ function aggregateWeekly(logs, allDates) {
   var sorted = Object.keys(weeks).sort();
   if (sorted.length > 26) sorted = sorted.slice(-26);
 
-  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[], sport:[] };
   var labels = [];
   sorted.forEach(function(wk) {
     var w = weeks[wk];
@@ -330,7 +332,7 @@ function aggregateMonthly(logs, allDates) {
   var months = {};
   allDates.forEach(function(date) {
     var mk = date.slice(0,7);
-    if (!months[mk]) months[mk] = { math:0, cs:0, eng:0, pol:0, total:0 };
+    if (!months[mk]) months[mk] = { math:0, cs:0, eng:0, pol:0, sport:0, total:0 };
     var dayData = logs[date];
     var segs = dayData.segments || [];
     months[mk].total += (dayData.total_time||0);
@@ -340,7 +342,7 @@ function aggregateMonthly(logs, allDates) {
   });
 
   var sorted = Object.keys(months).sort();
-  var ds = { total:[], math:[], cs:[], eng:[], pol:[] };
+  var ds = { total:[], math:[], cs:[], eng:[], pol:[], sport:[] };
   var labels = [];
   sorted.forEach(function(mk) {
     labels.push(parseInt(mk.slice(5))+'月');
@@ -418,6 +420,21 @@ function renderChart() {
     return;
   }
 
+  // Weight data for dates (with inheritance for daily modes)
+  var weightData = null;
+  if (dates && cachedWeights) {
+    var weightDates = Object.keys(cachedWeights).sort();
+    weightData = dates.map(function(date) {
+      if (cachedWeights[date] !== undefined && typeof cachedWeights[date] === 'number') return cachedWeights[date];
+      // Inherit from previous date
+      var latest = null;
+      for (var i = 0; i < weightDates.length; i++) {
+        if (weightDates[i] < date && typeof cachedWeights[weightDates[i]] === 'number') latest = cachedWeights[weightDates[i]];
+      }
+      return latest;
+    });
+  }
+
   var chartDatasets = SUBJ_KEYS.map(function(key) {
     var isTotal = key === 'total';
     return {
@@ -453,6 +470,26 @@ function renderChart() {
     });
   }
 
+  // Weight dataset (right y-axis, kg)
+  var hasWeight = weightData && weightData.some(function(v){ return v !== null; });
+  if (hasWeight) {
+    chartDatasets.push({
+      label: '体重 (kg)',
+      data: weightData,
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(34,211,238,0.08)',
+      borderWidth: 2,
+      borderDash: [8,4],
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      pointStyle: 'triangle',
+      tension: 0.3,
+      fill: false,
+      spanGaps: true,
+      yAxisID: 'y2'
+    });
+  }
+
   if (chartDatasets.length === 0) {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').textContent = '所选范围暂无学习数据。';
@@ -479,6 +516,9 @@ function renderChart() {
               if (ctx.dataset.yAxisID === 'y1') {
                 return ctx.dataset.label + ': ' + ctx.parsed.y + ' 分';
               }
+              if (ctx.dataset.yAxisID === 'y2') {
+                return ctx.dataset.label + ': ' + ctx.parsed.y + ' kg';
+              }
               return ctx.dataset.label + ': ' + ctx.parsed.y + ' h';
             }
           }
@@ -499,6 +539,12 @@ function renderChart() {
           title: { display: true, text: 'AI评分' },
           grid: { drawOnChartArea: false },
           ticks: { stepSize: 20, callback: function(v) { return v + ' 分'; } }
+        },
+        y2: {
+          position: 'right',
+          beginAtZero: false,
+          title: { display: true, text: '体重 (kg)' },
+          grid: { drawOnChartArea: false },
         },
         x: { grid: { display: false } }
       }
