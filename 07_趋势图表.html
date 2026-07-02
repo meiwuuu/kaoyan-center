@@ -517,7 +517,7 @@ function renderChart() {
                 return ctx.dataset.label + ': ' + ctx.parsed.y + ' 分';
               }
               if (ctx.dataset.yAxisID === 'y2') {
-                return ctx.dataset.label + ': ' + ctx.parsed.y + ' kg';
+                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + ' kg';
               }
               return ctx.dataset.label + ': ' + ctx.parsed.y + ' h';
             }

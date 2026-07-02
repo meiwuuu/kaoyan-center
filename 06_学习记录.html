@@ -480,7 +480,7 @@ function render(date, daily, review) {
     html += '<div class="summary-item"><div class="val" style="color:var(--orange);">'+(totalTime>0&&segs.length>0?fmtTimeShort(Math.round(totalTime/segs.length)):'—')+'</div><div class="lbl">平均每段</div></div>';
     // Weight display (with inheritance)
     var w = getWeightForDate(date);
-    html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+(w !== null ? w.toFixed(1)+' kg' : '—')+'</div><div class="lbl">体重</div></div>';
+    html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+(w !== null ? w.toFixed(2)+' kg' : '—')+'</div><div class="lbl">体重</div></div>';
     html += '</div>';
 
     // Subject bars
