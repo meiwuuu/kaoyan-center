@@ -477,7 +477,13 @@ function render(date, daily, review) {
     html += '<div class="summary-item"><div class="val" style="color:var(--blue);">'+fmtTimeShort(totalTime)+'</div><div class="lbl">总时长</div></div>';
     html += '<div class="summary-item"><div class="val">'+segs.length+'</div><div class="lbl">学习段数</div></div>';
     html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+totalPomos+'</div><div class="lbl">番茄数</div></div>';
-    html += '<div class="summary-item"><div class="val" style="color:var(--orange);">'+(totalTime>0&&segs.length>0?fmtTimeShort(Math.round(totalTime/segs.length)):'—')+'</div><div class="lbl">平均每段</div></div>';
+    
+    // 新增：起床与睡觉时间显示（如果没有记录则显示横杠）
+    var wakeTime = daily.wake_time || '—';
+    var sleepTime = daily.sleep_time || '—';
+    html += '<div class="summary-item"><div class="val" style="color:var(--orange);">'+wakeTime+'</div><div class="lbl">起床时间</div></div>';
+    html += '<div class="summary-item"><div class="val" style="color:var(--cs);">'+sleepTime+'</div><div class="lbl">睡觉时间</div></div>';
+    
     // Weight display (with inheritance)
     var w = getWeightForDate(date);
     html += '<div class="summary-item"><div class="val" style="color:var(--green);">'+(w !== null ? w.toFixed(2)+' kg' : '—')+'</div><div class="lbl">体重</div></div>';
