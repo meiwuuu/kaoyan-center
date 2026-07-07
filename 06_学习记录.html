@@ -562,15 +562,15 @@ function render(date, daily, review) {
 // ── Helpers ──
 function getWeightForDate(date) {
   // Return weight for date.
-  // Before tracking start (today): null
-  // Today onwards: if recorded, show it; if not, inherit from previous recorded date.
-  // Future dates not yet recorded: null
+  // Before first recorded weight: null
+  // On/after first recorded: if directly recorded, show it; else inherit from previous.
+  // Future dates: null
   var today = new Date().toISOString().slice(0,10);
   if (date > today) return null;  // future
-  if (date < today) return null;  // before tracking started
   if (weightCache[date] !== undefined) return weightCache[date];
   var allDates = Object.keys(weightCache).sort();
   if (allDates.length === 0) return null;
+  if (date < allDates[0]) return null;  // before tracking started
   var latest = null;
   for (var i = 0; i < allDates.length; i++) {
     if (allDates[i] <= date && weightCache[allDates[i]] !== undefined) latest = weightCache[allDates[i]];
@@ -601,10 +601,16 @@ function escHtml(s) {
   var today = selectedDate;
   var results = await Promise.all([
     fetch(API + '/api/stats/daily?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; }),
-    fetch(API + '/api/stats/review?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; })
+    fetch(API + '/api/stats/review?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; }),
+    fetch(API + '/api/stats/weight?date=' + today).then(function(r) { return r.json(); }).catch(function() { return null; })
   ]);
-  var daily = results[0], review = results[1];
+  var daily = results[0], review = results[1], weightData = results[2];
   if (!review || !review.text) review = null;
+
+  // 缓存体重
+  if (weightData && typeof weightData.weight === 'number') {
+    weightCache[today] = weightData.weight;
+  }
 
   // 缓存今天数据 + 立即更新今天圆点
   if (daily && daily.total_time !== undefined) {
