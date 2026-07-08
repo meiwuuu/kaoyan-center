@@ -92,6 +92,7 @@
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes blink { 50% { opacity: 0.5; } }
 
   /* ── Toast ── */
   .toast {
@@ -232,6 +233,53 @@
   .set-panel-content::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
   .set-panel-section { display:none; }
   .set-panel-section.active { display:block; animation:fadeSlideIn .25s ease; }
+
+  /* ── Chart Settings ── */
+  .chart-set-card {
+    border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; margin-bottom:10px;
+    background:var(--bg);
+  }
+  .chart-set-title {
+    font-weight:700; font-size:.82em; margin-bottom:8px;
+    color:var(--text);
+  }
+  .chart-set-row {
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:6px; flex-wrap:wrap;
+    font-size:.8em;
+  }
+  .chart-set-row:last-child { margin-bottom:0; }
+  .chart-set-label {
+    font-size:.78em; color:var(--text2); white-space:nowrap;
+  }
+  .chart-set-row input[type="number"], .chart-set-row select {
+    padding:4px 6px; border:1px solid var(--border);
+    border-radius:6px; font-size:.82em; font-family:inherit;
+    background:rgba(255,255,255,var(--card-alpha)); color:var(--text);
+  }
+  .chart-set-row input[type="number"]:focus, .chart-set-row select:focus {
+    outline:none; border-color:var(--blue);
+    box-shadow:0 0 0 2px rgba(37,99,235,.12);
+  }
+  @media (prefers-color-scheme:dark) {
+    .chart-set-card { background:var(--bg-alt); }
+    .chart-set-row input[type="number"], .chart-set-row select {
+      background:rgba(36,35,31,var(--card-alpha));
+    }
+  }
+  /* Series table */
+  .csr-table { width:100%; border-collapse:collapse; font-size:.78em; }
+  .csr-table th { font-weight:600; color:var(--text2); padding:5px 4px; border-bottom:1px solid var(--border); text-align:center; font-size:.88em; }
+  .csr-table td { padding:5px 4px; border-bottom:1px solid var(--bg-alt); text-align:center; vertical-align:middle; }
+  .csr-table td:first-child { text-align:left; font-weight:600; white-space:nowrap; }
+  .csr-table input[type="checkbox"] { width:15px; height:15px; accent-color:var(--blue); cursor:pointer; }
+  .csr-table input[type="range"] { width:56px; height:4px; accent-color:var(--blue); vertical-align:middle; }
+  .csr-table select { padding:2px 4px; border:1px solid var(--border); border-radius:4px; font-size:.88em; font-family:inherit; background:rgba(255,255,255,var(--card-alpha)); color:var(--text); }
+  .csr-table input[type="number"] { width:42px; padding:2px 4px; border:1px solid var(--border); border-radius:4px; font-size:.88em; font-family:inherit; text-align:center; background:rgba(255,255,255,var(--card-alpha)); color:var(--text); }
+  @media (prefers-color-scheme:dark) {
+    .csr-table select, .csr-table input[type="number"] { background:rgba(36,35,31,var(--card-alpha)); }
+  }
 </style>
 <body>
 
@@ -327,6 +375,7 @@
         <button data-stab="layout" onclick="switchSettingsTab('layout')">📋 布局</button>
         <button data-stab="homepage" onclick="switchSettingsTab('homepage')">🏠 首页</button>
         <button data-stab="data" onclick="switchSettingsTab('data')">💾 数据</button>
+        <button data-stab="chart" onclick="switchSettingsTab('chart')">📊 图表</button>
       </div>
       <div class="set-panel-content">
         <!-- 外观 -->
@@ -374,6 +423,48 @@
           </div>
           <p style="font-size:.76em;color:var(--text3);">导出包含每日复盘、周总结、设置等全部数据。</p>
         </div>
+        <!-- 图表 -->
+        <div class="set-panel-section" id="ssec-chart">
+          <div class="chart-set-card">
+            <div class="chart-set-title">Y轴 · 学习时长（小时）</div>
+            <div class="chart-set-row">
+              <span class="chart-set-label">周上限</span><input type="number" id="cs-y-week" placeholder="自动" step="0.5" min="0" style="width:72px;">
+              <span class="chart-set-label">14天上限</span><input type="number" id="cs-y-14d" placeholder="自动" step="0.5" min="0" style="width:72px;">
+              <span class="chart-set-label">月上限</span><input type="number" id="cs-y-month" placeholder="自动" step="1" min="0" style="width:72px;">
+              <span class="chart-set-label">年上限</span><input type="number" id="cs-y-year" placeholder="自动" step="1" min="0" style="width:72px;">
+            </div>
+            <div class="chart-set-row">
+              <span class="chart-set-label">刻度步长</span><input type="number" id="cs-y-step" placeholder="自动" step="0.5" min="0" style="width:72px;">
+              <span class="chart-set-label">小数精度</span>
+              <select id="cs-y-prec" style="width:80px;"><option value="auto">自动</option><option value="0.1">0.1</option><option value="0.5">0.5</option><option value="1">1(整数)</option></select>
+            </div>
+          </div>
+          <div class="chart-set-card">
+            <div class="chart-set-title">Y轴 · AI评分（右侧）</div>
+            <div class="chart-set-row">
+              <span class="chart-set-label">范围</span><input type="number" id="cs-y1-min" value="0" step="1" style="width:60px;"> ~ <input type="number" id="cs-y1-max" value="100" step="5" style="width:60px;">
+              <span class="chart-set-label">步长</span><input type="number" id="cs-y1-step" value="20" step="5" style="width:60px;">
+            </div>
+          </div>
+          <div class="chart-set-card">
+            <div class="chart-set-title">Y轴 · 体重 kg（右侧）</div>
+            <div class="chart-set-row">
+              <span class="chart-set-label">范围</span><input type="number" id="cs-y2-min" placeholder="自动" step="0.5" style="width:72px;"> ~ <input type="number" id="cs-y2-max" placeholder="自动" step="0.5" style="width:72px;">
+              <span class="chart-set-label">步长</span><input type="number" id="cs-y2-step" placeholder="自动" step="0.5" style="width:72px;">
+              <span class="chart-set-label">精度</span>
+              <select id="cs-y2-prec" style="width:80px;"><option value="auto">自动</option><option value="0.01">0.01</option><option value="0.1">0.1</option></select>
+            </div>
+          </div>
+          <div class="chart-set-card">
+            <div class="chart-set-title">数据系列外观</div>
+            <div id="chart-series-table"></div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-primary" onclick="saveChartSettings()">💾 保存并应用</button>
+            <button class="btn btn-sm btn-secondary" onclick="resetChartDefaults()">🔄 重置默认</button>
+          </div>
+          <p style="font-size:.76em;color:var(--text3);margin-top:8px;">修改后点击「保存并应用」，切换到趋势图表页面即可看到效果。上限/步长留空 = 自动缩放。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -396,6 +487,16 @@ function switchTab(name) {
   if (name === 'weekly') { initWeeklyTab(); }
   // 趋势图表页面撑宽 main，其他页面恢复默认
   document.querySelector('main').style.maxWidth = (name === 'trends') ? '1100px' : '';
+  // Reload trends iframe to pick up latest config
+  if (name === 'trends') {
+    var tf = document.getElementById('iframe-trends');
+    if (tf && tf.contentWindow) {
+      try {
+        var chartCfg = JSON.parse(localStorage.getItem('kaoyan_chart_config')||'null');
+        tf.contentWindow.postMessage({type:'kaoyan-chart-config', config: chartCfg}, '*');
+      } catch(e) {}
+    }
+  }
   window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
 }
 
@@ -1083,20 +1184,62 @@ function updateProgress() {
     totalHrs += parseFloat(s.math?.hrs)||0 + parseFloat(s.cs?.hrs)||0 + parseFloat(s.eng?.hrs)||0 + parseFloat(s.pol?.hrs)||0;
   });
   document.getElementById('total-hours').textContent = totalHrs.toFixed(1);
+  
   const exam = new Date(2026, 11, 20);
   const daysLeft = Math.ceil((exam - new Date()) / 86400000);
   document.getElementById('days-left').textContent = daysLeft > 0 ? daysLeft : 0;
+
+  // 一轮"生死线"倒计时系统
+  const stage1Deadline = new Date(2026, 7, 15); // 8月15日
+  const daysLeftStage1 = Math.ceil((stage1Deadline - new Date()) / 86400000);
+  
+  let deadlineHtml = '';
+  if (daysLeftStage1 > 0) {
+      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysLeftStage1 + ' 天</span>';
+  } else if (daysLeftStage1 === 0) {
+      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 今天是一轮最后期限！</span>';
+  }
+  
+  var daysLeftEl = document.getElementById('days-left');
+  if (daysLeftEl && daysLeftEl.parentNode) {
+    var existingWarning = daysLeftEl.parentNode.querySelector('.deadline-warning');
+    if (existingWarning) existingWarning.remove();
+    var span = document.createElement('span');
+    span.className = 'deadline-warning';
+    span.innerHTML = deadlineHtml;
+    daysLeftEl.parentNode.insertBefore(span, daysLeftEl.nextSibling);
+  }
 }
 
 function updateGoal() {
   const now = new Date();
   const m = now.getMonth() + 1;
+  const d = now.getDate();
+  
+  // 补救核心死线：8月15日
+  const deadline = new Date(2026, 7, 15);
+  const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const daysToDead = Math.ceil((deadline - todayZero) / 86400000);
+  
+  let warning = '';
+  if (daysToDead > 0 && daysToDead <= 40) {
+     warning = '<span style="color:var(--red); font-weight:bold; margin-left:8px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1);">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysToDead + ' 天</span>';
+  } else if (daysToDead === 0) {
+     warning = '<span style="color:var(--red); font-weight:bold; margin-left:8px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1); animation: blink 1s infinite;">⚠️ 今天是一轮最后期限！</span>';
+  } else if (daysToDead < 0) {
+     warning = '<span style="color:var(--orange); font-weight:bold; margin-left:8px;">已进入强化与输出期</span>';
+  }
+
   let goal = '';
-  if (m >= 5 && m <= 6) goal = '当前阶段：基础期 · 数学完成高数+线代基础，408计组一轮，英语阅读基础';
-  else if (m >= 7 && m <= 8) goal = '当前阶段：强化期 · 数学进入线代+概率，408 OS+计网，英语阅读强化';
-  else if (m >= 9 && m <= 10) goal = '当前阶段：真题期 · 数学660+880，408二轮+大题，英语真题限时';
-  else if (m >= 11) goal = '当前阶段：冲刺期 · 数学真题模拟，408真题，英语作文，政治肖四';
-  document.getElementById('today-goal').textContent = goal;
+  if (todayZero <= deadline) {
+    goal = '当前阶段：一轮"生死冲刺" · 计组/概率/OS/计网极速收官。<b>（原则：3分钟没思路直接看答案）</b>' + warning;
+  } else if (m === 8 || m === 9 || m === 10) {
+    goal = '当前阶段：二轮强化与错题攻坚 · 放弃输入，全面转向刷真题分类卷。' + warning;
+  } else {
+    goal = '当前阶段：50天"10日循环"冲刺 · 限时实战与费曼错题清理。';
+  }
+  
+  document.getElementById('today-goal').innerHTML = goal;
 }
 
 function updateEncouragement(streak, frozen) {
@@ -1229,6 +1372,11 @@ window.addEventListener('message',function(e){
   if(e.data&&e.data.type==='kaoyan-ready'&&e.source){
     var a=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-alpha').trim())||0.92;
     try{e.source.postMessage({type:'kaoyan-alpha',value:a},'*');}catch(ex){}
+    // Send current chart config to iframe (file:// localStorage isolation bypass)
+    try {
+      var chartCfg = JSON.parse(localStorage.getItem('kaoyan_chart_config')||'null');
+      if (chartCfg) { e.source.postMessage({type:'kaoyan-chart-config', config: chartCfg}, '*'); }
+    } catch(ex) {}
   }
 });
 function applyBg(){var url=document.getElementById('bg-url').value.trim();var blur=parseInt(document.getElementById('bg-blur').value)||0;var alpha=parseInt(document.getElementById('card-alpha').value)||92;var overlay=parseInt(document.getElementById('bg-overlay').value)||35;var s={bg:url,blur:blur,overlay:overlay,alpha:alpha};localStorage.setItem('kaoyan_theme',JSON.stringify(s));applySettings(s);}
@@ -1242,7 +1390,180 @@ function applyAlpha(v){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{
 function saveHomepage(){var v=document.getElementById('homepage-tab-select').value;if(v){localStorage.setItem('kaoyan_homepage_tab',v);showToast('首页已设为 '+TAB_NAMES[v]);}else{localStorage.removeItem('kaoyan_homepage_tab');showToast('已恢复为上次关闭的页面');}}
 
 function exportAll(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.startsWith('kaoyan_'))data[k]=localStorage.getItem(k);}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='考研作战中心_备份_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);}
-function importAll(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var count=0;for(var k in data){if(k.startsWith('kaoyan_')){localStorage.setItem(k,data[k]);count++;}}showToast('✅ 已恢复 '+count+' 条数据，刷新页面生效');}catch(err){showToast('❌ 文件格式错误',true);}};reader.readAsText(file);}
+function importAll(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);var count=0;for(var k in data){if(k.startsWith('kaoyan_')){localStorage.setItem(k,data[k]);count++;}}showToast('已恢复 '+count+' 条数据，刷新页面生效');}catch(err){showToast('文件格式错误',true);}};reader.readAsText(file);}
+
+// ═══════ Chart settings ═══════
+var CHART_DEFAULTS = {
+  y: { modeMax: { week:null, '14d':null, month:null, year:null }, stepSize: null, precision: 'auto' },
+  y1: { min: 0, max: 100, stepSize: 20 },
+  y2: { min: null, max: null, stepSize: null, precision: 'auto' },
+  series: {
+    total:  { visible:true, tension:0.30, borderWidth:3, dash:'5,5', pointRadius:5, fill:true,  color:null },
+    math:   { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    cs:     { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    eng:    { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    pol:    { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    sport:  { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    score:  { visible:true, tension:0.30, borderWidth:2.5,dash:'',    pointRadius:5, fill:false, color:null },
+    weight: { visible:true, tension:0.30, borderWidth:2, dash:'8,4',  pointRadius:4, fill:false, color:null }
+  }
+};
+var SERIES_NAMES = { total:'总时长', math:'数学', cs:'408', eng:'英语', pol:'政治', sport:'运动', score:'AI评分', weight:'体重' };
+var SERIES_KEYS = ['total','math','cs','eng','pol','sport','score','weight'];
+var DASH_OPTIONS = [
+  {v:'',    n:'实线'},
+  {v:'5,5', n:'虚线'},
+  {v:'8,4', n:'长虚线'},
+  {v:'2,2', n:'密点线'},
+  {v:'10,5',n:'疏虚线'}
+];
+
+function loadChartConfig() {
+  try {
+    var raw = localStorage.getItem('kaoyan_chart_config');
+    if (raw) {
+      var cfg = JSON.parse(raw);
+      // Deep merge with defaults to handle new keys
+      return deepMergeChart(JSON.parse(JSON.stringify(CHART_DEFAULTS)), cfg);
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(CHART_DEFAULTS));
+}
+
+function deepMergeChart(base, override) {
+  for (var k in override) {
+    if (override[k] && typeof override[k] === 'object' && !Array.isArray(override[k])) {
+      if (!base[k]) base[k] = {};
+      deepMergeChart(base[k], override[k]);
+    } else {
+      base[k] = override[k];
+    }
+  }
+  return base;
+}
+
+function renderSeriesTable() {
+  var cfg = loadChartConfig();
+  var html = '<table class="csr-table"><thead><tr><th>系列</th><th>显示</th><th>弯曲度<br><span style="font-weight:400;font-size:.82em;color:var(--text3)">0=折线 · 1=圆滑</span></th><th>粗细</th><th>线型</th><th>点径</th><th>颜色</th></tr></thead><tbody>';
+  var DEFAULT_COLORS = { total:'#10b981', math:'#2563eb', cs:'#7c3aed', eng:'#ea580c', pol:'#dc2626', sport:'#16a34a', score:'#f59e0b', weight:'#22d3ee' };
+  SERIES_KEYS.forEach(function(k) {
+    var s = cfg.series[k];
+    var dashOpts = DASH_OPTIONS.map(function(o) {
+      return '<option value="'+o.v+'"'+(s.dash===o.v?' selected':'')+'>'+o.n+'</option>';
+    }).join('');
+    var defaultClr = DEFAULT_COLORS[k] || '#888888';
+    var curClr = s.color || defaultClr;
+    html += '<tr>'+
+      '<td>'+SERIES_NAMES[k]+'</td>'+
+      '<td><input type="checkbox" data-sk="'+k+'" data-field="visible"'+(s.visible?' checked':'')+' onchange="updateSeriesField(this)"></td>'+
+      '<td><input type="range" min="0" max="1" step="0.05" value="'+s.tension+'" data-sk="'+k+'" data-field="tension" oninput="updateSeriesField(this)" title="'+s.tension+'"> <span style="font-size:.7em;color:var(--text3)">'+s.tension.toFixed(2)+'</span></td>'+
+      '<td><select data-sk="'+k+'" data-field="borderWidth" onchange="updateSeriesField(this)">'+
+        [1,1.5,2,2.5,3,4,5].map(function(w){return '<option value="'+w+'"'+(s.borderWidth===w?' selected':'')+'>'+w+'</option>';}).join('')+
+      '</select></td>'+
+      '<td><select data-sk="'+k+'" data-field="dash" onchange="updateSeriesField(this)">'+dashOpts+'</select></td>'+
+      '<td><select data-sk="'+k+'" data-field="pointRadius" onchange="updateSeriesField(this)">'+
+        [0,1,2,3,4,5,6,7,8].map(function(r){return '<option value="'+r+'"'+(s.pointRadius===r?' selected':'')+'>'+r+'</option>';}).join('')+
+      '</select></td>'+
+      '<td><input type="color" value="'+curClr+'" data-sk="'+k+'" data-field="color" onchange="updateSeriesField(this)" style="width:28px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px;"></td>'+
+    '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('chart-series-table').innerHTML = html;
+}
+
+function updateSeriesField(el) {
+  var cfg = loadChartConfig();
+  var k = el.dataset.sk, field = el.dataset.field, val;
+  if (el.type === 'checkbox') val = el.checked;
+  else if (el.type === 'range') {
+    val = parseFloat(el.value);
+    // Update the tension display span
+    var span = el.nextElementSibling;
+    if (span) span.textContent = val.toFixed(2);
+  }
+  else val = el.type === 'select-one' ? (isNaN(el.value) ? el.value : parseFloat(el.value)) : el.value;
+  cfg.series[k][field] = val;
+  localStorage.setItem('kaoyan_chart_config', JSON.stringify(cfg));
+}
+
+function loadChartSettingsUI() {
+  var cfg = loadChartConfig();
+  // Y axis
+  document.getElementById('cs-y-week').value = cfg.y.modeMax.week || '';
+  document.getElementById('cs-y-14d').value = cfg.y.modeMax['14d'] || '';
+  document.getElementById('cs-y-month').value = cfg.y.modeMax.month || '';
+  document.getElementById('cs-y-year').value = cfg.y.modeMax.year || '';
+  document.getElementById('cs-y-step').value = cfg.y.stepSize || '';
+  document.getElementById('cs-y-prec').value = cfg.y.precision;
+  // Y1
+  document.getElementById('cs-y1-min').value = cfg.y1.min;
+  document.getElementById('cs-y1-max').value = cfg.y1.max;
+  document.getElementById('cs-y1-step').value = cfg.y1.stepSize;
+  // Y2
+  document.getElementById('cs-y2-min').value = cfg.y2.min || '';
+  document.getElementById('cs-y2-max').value = cfg.y2.max || '';
+  document.getElementById('cs-y2-step').value = cfg.y2.stepSize || '';
+  document.getElementById('cs-y2-prec').value = cfg.y2.precision;
+  // Series table
+  renderSeriesTable();
+}
+
+function saveChartSettings() {
+  var cfg = loadChartConfig();
+  // Y axis
+  cfg.y.modeMax.week = vOrNull('cs-y-week');
+  cfg.y.modeMax['14d'] = vOrNull('cs-y-14d');
+  cfg.y.modeMax.month = vOrNull('cs-y-month');
+  cfg.y.modeMax.year = vOrNull('cs-y-year');
+  cfg.y.stepSize = vOrNull('cs-y-step');
+  cfg.y.precision = document.getElementById('cs-y-prec').value;
+  // Y1
+  cfg.y1.min = parseFloat(document.getElementById('cs-y1-min').value) || 0;
+  cfg.y1.max = parseFloat(document.getElementById('cs-y1-max').value) || 100;
+  cfg.y1.stepSize = parseFloat(document.getElementById('cs-y1-step').value) || 20;
+  // Y2
+  cfg.y2.min = vOrNull('cs-y2-min');
+  cfg.y2.max = vOrNull('cs-y2-max');
+  cfg.y2.stepSize = vOrNull('cs-y2-step');
+  cfg.y2.precision = document.getElementById('cs-y2-prec').value;
+  // Series data already saved via updateSeriesField
+  localStorage.setItem('kaoyan_chart_config', JSON.stringify(cfg));
+  // Send config to trends iframe (file:// localStorage isolation bypass)
+  var trendsFrame = document.getElementById('iframe-trends');
+  if (trendsFrame && trendsFrame.contentWindow) {
+    try {
+      trendsFrame.contentWindow.postMessage({type:'kaoyan-chart-config', config: cfg}, '*');
+    } catch(e) {}
+  }
+  showToast('图表设置已保存（趋势图已刷新）');
+}
+
+function vOrNull(id) {
+  var el = document.getElementById(id);
+  if (!el || el.value === '') return null;
+  var v = parseFloat(el.value);
+  return isNaN(v) ? null : v;
+}
+
+function resetChartDefaults() {
+  localStorage.removeItem('kaoyan_chart_config');
+  loadChartSettingsUI();
+  // Notify iframe to clear config and use defaults
+  var trendsFrame = document.getElementById('iframe-trends');
+  if (trendsFrame && trendsFrame.contentWindow) {
+    try { trendsFrame.contentWindow.postMessage({type:'kaoyan-chart-config', config: null}, '*'); } catch(e) {}
+  }
+  showToast('已恢复默认图表设置');
+}
+
+// Patch loadSettings to also load chart settings
+(function() {
+  var origLoadSettings = loadSettings;
+  loadSettings = function() {
+    origLoadSettings();
+    try { loadChartSettingsUI(); } catch(e) {}
+  };
+})();
 
 </script>
 </body>
