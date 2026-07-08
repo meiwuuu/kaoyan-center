@@ -31,9 +31,9 @@
 
   .deadline-banner {
     border-left: 4px solid var(--red); padding: 16px 20px; margin-bottom:24px;
-    background: rgba(220,38,38,0.10); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: rgba(220,38,38,0.12) !important; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   }
-  @media(prefers-color-scheme:dark){.deadline-banner{background:rgba(248,113,113,0.16)}}
+  @media(prefers-color-scheme:dark){.deadline-banner{background:rgba(248,113,113,0.20) !important}}
 
   .phase { margin-bottom:24px; }
   .phase-title { font-size:1.1em; font-weight:750; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
@@ -86,8 +86,8 @@
   <div style="display:flex; align-items:center; gap:16px;">
     <div class="count" id="deadline-count">-</div>
     <div>
-      <div style="font-weight:750; font-size:1.05em; color:var(--text);">一轮"生死线" — 8月15日</div>
-      <div style="font-size:.82em; color:var(--text); opacity:0.75;">超过此日期将失去完整的二轮强化机会</div>
+      <div style="font-weight:750; font-size:1.05em; color:#1c1b18;">一轮"生死线" — 8月15日</div>
+      <div style="font-size:.82em; color:#5f5b55;">超过此日期将失去完整的二轮强化机会</div>
     </div>
   </div>
 </div>
