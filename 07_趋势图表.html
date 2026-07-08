@@ -118,6 +118,83 @@ var cachedReviews = null;
 var cachedWeights = null;
 var chartInstance = null;
 
+// ── Chart config from parent settings ──
+var CHART_DEFAULTS = {
+  y: { modeMax: { week:null, '14d':null, month:null, year:null }, stepSize: null, precision: 'auto' },
+  y1: { min: 0, max: 100, stepSize: 20 },
+  y2: { min: null, max: null, stepSize: null, precision: 'auto' },
+  series: {
+    total:  { visible:true, tension:0.30, borderWidth:3, dash:'5,5', pointRadius:5, fill:true,  color:null },
+    math:   { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    cs:     { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    eng:    { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    pol:    { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    sport:  { visible:true, tension:0.30, borderWidth:2, dash:'',    pointRadius:4, fill:false, color:null },
+    score:  { visible:true, tension:0.30, borderWidth:2.5,dash:'',    pointRadius:5, fill:false, color:null },
+    weight: { visible:true, tension:0.30, borderWidth:2, dash:'8,4',  pointRadius:4, fill:false, color:null }
+  }
+};
+
+function deepMergeChart(base, override) {
+  for (var k in override) {
+    if (override[k] && typeof override[k] === 'object' && !Array.isArray(override[k])) {
+      if (!base[k]) base[k] = {};
+      deepMergeChart(base[k], override[k]);
+    } else { base[k] = override[k]; }
+  }
+  return base;
+}
+
+var parentChartConfig = null;
+
+function loadConfig() {
+  var cfgSource = parentChartConfig;
+  if (!cfgSource) {
+    try {
+      var raw = localStorage.getItem('kaoyan_chart_config');
+      if (raw) cfgSource = JSON.parse(raw);
+    } catch(e) {}
+  }
+  if (cfgSource) {
+    return deepMergeChart(JSON.parse(JSON.stringify(CHART_DEFAULTS)), cfgSource);
+  }
+  return JSON.parse(JSON.stringify(CHART_DEFAULTS));
+}
+
+function parseDash(dashStr) {
+  if (!dashStr || dashStr === '') return [];
+  return dashStr.split(',').map(function(v){ return parseInt(v)||0; });
+}
+
+function getTickCallback(precision) {
+  if (precision === 'auto') return undefined;
+  var decimals = parseFloat(precision);
+  if (decimals === 0.01) return function(v) { return v.toFixed(2); };
+  if (decimals === 0.1) return function(v) { return v.toFixed(1); };
+  if (decimals === 0.5) return function(v) { return (Math.round(v*2)/2).toFixed(1); };
+  return function(v) { return Math.round(v).toString(); };
+}
+
+function hexToRgba(hex, alpha) {
+  if (!hex || typeof hex !== 'string') return hex;
+  if (hex.startsWith('rgba') || hex.startsWith('rgb(')) {
+    var m = hex.match(/[\d.]+/g);
+    if (m && m.length >= 3) return 'rgba(' + m[0] + ',' + m[1] + ',' + m[2] + ',' + alpha + ')';
+  }
+  if (hex.startsWith('#')) {
+    var h = hex.replace('#','');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if (h.length === 6) {
+      var r = parseInt(h.slice(0,2), 16);
+      var g = parseInt(h.slice(2,4), 16);
+      var b = parseInt(h.slice(4,6), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
+  }
+  // Fallback: 8-digit hex alpha
+  return hex + (alpha < 0.1 ? '1A' : alpha < 0.2 ? '33' : '4D');
+}
+
 // ── Mode switch ──
 document.getElementById('range-bar').addEventListener('click', function(e) {
   var btn = e.target.closest('.range-btn');
@@ -438,36 +515,42 @@ function renderChart() {
     });
   }
 
+  var chartCfg = loadConfig();
   var chartDatasets = SUBJ_KEYS.map(function(key) {
     var isTotal = key === 'total';
+    var sc = chartCfg.series[key];
+    if (!sc || !sc.visible) return null;
+    var clr = (sc.color && sc.color !== 'null') ? sc.color : SUBJECT_COLORS[key];
     return {
       label: SUBJECT_NAMES[key],
       data: result.datasets[key],
-      borderColor: SUBJECT_COLORS[key],
-      backgroundColor: SUBJECT_COLORS[key] + (isTotal ? '15' : '20'),
-      borderWidth: isTotal ? 3 : 2,
-      borderDash: isTotal ? [5,5] : [],
-      pointRadius: isTotal ? 5 : 4,
-      pointHoverRadius: isTotal ? 7 : 6,
-      tension: 0.3,
-      fill: isTotal
+      borderColor: clr,
+      backgroundColor: clr + (sc.fill ? '15' : '20'),
+      borderWidth: sc.borderWidth,
+      borderDash: parseDash(sc.dash),
+      pointRadius: sc.pointRadius,
+      pointHoverRadius: sc.pointRadius + 2,
+      tension: sc.tension,
+      fill: sc.fill
     };
-  }).filter(function(ds) { return ds.data.some(function(v){ return v > 0; }); });
+  }).filter(function(ds) { return ds !== null && ds.data.some(function(v){ return v > 0; }); });
 
   var hasScores = scoreData && scoreData.some(function(v){ return v !== null; });
-  if (hasScores) {
+  var scScore = chartCfg.series.score;
+  if (hasScores && scScore && scScore.visible) {
+    var scoreClr = (scScore.color && scScore.color !== 'null') ? scScore.color : '#f59e0b';
     chartDatasets.push({
       label: 'AI评分',
       data: scoreData,
-      borderColor: '#f59e0b',
-      backgroundColor: 'rgba(245,158,11,0.10)',
-      borderWidth: 2.5,
-      borderDash: [],
-      pointRadius: 5,
-      pointHoverRadius: 7,
+      borderColor: scoreClr,
+      backgroundColor: hexToRgba(scoreClr, 0.10),
+      borderWidth: scScore.borderWidth,
+      borderDash: parseDash(scScore.dash),
+      pointRadius: scScore.pointRadius,
+      pointHoverRadius: scScore.pointRadius + 2,
       pointStyle: 'rectRounded',
-      tension: 0.3,
-      fill: false,
+      tension: scScore.tension,
+      fill: scScore.fill,
       spanGaps: true,
       yAxisID: 'y1'
     });
@@ -475,19 +558,21 @@ function renderChart() {
 
   // Weight dataset (right y-axis, kg)
   var hasWeight = weightData && weightData.some(function(v){ return v !== null; });
-  if (hasWeight) {
+  var scWeight = chartCfg.series.weight;
+  if (hasWeight && scWeight && scWeight.visible) {
+    var wtClr = (scWeight.color && scWeight.color !== 'null') ? scWeight.color : '#22d3ee';
     chartDatasets.push({
       label: '体重 (kg)',
       data: weightData,
-      borderColor: '#22d3ee',
-      backgroundColor: 'rgba(34,211,238,0.08)',
-      borderWidth: 2,
-      borderDash: [8,4],
-      pointRadius: 4,
-      pointHoverRadius: 6,
+      borderColor: wtClr,
+      backgroundColor: hexToRgba(wtClr, 0.08),
+      borderWidth: scWeight.borderWidth,
+      borderDash: parseDash(scWeight.dash),
+      pointRadius: scWeight.pointRadius,
+      pointHoverRadius: scWeight.pointRadius + 2,
       pointStyle: 'triangle',
-      tension: 0.3,
-      fill: false,
+      tension: scWeight.tension,
+      fill: scWeight.fill,
       spanGaps: true,
       yAxisID: 'y2'
     });
@@ -502,6 +587,42 @@ function renderChart() {
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('chart-wrapper').style.display = 'block';
+
+  // Build scales with config
+  var yScale = {
+    beginAtZero: true,
+    title: { display: true, text: '学习时长 (小时)' },
+    grid: { color: 'rgba(0,0,0,0.05)' }
+  };
+  var yMax = chartCfg.y.modeMax[currentMode];
+  if (yMax !== null && yMax !== undefined) yScale.max = yMax;
+  if (chartCfg.y.stepSize !== null && chartCfg.y.stepSize !== undefined) yScale.ticks = { stepSize: chartCfg.y.stepSize };
+  else yScale.ticks = {};
+  var yTickCb = getTickCallback(chartCfg.y.precision);
+  if (yTickCb) yScale.ticks.callback = yTickCb;
+
+  var y1Scale = {
+    position: 'right',
+    beginAtZero: false,
+    min: chartCfg.y1.min,
+    max: chartCfg.y1.max,
+    title: { display: true, text: 'AI评分' },
+    grid: { drawOnChartArea: false },
+    ticks: { stepSize: chartCfg.y1.stepSize, callback: function(v) { return v + ' 分'; } }
+  };
+
+  var y2Scale = {
+    position: 'right',
+    beginAtZero: false,
+    title: { display: true, text: '体重 (kg)' },
+    grid: { drawOnChartArea: false }
+  };
+  if (chartCfg.y2.min !== null && chartCfg.y2.min !== undefined) y2Scale.min = chartCfg.y2.min;
+  if (chartCfg.y2.max !== null && chartCfg.y2.max !== undefined) y2Scale.max = chartCfg.y2.max;
+  y2Scale.ticks = {};
+  if (chartCfg.y2.stepSize !== null && chartCfg.y2.stepSize !== undefined) y2Scale.ticks.stepSize = chartCfg.y2.stepSize;
+  var y2TickCb = getTickCallback(chartCfg.y2.precision);
+  if (y2TickCb) y2Scale.ticks.callback = y2TickCb;
 
   if (chartInstance) chartInstance.destroy();
   var ctx = document.getElementById('trendChart').getContext('2d');
@@ -529,26 +650,9 @@ function renderChart() {
         legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: '学习时长 (小时)' },
-          grid: { color: 'rgba(0,0,0,0.05)' }
-        },
-        y1: {
-          position: 'right',
-          beginAtZero: false,
-          min: 0,
-          max: 100,
-          title: { display: true, text: 'AI评分' },
-          grid: { drawOnChartArea: false },
-          ticks: { stepSize: 20, callback: function(v) { return v + ' 分'; } }
-        },
-        y2: {
-          position: 'right',
-          beginAtZero: false,
-          title: { display: true, text: '体重 (kg)' },
-          grid: { drawOnChartArea: false },
-        },
+        y: yScale,
+        y1: y1Scale,
+        y2: y2Scale,
         x: { grid: { display: false } }
       }
     }
@@ -577,6 +681,11 @@ loadData();
   update(0.92);
   window.addEventListener('message',function(e){
     if(e.data&&e.data.type==='kaoyan-alpha') update(e.data.value);
+    if(e.data&&e.data.type==='kaoyan-chart-config') {
+      parentChartConfig = e.data.config;
+      if(cachedLogs) renderChart();
+    }
+    if(e.data&&e.data.type==='kaoyan-reload') { if(cachedLogs) renderChart(); }
   });
   try{window.parent.postMessage({type:'kaoyan-ready'},'*');}catch(e){}
 })();
