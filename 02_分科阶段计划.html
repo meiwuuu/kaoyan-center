@@ -30,11 +30,14 @@
   @media(prefers-color-scheme:dark){.card{background:rgba(36,35,31,var(--card-alpha))}}
 
   .deadline-banner {
-    border-left: 4px solid var(--red); padding: 16px 20px; margin-bottom:24px;
-    background: rgba(220,38,38,0.06); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 16px 20px; margin-bottom:24px;
+    background: rgba(255,255,255,var(--card-alpha));
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    border-radius: var(--radius);
   }
   .deadline-banner .count { font-size:2.4em; font-weight:800; color:var(--red); line-height:1; }
-  @media(prefers-color-scheme:dark){.deadline-banner{background:rgba(248,113,113,0.08)}}
+  @media(prefers-color-scheme:dark){.deadline-banner{background:rgba(36,35,31,var(--card-alpha))}}
 
   .phase { margin-bottom:24px; }
   .phase-title { font-size:1.1em; font-weight:750; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
