@@ -1195,9 +1195,9 @@ function updateProgress() {
   
   let deadlineHtml = '';
   if (daysLeftStage1 > 0) {
-      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysLeftStage1 + ' 天</span>';
+      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysLeftStage1 + ' 天 · 超过则失去完整二轮强化机会</span>';
   } else if (daysLeftStage1 === 0) {
-      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 今天是一轮最后期限！</span>';
+      deadlineHtml = '<span style="color: var(--red); font-weight: bold; margin-left: 10px;">⚠️ 今天是一轮最后期限！超过则失去完整二轮强化机会</span>';
   }
   
   var daysLeftEl = document.getElementById('days-left');
@@ -1216,27 +1216,26 @@ function updateGoal() {
   const m = now.getMonth() + 1;
   const d = now.getDate();
   
-  // 补救核心死线：8月15日（来源：考研408与数学追赶补救规划指南.docx）
   const deadline = new Date(2026, 7, 15);
   const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const daysToDead = Math.ceil((deadline - todayZero) / 86400000);
   
   let warning = '';
   if (daysToDead > 0 && daysToDead <= 40) {
-     warning = '<span style="color:var(--red); font-weight:bold; margin-left:8px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1);">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysToDead + ' 天</span>';
+     warning = '<span style="color:var(--red); font-weight:bold; margin-left:10px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1);">⚠️ 距一轮"生死线"(8.15)仅剩 ' + daysToDead + ' 天</span>';
   } else if (daysToDead === 0) {
-     warning = '<span style="color:var(--red); font-weight:bold; margin-left:8px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1); animation: blink 1s infinite;">⚠️ 今天是一轮最后期限！</span>';
+     warning = '<span style="color:var(--red); font-weight:bold; margin-left:10px; border: 1px solid var(--red); padding: 1px 6px; border-radius: 4px; background: rgba(220,38,38,0.1); animation: blink 1s infinite;">⚠️ 今天是一轮最后期限！超过则失去完整二轮强化机会</span>';
   } else if (daysToDead < 0) {
-     warning = '<span style="color:var(--orange); font-weight:bold; margin-left:8px;">已进入强化与输出期</span>';
+     warning = '<span style="color:var(--orange); font-weight:bold; margin-left:10px;">已进入强化与输出期 · 重心从输入转向输出</span>';
   }
 
   let goal = '';
   if (todayZero <= deadline) {
-    goal = '当前阶段：一轮"生死冲刺" · 减法策略 · 计组(7.25)→概率(8.1)→OS(8.10)→计网(8.15)。<b>（铁律：3分钟没思路直接看答案，少回头多轮次）</b>' + warning;
+    goal = '当前阶段：一轮"生死冲刺" · 「减法策略」锁定8.15 · 计组(7.25只做选择/盯硬件逻辑图) → 概率(8.1钻研讲义+倍速网课/与计组交叉) → OS(8.10只看书不视频/只写选择极速过基础) → 计网(8.15体量最小/全线收官底线)。<br><b>铁律：3分钟没思路直接看答案，少回头多轮次，忘了不停。若8.1仍无法推进则合并基础+强化直接真题。</b>' + warning;
   } else if (m === 8 || m === 9 || m === 10) {
-    goal = '当前阶段：二轮强化与错题攻坚 · 刷真题分类卷（勿留到最后）· 英语8月开真题 · 最晚10月开政治1000题。' + warning;
+    goal = '当前阶段：二轮强化与错题攻坚 · 8/16-9/30 数学&408刷历年真题分类卷（勿留到最后）+ 英语8月开真题+每日单词 · 10/1-10/31 红笔"思路断点"专项突破 + 最晚10月开启政治基础课与1000题。' + warning;
   } else {
-    goal = '当前阶段：50天"10日循环"冲刺 · 模拟卷限时实战 · 费曼学习法消化错题 · 查漏补缺。';
+    goal = '当前阶段：50天"10日循环"冲刺 · 阶段一(11/1-11/10)模拟卷限时实战 · 阶段二(11/11-11/20)费曼学习法吃透错题 · 阶段三(11/21-11/30)政治背诵+数学手感 · 阶段四(12/1-12/10)考点大总结查漏补缺 · 阶段五(12/11-考前)平稳心态对抗膨胀焦虑。';
   }
   
   document.getElementById('today-goal').innerHTML = goal;
