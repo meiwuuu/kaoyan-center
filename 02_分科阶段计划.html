@@ -10,14 +10,14 @@
     --bg: #fafaf8; --text: #1c1b18; --text2: #5f5b55; --text3: #8b857d;
     --math: #2563eb; --cs: #7c3aed; --eng: #ea580c; --pol: #dc2626;
     --border: #e7e4de; --border-strong: #d4d0c8;
-    --card: #fff;
+    --card: #fff; --red: #dc2626; --orange: #ea580c; --green: #16a34a;
     --radius: 14px; --radius-sm: 10px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
   }
   @media (prefers-color-scheme: dark) {
     :root { --card-alpha:0.92; --bg: #1b1a17; --text: #ebe9e4; --text2: #b5b0a6; --text3: #736e65;
       --border: #35322c; --border-strong: #4a4740;
-      --card: #24231f; }
+      --card: #24231f; --red: #f87171; --orange: #fb923c; --green: #4ade80; }
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{background:transparent}body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:transparent; color:var(--text); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
@@ -26,135 +26,197 @@
   h1 { font-size:2em; font-weight:800; letter-spacing:.02em; margin-bottom:6px; }
   .subtitle { font-size:.88em; color:var(--text2); margin-bottom:32px; }
 
+  .card { background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
+  @media(prefers-color-scheme:dark){.card{background:rgba(36,35,31,var(--card-alpha))}}
+
+  .deadline-banner {
+    border-left: 4px solid var(--red); padding: 16px 20px; margin-bottom:24px;
+    background: rgba(220,38,38,0.06); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .deadline-banner .count { font-size:2.4em; font-weight:800; color:var(--red); line-height:1; }
+  @media(prefers-color-scheme:dark){.deadline-banner{background:rgba(248,113,113,0.08)}}
+
+  .phase { margin-bottom:24px; }
+  .phase-title { font-size:1.1em; font-weight:750; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+  .phase-tag { display:inline-block; padding:3px 12px; border-radius:99px; font-size:.72em; font-weight:650; }
+  .tag-red { background:#fef2f2; color:#991b1b; }
+  .tag-orange { background:#fff7ed; color:#9a4700; }
+  .tag-blue { background:#eff4ff; color:#1e40af; }
+  @media(prefers-color-scheme:dark){
+    .tag-red{background:#2d1516;color:#f87171}
+    .tag-orange{background:#2b1f14;color:#fb923c}
+    .tag-blue{background:#1a2740;color:#60a5fa}
+  }
+
+  .task-list { list-style:none; padding:0; }
+  .task-list li { padding:10px 0; border-bottom:1px solid var(--border); font-size:.9em; }
+  .task-list li:last-child { border-bottom:none; }
+  .task-list .task-date { font-weight:650; font-size:.82em; margin-right:8px; white-space:nowrap; }
+  .task-list .task-subj { font-weight:650; }
+
+  .remedy-box { border:1px solid var(--orange); border-radius:var(--radius-sm); padding:16px 20px; background:rgba(234,88,12,0.04); }
+  .remedy-box .title { font-weight:750; color:var(--orange); margin-bottom:10px; }
+  @media(prefers-color-scheme:dark){.remedy-box{background:rgba(251,146,60,0.06)}}
+
   .stats { display:flex; gap:36px; flex-wrap:wrap; padding:24px 28px; border-radius:var(--radius); background:rgba(255,255,255,var(--card-alpha)); border:1px solid var(--border); box-shadow:var(--shadow-sm); margin-bottom:28px; }
   .stat-item { display:flex; flex-direction:column; }
   .stat-item .val { font-size:1.4em; font-weight:750; letter-spacing:-.01em; }
   .stat-item .lbl { font-size:.7em; color:var(--text3); letter-spacing:.05em; margin-top:4px; text-transform:uppercase; }
 
-  .subj { background:var(--card); border-radius:var(--radius); padding:28px 30px; margin:24px 0; box-shadow:var(--shadow-sm); border:1px solid var(--border); }
-  .subj h3 { font-size:1.15em; font-weight:750; margin-bottom:18px; }
-
-  table { width:100%; border-collapse:separate; border-spacing:0; }
-  th { text-align:left; font-size:.8em; font-weight:700; color:var(--text); letter-spacing:.02em; padding:0 14px 14px; border-bottom:2px solid #3d3a35; border-right:1px solid #3d3a35; }
-  td { padding:11px 14px; font-size:.87em; border-bottom:1px solid #3d3a35; border-right:1px solid #3d3a35; vertical-align:top; line-height:1.55; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; font-size:.8em; font-weight:700; padding:0 12px 10px; border-bottom:2px solid var(--border-strong); color:var(--text2); }
+  td { padding:10px 12px; font-size:.87em; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.55; }
   tr:last-child td { border-bottom:none; }
-  td:last-child, th:last-child { border-right:none; }
   td:first-child { font-weight:650; }
-  
-  tr.done td { color:var(--text3); }
-  tr.done td:first-child { text-decoration:line-through; }
-  tr.hi td { font-weight:700; }
 
-  .alloc { background:var(--card); border-radius:var(--radius); padding:28px 30px; margin:32px 0; box-shadow:var(--shadow-sm); border:1px solid var(--border); }
-  .alloc h3 { font-size:1.15em; font-weight:750; margin-bottom:18px; }
-  .alloc td:first-child { font-weight:650; }
-  .alloc .a-math { color:var(--math); font-weight:650; }
-  .alloc .a-cs   { color:var(--cs); font-weight:650; }
-  .alloc .a-eng  { color:var(--eng); font-weight:650; }
-  .alloc .a-pol  { color:var(--pol); font-weight:650; }
+  .done td { color:var(--text3); text-decoration:line-through; }
 
-  .tag-now { display:inline-block; padding:3px 10px; border-radius:99px; background:#e6f4ea; color:#166534; font-size:.73em; font-weight:650; margin-right:4px; }
-  @media (prefers-color-scheme:dark){ .tag-now{background:#152b19;color:#4ade80} }
   @media(max-width:600px){ .stats{gap:20px} }
-
-  .header-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
-  @media(prefers-color-scheme:dark){.header-card{background:rgba(36,35,31,var(--card-alpha))}}
 </style>
 </head>
 <body>
 <main>
 
-<div class="header-card">
-<h1>📋 分科目阶段计划</h1>
-<p class="subtitle">2026年5月 到 12月初试</p>
+<div class="card">
+<h1>📋 追赶补救计划</h1>
+<p class="subtitle">当前进度：数据结构 ✅ · 高数 ✅ · 线代 ✅ · 计组 1/5 — 比原计划慢约一个月</p>
 </div>
 
-<div class="stats">
-  <div class="stat-item"><div class="val" style="color:var(--math)">~30%</div><div class="lbl">数学基础</div></div>
-  <div class="stat-item"><div class="val" style="color:var(--cs)">25%</div><div class="lbl">408 一轮</div></div>
-  <div class="stat-item"><div class="val" style="color:var(--eng)">10%</div><div class="lbl">英语进度</div></div>
-  <div class="stat-item"><div class="val" style="color:var(--pol)">0%</div><div class="lbl">政治进度</div></div>
-  <div class="stat-item"><div class="val"><span id="countdown-days">-</span><span style="font-size:.45em;font-weight:500;">天</span></div><div class="lbl">距初试</div></div>
+<!-- 一轮生死线倒计时 -->
+<div class="deadline-banner" id="deadline-banner">
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="count" id="deadline-count">-</div>
+    <div>
+      <div style="font-weight:750; font-size:1.05em;">一轮"生死线" — 8月15日</div>
+      <div style="font-size:.82em; color:var(--text2);">超过此日期将失去完整的二轮强化机会</div>
+    </div>
+  </div>
 </div>
 
-<div class="subj math">
-  <h3>🧮 数学一</h3>
+<!-- 三阶段总览 -->
+<div class="card">
+  <h2 style="font-size:1.2em; margin-bottom:20px;">🗺 三阶段补救路线图</h2>
+
+  <div class="phase">
+    <div class="phase-title"><span class="phase-tag tag-red">第一阶段</span> 一轮"生死冲刺" · 即日起 — 8月15日</div>
+    <ul class="task-list">
+      <li><span class="task-date" style="color:var(--red);">7月25日</span> <span class="task-subj" style="color:var(--cs);">【计组】</span>完结 — 剩余4/5内容，只做选择题，严禁死磕大题，盯准硬件逻辑图（CPU周期、指令流程）</li>
+      <li><span class="task-date" style="color:var(--orange);">8月1日</span> <span class="task-subj" style="color:var(--math);">【概率论】</span>完结 — 钻研讲义+倍速网课，与计组交叉复习</li>
+      <li><span class="task-date" style="color:var(--orange);">8月10日</span> <span class="task-subj" style="color:var(--cs);">【操作系统】</span>完结 — 只看书不看视频/只写真题选择题，极速过基础概念</li>
+      <li><span class="task-date" style="color:var(--red);">8月15日</span> <span class="task-subj" style="color:var(--cs);">【计网】</span>完结 — 体量最小约10-15天，一轮全线收官底线</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-title"><span class="phase-tag tag-orange">第二阶段</span> 二轮强化与错题攻坚 · 8月16日 — 10月31日</div>
+    <ul class="task-list">
+      <li><span class="task-date">8/16 - 9/30</span> <span class="task-subj" style="color:var(--math);">【数学】</span><span style="color:var(--cs);">【408】</span>强化 — 刷历年真题分类卷，不要把真题留到最后。通过真题摸清常考题型</li>
+      <li><span class="task-date">8月起</span> <span class="task-subj" style="color:var(--eng);">【英语】</span>开启英语真题，维持每日单词记忆</li>
+      <li><span class="task-date">10/1 - 10/31</span> 专题突破 — 红笔标记"思路断点"专项突破</li>
+      <li><span class="task-date">最晚10月</span> <span class="task-subj" style="color:var(--pol);">【政治】</span>开启 — 利用琐碎时间完成基础课与1000题</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-title"><span class="phase-tag tag-blue">第三阶段</span> 50天"10日循环"冲刺 · 11月1日 — 考试</div>
+    <ul class="task-list">
+      <li><span class="task-date">11/1 - 11/10</span> 阶段一 — 模拟卷/套卷实战，严格3小时限时训练</li>
+      <li><span class="task-date">11/11 - 11/20</span> 阶段二 — 错题集中清理，费曼学习法（脑补小人讲题）吃透每一道</li>
+      <li><span class="task-date">11/21 - 11/30</span> 阶段三 — 强化政治背诵，数学维持手感</li>
+      <li><span class="task-date">12/1 - 12/10</span> 阶段四 — 重点考点最后一次大总结，查漏补缺</li>
+      <li><span class="task-date">12/11 - 考前</span> 阶段五 — 保持心态平稳，对抗膨胀/焦虑情绪</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 补救守则 -->
+<div class="remedy-box card">
+  <div class="title">⚠️ 补救守则</div>
+  <div style="font-size:.87em;">
+    <p style="margin-bottom:8px;"><b>① 少回头，多轮次：</b>前面章节忘了很正常，不要停下来复习。通过增加复习总轮数（二轮、三轮）来对抗遗忘，效果远胜于中途折返。</p>
+    <p style="margin-bottom:8px;"><b>② 限时做题：</b>既然进度慢，<b style="color:var(--red);">3分钟没思路直接看答案</b>。学习方法比自己硬想更高效。一轮目标是"看懂"而非"创造"。</p>
+    <p><b>③ 合并阶段（备选）：</b>如果到8月1日发现依然无法推进，果断合并"基础"与"强化"，直接开始真题练习，以题带考点。</p>
+  </div>
+</div>
+
+<!-- 数学 -->
+<div class="card">
+  <h3 style="font-size:1.1em; margin-bottom:16px;">🧮 数学一（高数✅ 线代✅）</h3>
   <table>
-    <tr><th>阶段</th><th>时间</th><th>任务</th><th>验收</th></tr>
-    <tr class="now"><td><span class="tag-now">当前</span> 高数上</td><td>5月中到6月中</td><td>武忠祥视频 +《1800》基础篇。看一节立刻做题。</td><td>正确率 &gt; 60%</td></tr>
-    <tr><td>高数下</td><td>6月中到7月中</td><td>多元微分到无穷级数。《1800》跟进。</td><td>正确率 &gt; 60%</td></tr>
-    <tr><td>线代基础</td><td>7月下到8月上</td><td>李永乐基础班 + 讲义。</td><td>660线代 &gt; 60%</td></tr>
-    <tr><td>概率基础</td><td>8月中到8月下</td><td>余丙森基础班 + 讲义。</td><td>660概率 &gt; 55%</td></tr>
-    <tr class="hi"><td>🔴 强化期</td><td>9月到10月</td><td>二刷1800错题 + 660全刷 + 880核心。880刷2遍。</td><td>880 &gt; 65%</td></tr>
-    <tr class="hi"><td>🔴 真题期</td><td>11月</td><td>1987到2025真题。2005后限时模拟。</td><td>近5年均 &gt; 100</td></tr>
+    <tr><th>阶段</th><th>截止</th><th>任务</th><th>策略</th></tr>
+    <tr class="done"><td>高数</td><td>已完成</td><td>武忠祥视频 + 1800基础篇</td><td>✅</td></tr>
+    <tr class="done"><td>线代</td><td>已完成</td><td>李永乐基础班 + 讲义</td><td>✅</td></tr>
+    <tr style="background:rgba(234,88,12,0.06);"><td><b>概率论</b></td><td><span style="color:var(--red);font-weight:650;">8月1日</span></td><td>余丙森基础班 + 讲义（钻研讲义+倍速网课）</td><td>与计组交叉复习，不单独占用整天</td></tr>
+    <tr><td>数学强化</td><td>9月 - 10月</td><td>二刷1800错题 + 660全刷 + 880核心</td><td>刷历年真题分类卷，转向输出</td></tr>
+    <tr><td>真题期</td><td>11月</td><td>1987-2025真题，2005后限时模拟</td><td>近5年均 &gt; 100</td></tr>
   </table>
 </div>
 
-<div class="subj cs">
-  <h3>💻 408 计算机基础</h3>
+<!-- 408 -->
+<div class="card">
+  <h3 style="font-size:1.1em; margin-bottom:16px;">💻 408 计算机基础（数据结构✅ 计组1/5）</h3>
   <table>
-    <tr><th>阶段</th><th>时间</th><th>任务</th><th>验收</th></tr>
-    <tr class="done"><td>数据结构</td><td>4月到5月中</td><td>✅ 王道视频 + 选择题已过一轮</td><td>✅</td></tr>
-    <tr class="now"><td><span class="tag-now">当前</span> 计组</td><td>5月下到6月下</td><td>王道视频 + 教材 + 选择题。408最难，花5周。</td><td>&gt; 55%</td></tr>
-    <tr><td>操作系统</td><td>7月</td><td>王道视频 + 选择题。与计组对照学。</td><td>&gt; 60%</td></tr>
-    <tr><td>计网</td><td>8月</td><td>王道视频 + 选择题。最简单，快过。</td><td>&gt; 65%</td></tr>
-    <tr><td>二轮强化</td><td>9月到10月</td><td>四科二刷错题 + 大题。每天1道数据结构算法。</td><td>大题 60%</td></tr>
-    <tr class="hi"><td>真题</td><td>11月</td><td>历年真题限时模拟。</td><td>近5年均 &gt; 105</td></tr>
+    <tr><th>科目</th><th>截止</th><th>补救措施</th><th>原需/压缩后</th></tr>
+    <tr class="done"><td>数据结构</td><td>已完成</td><td>王道视频 + 选择题已过一轮</td><td>✅</td></tr>
+    <tr style="background:rgba(220,38,38,0.06);"><td><b>计组</b></td><td><span style="color:var(--red);font-weight:650;">7月25日</span></td><td>只做选择题，严禁死磕大题，盯准硬件逻辑图（CPU周期、指令流程）</td><td>30天 → 20天</td></tr>
+    <tr><td><b>操作系统</b></td><td>8月10日</td><td>只看书不看视频 / 只写真题选择题，极速过基础概念</td><td>25天 → 12天</td></tr>
+    <tr><td><b>计网</b></td><td>8月15日</td><td>体量最小，快过选择题，不求深入</td><td>15天 → 10天</td></tr>
+    <tr><td>二轮强化</td><td>9月 - 10月</td><td>四科二刷错题 + 大题，每天1道数据结构算法</td><td>真题分类卷</td></tr>
+    <tr><td>真题</td><td>11月</td><td>历年真题限时模拟</td><td>近5年均 &gt; 105</td></tr>
   </table>
 </div>
 
-<div class="subj eng">
-  <h3>📖 英语一</h3>
+<!-- 英语 -->
+<div class="card">
+  <h3 style="font-size:1.1em; margin-bottom:16px;">📖 英语一</h3>
   <table>
     <tr><th>阶段</th><th>时间</th><th>任务</th></tr>
-    <tr><td>单词</td><td>全年每天</td><td>墨墨80词，雷打不动。</td></tr>
-    <tr><td>语法长难句</td><td>5月到6月</td><td>田静视频。每天2到3个长难句。</td></tr>
-    <tr><td>阅读基础</td><td>5月到7月</td><td>每周2到3篇早年真题(2001-2009)。每篇精读。</td></tr>
-    <tr><td>阅读强化</td><td>8月到10月</td><td>2010-2022真题。限时15-18min每篇。</td></tr>
-    <tr><td>作文</td><td>11月到12月</td><td>背模板 + 仿写。大小作文各10篇。</td></tr>
+    <tr><td>单词</td><td>全年每天</td><td>墨墨80词，雷打不动</td></tr>
+    <tr><td>阅读基础</td><td>即日 - 7月</td><td>早年真题(2001-2009)精读，每周2-3篇</td></tr>
+    <tr><td>阅读强化</td><td>8月 - 10月</td><td>2010-2022真题，限时15-18min每篇</td></tr>
+    <tr><td>作文</td><td>11月 - 12月</td><td>背模板 + 仿写，大小作文各10篇</td></tr>
   </table>
 </div>
 
-<div class="subj pol">
-  <h3>🏛 政治</h3>
+<!-- 政治 -->
+<div class="card">
+  <h3 style="font-size:1.1em; margin-bottom:16px;">🏛 政治</h3>
   <table>
     <tr><th>阶段</th><th>时间</th><th>任务</th></tr>
-    <tr><td>背景渗透</td><td>5月到6月</td><td>每天15min徐涛音频，不背不记。</td></tr>
-    <tr><td>正式启动</td><td>7月到8月</td><td>徐涛强化班 + 肖秀荣精讲精练。每天1h。</td></tr>
-    <tr><td>选择刷题</td><td>9月到10月</td><td>肖1000刷2遍。</td></tr>
-    <tr class="hi"><td>🔴 冲刺</td><td>12月</td><td>肖四全背。每天2到3h。政治最关键的月。</td></tr>
+    <tr><td>背景渗透</td><td>即日 - 9月</td><td>每天15min徐涛音频，不背不记，磨耳朵</td></tr>
+    <tr><td>正式启动</td><td>最晚10月</td><td>徐涛强化班 + 肖秀荣精讲精练 + 1000题</td></tr>
+    <tr><td>选择刷题</td><td>10月 - 11月</td><td>肖1000刷2遍，利用琐碎时间</td></tr>
+    <tr><td>冲刺</td><td>12月</td><td>肖四全背，每天2-3h</td></tr>
   </table>
 </div>
 
-<div class="alloc">
-  <h3>⏱ 各阶段每日时间分配</h3>
+<!-- 每日时间分配 -->
+<div class="card">
+  <h3 style="font-size:1.1em; margin-bottom:16px;">⏱ 各阶段每日时间分配</h3>
   <table>
-    <tr><th>阶段</th><th>数学</th><th>408</th><th>英语</th><th>政治</th><th>合计</th></tr>
-    <tr class="now"><td>5到6月（当前）</td><td class="a-math">3.5h</td><td class="a-cs">3h</td><td class="a-eng">1.5h</td><td class="a-pol">15min</td><td><b>~8h</b></td></tr>
-    <tr><td>7到8月</td><td class="a-math">3h</td><td class="a-cs">2.5h</td><td class="a-eng">1.5h</td><td class="a-pol">1h</td><td><b>~8h</b></td></tr>
-    <tr><td>9到10月</td><td class="a-math">3h</td><td class="a-cs">2.5h</td><td class="a-eng">1.5h</td><td class="a-pol">1.5h</td><td><b>~8.5h</b></td></tr>
-    <tr><td>11月</td><td class="a-math">3h</td><td class="a-cs">2h</td><td class="a-eng">1.5h</td><td class="a-pol">2h</td><td><b>~8.5h</b></td></tr>
-    <tr class="hi"><td>12月</td><td class="a-math">2h</td><td class="a-cs">2h</td><td class="a-eng">1h</td><td class="a-pol"><b>3h</b></td><td><b>~8h</b></td></tr>
+    <tr><th>阶段</th><th style="color:var(--math);">数学</th><th style="color:var(--cs);">408</th><th style="color:var(--eng);">英语</th><th style="color:var(--pol);">政治</th><th>合计</th></tr>
+    <tr><td>7月（一轮冲刺）</td><td style="color:var(--math);font-weight:650;">3h</td><td style="color:var(--cs);font-weight:650;">3.5h</td><td style="color:var(--eng);">1h</td><td style="color:var(--pol);">15min</td><td><b>~7.5h</b></td></tr>
+    <tr><td>8月（一轮收官）</td><td style="color:var(--math);font-weight:650;">2.5h</td><td style="color:var(--cs);font-weight:650;">3h</td><td style="color:var(--eng);">1.5h</td><td style="color:var(--pol);">0.5h</td><td><b>~7.5h</b></td></tr>
+    <tr><td>9-10月（二轮强化）</td><td style="color:var(--math);font-weight:650;">3h</td><td style="color:var(--cs);font-weight:650;">2.5h</td><td style="color:var(--eng);">1.5h</td><td style="color:var(--pol);">1h</td><td><b>~8h</b></td></tr>
+    <tr><td>11月（真题）</td><td style="color:var(--math);font-weight:650;">3h</td><td style="color:var(--cs);">2h</td><td style="color:var(--eng);">1.5h</td><td style="color:var(--pol);font-weight:650;">2h</td><td><b>~8.5h</b></td></tr>
+    <tr><td>12月（冲刺）</td><td style="color:var(--math);">2h</td><td style="color:var(--cs);">2h</td><td style="color:var(--eng);">1h</td><td style="color:var(--pol);font-weight:650;">3h</td><td><b>~8h</b></td></tr>
   </table>
 </div>
 
 </main>
 
-
-
 <script>
-// Auto-updating countdown to exam day (Dec 26, 2026)
+// 8.15 倒计时
 (function(){
-  var exam = new Date(2026, 11, 20); // Dec 20, 2026
-  var el = document.getElementById('countdown-days');
+  var deadline = new Date(2026, 7, 15);
+  var el = document.getElementById('deadline-count');
   if (!el) return;
-  var today = new Date();
-  today.setHours(0,0,0,0);
-  var diff = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
+  var today = new Date(); today.setHours(0,0,0,0);
+  var diff = Math.ceil((deadline - today) / (1000*60*60*24));
   el.textContent = diff > 0 ? diff : 0;
+  if (diff <= 7) el.style.color = 'var(--red)';
 })();
 </script>
-
 
 <script>
 /* kaoyan-alpha: complete card coverage */
