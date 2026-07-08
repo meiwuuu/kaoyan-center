@@ -1216,7 +1216,7 @@ function updateGoal() {
   const m = now.getMonth() + 1;
   const d = now.getDate();
   
-  // 补救核心死线：8月15日
+  // 补救核心死线：8月15日（来源：考研408与数学追赶补救规划指南.docx）
   const deadline = new Date(2026, 7, 15);
   const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const daysToDead = Math.ceil((deadline - todayZero) / 86400000);
@@ -1232,11 +1232,11 @@ function updateGoal() {
 
   let goal = '';
   if (todayZero <= deadline) {
-    goal = '当前阶段：一轮"生死冲刺" · 计组/概率/OS/计网极速收官。<b>（原则：3分钟没思路直接看答案）</b>' + warning;
+    goal = '当前阶段：一轮"生死冲刺" · 减法策略 · 计组(7.25)→概率(8.1)→OS(8.10)→计网(8.15)。<b>（铁律：3分钟没思路直接看答案，少回头多轮次）</b>' + warning;
   } else if (m === 8 || m === 9 || m === 10) {
-    goal = '当前阶段：二轮强化与错题攻坚 · 放弃输入，全面转向刷真题分类卷。' + warning;
+    goal = '当前阶段：二轮强化与错题攻坚 · 刷真题分类卷（勿留到最后）· 英语8月开真题 · 最晚10月开政治1000题。' + warning;
   } else {
-    goal = '当前阶段：50天"10日循环"冲刺 · 限时实战与费曼错题清理。';
+    goal = '当前阶段：50天"10日循环"冲刺 · 模拟卷限时实战 · 费曼学习法消化错题 · 查漏补缺。';
   }
   
   document.getElementById('today-goal').innerHTML = goal;
