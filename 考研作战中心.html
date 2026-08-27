@@ -187,6 +187,12 @@
   .taborder-btn:hover { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
   .taborder-btn:disabled { opacity:.25; cursor:default; }
   .taborder-btn:disabled:hover { background:var(--bg-alt); color:var(--text2); border-color:var(--border); }
+  .taborder-btn.toggle-hidden { color:var(--text3); }
+  .taborder-btn.toggle-hidden:hover { background:var(--red); color:#fff; border-color:var(--red); }
+  .taborder-item.hidden-tab { opacity:0.55; }
+  .taborder-item.hidden-tab .to-label { text-decoration:line-through; }
+
+  nav a.nav-hidden { display:none !important; }
 
   /* ── 专注工具按钮 ── */
   .nav-focus-btn {
@@ -459,6 +465,32 @@
             <div class="chart-set-title">数据系列外观</div>
             <div id="chart-series-table"></div>
           </div>
+          <div class="chart-set-card">
+            <div class="chart-set-title">平均线</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:.8em;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="avg-visible" onchange="updateAvgField('visible', this.checked)">
+                <label for="avg-visible" style="color:var(--text2);">显示均值水平线（当前周/14天/月中已过去完整日的总时长均值）</label>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text3);width:60px;">颜色</span>
+                <input type="color" id="avg-color" value="#ef4444" onchange="updateAvgField('color', this.value)" style="width:40px;height:26px;border:none;background:none;cursor:pointer;">
+                <input type="text" id="avg-color-hex" value="#ef4444" onchange="updateAvgField('color', this.value)" style="width:90px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:.8em;">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text3);width:60px;">线型</span>
+                <select id="avg-dash" onchange="updateAvgField('dash', this.value)" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:.8em;background:transparent;">
+                  <option value="6,4">虚线</option>
+                  <option value="">实线</option>
+                  <option value="2,2">密点线</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text3);width:60px;">标签</span>
+                <input type="text" id="avg-label" value="均值" onchange="updateAvgField('label', this.value)" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:.8em;background:transparent;">
+              </div>
+            </div>
+          </div>
           <div style="margin-top:12px;display:flex;gap:8px;">
             <button class="btn btn-sm btn-primary" onclick="saveChartSettings()">💾 保存并应用</button>
             <button class="btn btn-sm btn-secondary" onclick="resetChartDefaults()">🔄 重置默认</button>
@@ -477,6 +509,14 @@
 <script>
 const tabs = ['schedule','plan','daily','weekly','courses','emergency','learnlog','trends'];
 function switchTab(name) {
+  // Skip hidden tabs
+  var hidden = getHiddenTabs();
+  if (hidden.indexOf(name) >= 0) {
+    var order = getTabOrder();
+    for (var i = 0; i < order.length; i++) {
+      if (hidden.indexOf(order[i]) < 0) { name = order[i]; break; }
+    }
+  }
   tabs.forEach(t => {
     document.getElementById('tab-'+t).classList.remove('active');
     document.getElementById('nav-'+t).classList.remove('active');
@@ -505,11 +545,12 @@ let currentMood = 'ok';
 
 (function(){
   const homepage = localStorage.getItem('kaoyan_homepage_tab');
-  if (homepage && tabs.includes(homepage)) {
+  const hidden = getHiddenTabs();
+  if (homepage && tabs.includes(homepage) && hidden.indexOf(homepage) < 0) {
     switchTab(homepage);
   } else {
     const saved = localStorage.getItem('kaoyan_active_tab');
-    if (saved && tabs.includes(saved)) switchTab(saved);
+    if (saved && tabs.includes(saved) && hidden.indexOf(saved) < 0) switchTab(saved);
   }
 })();
 
@@ -1260,11 +1301,12 @@ function updateEncouragement(streak, frozen) {
 
 (function(){
   const homepage = localStorage.getItem('kaoyan_homepage_tab');
-  if (homepage && tabs.includes(homepage)) {
+  const hidden = getHiddenTabs();
+  if (homepage && tabs.includes(homepage) && hidden.indexOf(homepage) < 0) {
     switchTab(homepage);
   } else {
     const activeTab = localStorage.getItem('kaoyan_active_tab');
-    if (activeTab && tabs.includes(activeTab)) {
+    if (activeTab && tabs.includes(activeTab) && hidden.indexOf(activeTab) < 0) {
       switchTab(activeTab);
     }
   }
@@ -1291,12 +1333,22 @@ function saveTabOrder(order) {
 
 function applyTabOrder(order) {
   if (!order) order = getTabOrder();
+  var hidden = getHiddenTabs();
   var nav = document.querySelector('nav');
   var main = document.querySelector('main');
-  // Find anchor points: spacer in nav, settings overlay in main
   var spacer = nav ? nav.querySelector('span[style*="flex:1"]') : null;
   var overlay = document.getElementById('settings-overlay');
-  // Reorder nav links: insert before spacer (so brand stays left, settings stays right)
+  
+  // Show/hide nav links and tab divs based on hidden list
+  DEFAULT_TAB_ORDER.forEach(function(id) {
+    var a = document.getElementById('nav-' + id);
+    var tab = document.getElementById('tab-' + id);
+    var isHidden = hidden.indexOf(id) >= 0;
+    if (a) { if (isHidden) a.classList.add('nav-hidden'); else a.classList.remove('nav-hidden'); }
+    if (tab) { if (isHidden) tab.style.display = 'none'; else tab.style.display = ''; }
+  });
+  
+  // Reorder visible nav links: insert before spacer (brand left, settings right)
   order.forEach(function(id) {
     var a = document.getElementById('nav-' + id);
     if (a && spacer) nav.insertBefore(a, spacer);
@@ -1312,16 +1364,34 @@ function applyTabOrder(order) {
   }
 }
 
+function getHiddenTabs() {
+  try { return JSON.parse(localStorage.getItem('kaoyan_hidden_tabs') || '[]'); }
+  catch(e) { return []; }
+}
+function saveHiddenTabs(arr) { localStorage.setItem('kaoyan_hidden_tabs', JSON.stringify(arr)); }
+
+function toggleTabVisibility(id) {
+  var hidden = getHiddenTabs();
+  var idx = hidden.indexOf(id);
+  if (idx >= 0) { hidden.splice(idx, 1); } else { hidden.push(id); }
+  saveHiddenTabs(hidden);
+  applyTabOrder();
+  renderTabOrderList();
+}
+
 function renderTabOrderList() {
   var order = getTabOrder();
+  var hidden = getHiddenTabs();
   var container = document.getElementById('tab-order-list');
   if (!container) return;
   var html = '';
   order.forEach(function(id, i) {
-    html += '<div class="taborder-item">';
+    var isHidden = hidden.indexOf(id) >= 0;
+    html += '<div class="taborder-item' + (isHidden ? ' hidden-tab' : '') + '">';
     html += '<span class="to-label">' + (TAB_NAMES[id] || id) + '</span>';
     html += '<button class="taborder-btn" onclick="moveTabUp('+i+')" ' + (i===0?'disabled':'') + '>↑</button>';
     html += '<button class="taborder-btn" onclick="moveTabDown('+i+')" ' + (i===order.length-1?'disabled':'') + '>↓</button>';
+    html += '<button class="taborder-btn' + (isHidden ? ' toggle-hidden' : '') + '" onclick="toggleTabVisibility(\''+id+'\')" title="' + (isHidden ? '显示' : '隐藏') + '">' + (isHidden ? '👁‍🗨' : '👁') + '</button>';
     html += '</div>';
   });
   container.innerHTML = html;
@@ -1358,7 +1428,7 @@ function resetTabOrder() {
 
 function toggleSettings(){var o=document.getElementById('settings-overlay');var show=o.style.display==='none'||!o.style.display;o.style.display=show?'flex':'none';if(show)loadSettings();}
 function switchSettingsTab(name){document.querySelectorAll('.set-panel-section').forEach(function(s){s.classList.remove('active');});document.querySelectorAll('.set-panel-nav button').forEach(function(b){b.classList.remove('active');});var sec=document.getElementById('ssec-'+name);var btn=document.querySelector('.set-panel-nav button[data-stab="'+name+'"]');if(sec)sec.classList.add('active');if(btn)btn.classList.add('active');}
-function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();var hp=localStorage.getItem('kaoyan_homepage_tab')||'';var sel=document.getElementById('homepage-tab-select');if(sel){var opts='<option value="">上次关闭的页面</option>';DEFAULT_TAB_ORDER.forEach(function(id){opts+='<option value="'+id+'"'+(hp===id?' selected':'')+'>'+TAB_NAMES[id]+'</option>';});sel.innerHTML=opts;}}
+function loadSettings(){var s=JSON.parse(localStorage.getItem('kaoyan_theme')||'{}');document.getElementById('bg-url').value=s.bg||'';document.getElementById('bg-blur').value=s.blur||0;document.getElementById('blur-val').textContent=(s.blur||0)+'px';document.getElementById('card-alpha').value=s.alpha||92;document.getElementById('bg-overlay').value=s.overlay!=null?s.overlay:35;document.getElementById('overlay-val').textContent=(s.overlay!=null?s.overlay:35)+'%';applySettings(s);renderTabOrderList();var hp=localStorage.getItem('kaoyan_homepage_tab')||'';var sel=document.getElementById('homepage-tab-select');if(sel){var opts='<option value="">上次关闭的页面</option>';var hidden=getHiddenTabs();DEFAULT_TAB_ORDER.forEach(function(id){if(hidden.indexOf(id)<0)opts+='<option value="'+id+'"'+(hp===id?' selected':'')+'>'+TAB_NAMES[id]+'</option>';});sel.innerHTML=opts;}}
 function applySettings(s){s=s||{};var r=document.documentElement;r.style.setProperty('--bg-image',s.bg?'url('+s.bg+')':'none');r.style.setProperty('--bg-blur',(s.blur||0)+'px');var a=(s.alpha||92)/100;r.style.setProperty('--card-alpha',a);
   r.style.setProperty('--bg-overlay',(s.overlay!=null?s.overlay:35)/100);
   r.style.setProperty('--body-bg',s.bg?'transparent':'var(--bg)');
@@ -1393,6 +1463,7 @@ function importAll(input){var file=input.files[0];if(!file)return;var reader=new
 
 // ═══════ Chart settings ═══════
 var CHART_DEFAULTS = {
+  avgLine: { visible: true, color: '#ef4444', dash: '6,4', label: '均值' },
   y: { modeMax: { week:null, '14d':null, month:null, year:null }, stepSize: null, precision: 'auto' },
   y1: { min: 0, max: 100, stepSize: 20 },
   y2: { min: null, max: null, stepSize: null, precision: 'auto' },
@@ -1470,6 +1541,20 @@ function renderSeriesTable() {
   document.getElementById('chart-series-table').innerHTML = html;
 }
 
+function updateAvgField(field, val) {
+  var cfg = loadChartConfig();
+  if (!cfg.avgLine) cfg.avgLine = { visible: true, color: '#ef4444', dash: '6,4', label: '均值' };
+  cfg.avgLine[field] = val;
+  if (field === 'color') {
+    var hexEl = document.getElementById('avg-color-hex');
+    if (hexEl && hexEl !== document.activeElement) hexEl.value = val;
+  }
+  localStorage.setItem('kaoyan_chart_config', JSON.stringify(cfg));
+  var trendsFrame = document.getElementById('iframe-trends');
+  if (trendsFrame && trendsFrame.contentWindow) {
+    try { trendsFrame.contentWindow.postMessage({type:'kaoyan-chart-config', config: cfg}, '*'); } catch(e) {}
+  }
+}
 function updateSeriesField(el) {
   var cfg = loadChartConfig();
   var k = el.dataset.sk, field = el.dataset.field, val;
@@ -1503,6 +1588,18 @@ function loadChartSettingsUI() {
   document.getElementById('cs-y2-max').value = cfg.y2.max || '';
   document.getElementById('cs-y2-step').value = cfg.y2.stepSize || '';
   document.getElementById('cs-y2-prec').value = cfg.y2.precision;
+  // Avg line
+  var al = cfg.avgLine || { visible: true, color: '#ef4444', dash: '6,4', label: '均值' };
+  var avgVis = document.getElementById('avg-visible');
+  if (avgVis) avgVis.checked = al.visible !== false;
+  var avgCol = document.getElementById('avg-color');
+  if (avgCol) avgCol.value = (al.color && al.color !== 'null') ? al.color : '#ef4444';
+  var avgHex = document.getElementById('avg-color-hex');
+  if (avgHex) avgHex.value = (al.color && al.color !== 'null') ? al.color : '#ef4444';
+  var avgDash = document.getElementById('avg-dash');
+  if (avgDash) avgDash.value = al.dash || '6,4';
+  var avgLbl = document.getElementById('avg-label');
+  if (avgLbl) avgLbl.value = al.label || '均值';
   // Series table
   renderSeriesTable();
 }

@@ -120,6 +120,7 @@ var chartInstance = null;
 
 // ── Chart config from parent settings ──
 var CHART_DEFAULTS = {
+  avgLine: { visible: true, color: '#ef4444', dash: '6,4', label: '均值' },
   y: { modeMax: { week:null, '14d':null, month:null, year:null }, stepSize: null, precision: 'auto' },
   y1: { min: 0, max: 100, stepSize: 20 },
   y2: { min: null, max: null, stepSize: null, precision: 'auto' },
@@ -344,6 +345,23 @@ function avgNonEmpty(arr) {
   var vals = arr.filter(function(v){ return v !== null; });
   if (vals.length === 0) return null;
   return parseFloat((vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(1));
+}
+
+// ── 平均线：当前显示范围内已过去完整日的总时长均值 ──
+function calcAvgLine(result, dates) {
+  if (!dates || !result || !result.datasets.total) return null;
+  var today = new Date();
+  var todayStr = fmtDate(today);
+  var vals = [];
+  for (var i = 0; i < dates.length; i++) {
+    if (dates[i] >= todayStr) continue; // 今天及未来不算（今天尚未完整过去）
+    var v = result.datasets.total[i];
+    if (v !== null && v !== undefined) vals.push(v);
+  }
+  if (vals.length === 0) return null;
+  var sum = 0;
+  for (var j = 0; j < vals.length; j++) sum += vals[j];
+  return parseFloat((sum / vals.length).toFixed(2));
 }
 
 // ── Aggregate ──
@@ -624,11 +642,48 @@ function renderChart() {
   var y2TickCb = getTickCallback(chartCfg.y2.precision);
   if (y2TickCb) y2Scale.ticks.callback = y2TickCb;
 
+  // ── 平均线绘制插件 ──
+  var avgVal = calcAvgLine(result, dates);
+  var avgCfg = chartCfg.avgLine || {};
+  var avgPlugin = {
+    id: 'avgLine',
+    afterDatasetsDraw: function(chart) {
+      if (!avgCfg.visible || avgVal === null || avgVal === undefined) return;
+      var yScale = chart.scales.y;
+      var xScale = chart.scales.x;
+      if (!yScale || !xScale) return;
+      var yPx = yScale.getPixelForValue(avgVal);
+      var left = xScale.left, right = xScale.right;
+      var ctx2 = chart.ctx;
+      var clr = (avgCfg.color && avgCfg.color !== 'null') ? avgCfg.color : '#ef4444';
+      var dash = parseDash(avgCfg.dash || '6,4');
+      ctx2.save();
+      ctx2.strokeStyle = clr;
+      ctx2.setLineDash(dash);
+      ctx2.lineWidth = 1.5;
+      ctx2.globalAlpha = 0.8;
+      ctx2.beginPath();
+      ctx2.moveTo(left, yPx);
+      ctx2.lineTo(right, yPx);
+      ctx2.stroke();
+      ctx2.setLineDash([]);
+      // 标签
+      var label = (avgCfg.label || '均值') + ' ' + avgVal + 'h';
+      ctx2.font = '11px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx2.fillStyle = clr;
+      ctx2.textAlign = 'right';
+      ctx2.textBaseline = 'bottom';
+      ctx2.fillText(label, right - 4, yPx - 3);
+      ctx2.restore();
+    }
+  };
+
   if (chartInstance) chartInstance.destroy();
   var ctx = document.getElementById('trendChart').getContext('2d');
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: { labels: result.labels, datasets: chartDatasets },
+    plugins: [avgPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
