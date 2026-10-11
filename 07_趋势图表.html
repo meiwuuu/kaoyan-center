@@ -367,6 +367,7 @@ function calcAvgLine(result, dates) {
 // ── Aggregate ──
 function aggregateDaily(logs, dates) {
   var ds = { total:[], math:[], cs:[], eng:[], pol:[], sport:[] };
+  var todayStr = fmtDate(new Date());
 
   dates.forEach(function(date) {
     var day = logs[date];
@@ -380,7 +381,12 @@ function aggregateDaily(logs, dates) {
         if (k === 'total') ds[k].push(parseFloat(((day.total_time||0)/3600).toFixed(2)));
         else ds[k].push(parseFloat((sum[k]/3600).toFixed(2)));
       });
+    } else if (date < todayStr) {
+      // 已经过去但没有记录的那天 = 学习 0：补 0 而不是留空，
+      // 0 处也会画点，曲线就能和两边连起来（不再断成多段）
+      SUBJ_KEYS.forEach(function(k) { ds[k].push(0); });
     } else {
+      // 今天/未来：还没结束，留空不画点
       SUBJ_KEYS.forEach(function(k) { ds[k].push(null); });
     }
   });
